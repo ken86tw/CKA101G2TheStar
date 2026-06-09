@@ -51,7 +51,7 @@ public class OrderService {
         //建立一個暫存明細集合
         List<OrderListVO> orderList = new ArrayList<>();
 
-        //算出 單個房型的住房期間費用 加到暫存明細中
+        //算出 單個房型的住房期間費用 加到暫存明細中.
         for (CreateRoomOrderDTO.RoomItem item : dto.getRooms()) {
 
             Integer roomTypeId = item.getRoomTypeId();
