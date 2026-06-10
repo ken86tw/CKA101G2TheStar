@@ -179,4 +179,12 @@ public class OrderService {
     }
 
 
+    @Transactional
+    public void completeOrder(Integer orderId) {
+
+        int row = orderRepository.finishOrder(orderId);
+        if (row == 0) {
+            throw new IllegalStateException("訂單無法完成 OrderId =" + orderId);
+        }
+    }
 }

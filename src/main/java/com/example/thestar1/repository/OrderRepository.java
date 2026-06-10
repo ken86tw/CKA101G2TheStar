@@ -30,4 +30,5 @@ public interface OrderRepository extends JpaRepository<OrderVO,Integer> {
     @Modifying
     @Query(value ="UPDATE ROOM_ORDER SET ORDER_STATUS = 2 WHERE ORDER_ID = :orderId AND ORDER_STATUS = 1" ,nativeQuery = true)
     int finishOrder(@Param("orderId") Integer orderId);
+
 }
