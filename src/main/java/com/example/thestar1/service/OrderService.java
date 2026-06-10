@@ -3,8 +3,10 @@ package com.example.thestar1.service;
 import com.example.thestar1.dto.CreateRoomOrderDTO;
 import com.example.thestar1.entity.OrderListVO;
 import com.example.thestar1.entity.OrderVO;
+import com.example.thestar1.entity.RefundListVO;
 import com.example.thestar1.entity.RoomTypeVO;
 import com.example.thestar1.repository.OrderRepository;
+import com.example.thestar1.repository.RefundListRepository;
 import com.example.thestar1.repository.RoomInventoryRepository;
 import com.example.thestar1.repository.RoomTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +26,15 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final RoomInventoryRepository roomInventoryRepository;
     private final RoomTypeRepository roomTypeRepository;
+    private final RefundListRepository refundListRepository;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, RoomInventoryRepository roomInventoryRepository, RoomTypeRepository roomTypeRepository) {
+    public OrderService(OrderRepository orderRepository, RoomInventoryRepository roomInventoryRepository
+            , RoomTypeRepository roomTypeRepository, RefundListRepository refundListRepository) {
         this.orderRepository = orderRepository;
         this.roomInventoryRepository = roomInventoryRepository;
         this.roomTypeRepository = roomTypeRepository;
+        this.refundListRepository = refundListRepository;
     }
 
     @Transactional
@@ -151,7 +156,7 @@ public class OrderService {
 
     @Scheduled(fixedDelay = 60000)
     @Transactional
-    public void cancelExpiredOrder() {
+    public void cleanExpiredOrder() {
         LocalDateTime time = LocalDateTime.now().minusMinutes(5);
 
         List<OrderVO> expiredOrdeList = orderRepository.findByOrderStatusAndCreatedTimeBefore((byte) 0, time);
@@ -178,7 +183,6 @@ public class OrderService {
         }
     }
 
-
     @Transactional
     public void completeOrder(Integer orderId) {
 
@@ -186,5 +190,33 @@ public class OrderService {
         if (row == 0) {
             throw new IllegalStateException("訂單無法完成 OrderId =" + orderId);
         }
+    }
+
+    @Transactional
+    public void cancelOrder(Integer orderId, String reason) {
+        int row = orderRepository.customerCancelOrder(orderId);
+        if (row == 0) {
+            throw new IllegalArgumentException("訂單狀態非以付款,不能取消");
+        }
+        OrderVO vo = orderRepository.findById(orderId).orElseThrow();
+        LocalDate checkInDate = vo.getCheckInDate();
+        LocalDate checkOutDate = vo.getCheckOutDate();
+        long nights = checkOutDate.toEpochDay() - checkInDate.toEpochDay();
+
+        List<OrderListVO> orderList = vo.getOrderList();
+        for (OrderListVO list : orderList) {
+            Integer roomTypeId = list.getRoomTypeId();
+            int qty = list.getQuantity();
+            for (int i = 0; i < nights; i++) {
+                LocalDate date = checkInDate.plusDays(i);
+                roomInventoryRepository.releaseRoom(date, roomTypeId, qty);
+            }
+        }
+        RefundListVO refund = new RefundListVO();
+        refund.setAmount(vo.getPaidAmount());
+        refund.setRefundStatus((byte)0);
+        refund.setReason(reason);
+        refund.setOrdervo(vo);
+        refundListRepository.save(refund);
     }
 }

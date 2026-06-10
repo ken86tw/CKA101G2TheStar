@@ -57,6 +57,7 @@ public class OrderVO {
     @CreationTimestamp
     @Column(name = "CREATED_TIME")
     private LocalDateTime createdTime;
+
     @UpdateTimestamp
     @Column(name = "UPDATED_TIME")
     private LocalDateTime updatedTime;

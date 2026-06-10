@@ -3,6 +3,7 @@ package com.example.thestar1;
 import com.example.thestar1.dto.CreateRoomOrderDTO;
 import com.example.thestar1.entity.OrderVO;
 import com.example.thestar1.repository.OrderRepository;
+import com.example.thestar1.repository.RefundListRepository;
 import com.example.thestar1.service.OrderService;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -11,55 +12,49 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @Transactional
-public class CancelExpiredTest {
+public class CancelOrderTest {
 
     @Autowired
     private OrderService orderService;
     @Autowired
     private OrderRepository orderRepository;
     @Autowired
-    private EntityManager entityManager;   // 改時間 + 清快取要用
+    private RefundListRepository refundListRepository;
+    @Autowired
+    private EntityManager entityManager;
 
     @Test
-    void canceled() {
-        // 1. 建一筆 PENDING 訂單
+    void 主動取消已付款訂單_應該取消並建退款記錄() {
+        // 1. 建單(PENDING)
         CreateRoomOrderDTO dto = new CreateRoomOrderDTO();
         dto.setCheckInDate(LocalDate.of(2026, 8, 1));
         dto.setCheckOutDate(LocalDate.of(2026, 8, 3));
-        CreateRoomOrderDTO.RoomItem room = new CreateRoomOrderDTO.RoomItem();
-        room.setRoomTypeId(1);
-        room.setQty(1);
-        dto.setRooms(List.of(room));
+        CreateRoomOrderDTO.RoomItem item = new CreateRoomOrderDTO.RoomItem();
+        item.setRoomTypeId(1);
+        item.setQty(1);
+        dto.setRooms(List.of(item));
 
         OrderVO created = orderService.createOrder(1, dto);
         Integer orderId = created.getOrderId();
+        String mtn = created.getMerchantTradeNo();
+        Integer total = created.getTotalAmount();
 
-        // 2. 把 CREATED_TIME 改成 6 分鐘前（騙過逾時判斷）
-        entityManager.createNativeQuery(
-                        "UPDATE ROOM_ORDER SET CREATED_TIME = ? WHERE ORDER_ID = ?")
-                .setParameter(1, LocalDateTime.now().minusMinutes(6))
-                .setParameter(2, orderId)
-                .executeUpdate();
+        // 2. 付款(PENDING → CONFIRMED)
+        orderService.confirmOrder(mtn, total, (byte) 0, "ECPAY123");
 
+        // 3. 主動取消
+        orderService.cancelOrder(orderId, "測試取消");
 
-        // 3. 清快取（ native SQL 改了時間，JPA 快取裡是舊的）
+        // 4. 清快取後驗證
         entityManager.clear();
 
-        // 4. 執行逾時取消
-        orderService.cleanExpiredOrder();
-
-        // 5. 清快取後重新查（cancelExpiredOrder 也是 native UPDATE，快取要清）
-        entityManager.clear();
-
-        // 6. 驗證：狀態應該變成 3（CANCELED）
         OrderVO after = orderRepository.findById(orderId).orElseThrow();
-        assertEquals((byte) 3, after.getOrderStatus());
+        assertEquals((byte) 3, after.getOrderStatus());   // 訂單變 CANCELED
     }
 }
