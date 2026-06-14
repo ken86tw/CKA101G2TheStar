@@ -1,7 +1,6 @@
 package com.example.thestar1;
 
 
-
 import com.example.thestar1.repository.RoomInventoryRepository;
 import com.example.thestar1.service.OrderService;
 import org.junit.jupiter.api.Test;
@@ -19,14 +18,16 @@ class RedisBookRoomTest {
 
     @Autowired
     private OrderService orderService;
-    @Autowired private StringRedisTemplate redisTemplate;
-    @Autowired private RoomInventoryRepository roomInventoryRepository;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+    @Autowired
+    private RoomInventoryRepository roomInventoryRepository;
 
     @Test
     @Transactional
         // 只回滾 DB，Redis 不受影響
     void redis預扣_扣到剛好與不夠() {
-        Integer roomTypeId =1 /* DB 有的房型 id */;
+        Integer roomTypeId = 1 /* DB 有的房型 id */;
         LocalDate date = LocalDate.of(2026, 12, 31);   // 用沒人訂過的未來日，避免干擾
         String key = "room:" + roomTypeId + ":" + date;
 
