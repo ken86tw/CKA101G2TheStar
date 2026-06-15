@@ -27,15 +27,18 @@ public class OrderService {
     private final RoomInventoryRepository roomInventoryRepository;
     private final RoomTypeRepository roomTypeRepository;
     private final RefundListRepository refundListRepository;
+    private final RedisRoomStock redisRoomStock;
 
 
     @Autowired
     public OrderService(OrderRepository orderRepository, RoomInventoryRepository roomInventoryRepository
-            , RoomTypeRepository roomTypeRepository, RefundListRepository refundListRepository) {
+            , RoomTypeRepository roomTypeRepository, RefundListRepository refundListRepository
+            , RedisRoomStock redisRoomStock) {
         this.orderRepository = orderRepository;
         this.roomInventoryRepository = roomInventoryRepository;
         this.roomTypeRepository = roomTypeRepository;
         this.refundListRepository = refundListRepository;
+        this.redisRoomStock = redisRoomStock;
     }
 
     @Transactional
@@ -98,37 +101,61 @@ public class OrderService {
         dailyBookings.sort(Comparator.comparing((DailyBooking d) -> d.roomTypeId)
                 .thenComparing((DailyBooking d) -> d.date));
 
-        //使用dailyBookings將存好的每日訂房資料一筆一筆扣進庫存 回傳0交易失敗回滾
+        //建立一個redis操作過明細的集合
+        List<DailyBooking> redisBooked = new ArrayList<>();
 
+        //先讓redis操作庫存
         for (DailyBooking d : dailyBookings) {
 
-            roomInventoryRepository.initInventory(d.date, d.roomTypeId);
-            int row = roomInventoryRepository.bookRooms(d.date, d.roomTypeId, d.qty);
-            if (row == 0) {
+            redisRoomStock.initRedisRoom(d.roomTypeId, d.date);
+
+            if (!redisRoomStock.bookRedisRoom(d.roomTypeId, d.date, d.qty)) {
+
+                for (DailyBooking b : redisBooked) {
+                    redisRoomStock.releaseRoom(b.roomTypeId, b.date, b.qty);
+                }
                 throw new IllegalStateException("房型" + d.roomTypeId +
                         "於" + d.date + "庫存不足，無法完成訂房");
             }
-        }
-        //訂房資料存進去後建立訂單
-        OrderVO ordervo = new OrderVO();
-        ordervo.setMemberId(memberId);
-        ordervo.setCouponId(dto.getCouponId());
-        ordervo.setOrderStatus((byte) 0);
-        ordervo.setCheckInDate(checkInDate);
-        ordervo.setCheckOutDate(checkOutDate);
-        ordervo.setTotalAmount(totalAmount);
-        ordervo.setDiscountAmount(0);
-        ordervo.setPaidAmount(0);
-        ordervo.setMerchantTradeNo(generateMerchantTradeNo());
-
-        //將此訂單依房型暫存明細一筆筆存入orderListVO
-        for (OrderListVO listVO : orderList) {
-            ordervo.addOrderList(listVO);
+            redisBooked.add(d);
         }
 
-        return orderRepository.save(ordervo);
+        try {
+            //使用dailyBookings將存好的每日訂房資料一筆一筆扣進庫存 回傳0交易失敗回滾
+            for (DailyBooking d : dailyBookings) {
+                roomInventoryRepository.initInventory(d.date, d.roomTypeId);
+                int row = roomInventoryRepository.bookRooms(d.date, d.roomTypeId, d.qty);
+                if (row == 0) {
+                    throw new IllegalStateException("房型" + d.roomTypeId +
+                            "於" + d.date + "庫存不足，無法完成訂房");
+                }
+            }
+            //訂房資料存進去後建立訂單
+            OrderVO ordervo = new OrderVO();
+            ordervo.setMemberId(memberId);
+            ordervo.setCouponId(dto.getCouponId());
+            ordervo.setOrderStatus((byte) 0);
+            ordervo.setCheckInDate(checkInDate);
+            ordervo.setCheckOutDate(checkOutDate);
+            ordervo.setTotalAmount(totalAmount);
+            ordervo.setDiscountAmount(0);
+            ordervo.setPaidAmount(0);
+            ordervo.setMerchantTradeNo(generateMerchantTradeNo());
 
+            //將此訂單依房型暫存明細一筆筆存入orderListVO
+            for (OrderListVO listVO : orderList) {
+                ordervo.addOrderList(listVO);
+            }
 
+            return orderRepository.save(ordervo);
+
+        } catch (RuntimeException e) {
+            //交易失敗要手動回滾redis
+            for (DailyBooking d : redisBooked) {
+                redisRoomStock.releaseRoom(d.roomTypeId, d.date, d.qty);
+            }
+            throw e;
+        }
     }
 
     //建立此訂單金流編號
@@ -184,7 +211,7 @@ public class OrderService {
                 for (int i = 0; i < nights; i++) {
                     LocalDate date = checkInDate.plusDays(i);
                     roomInventoryRepository.releaseRoom(date, roomTypeId, qty);
-
+                    redisRoomStock.releaseRoom(roomTypeId, date, qty);
                 }
             }
         }
@@ -217,6 +244,7 @@ public class OrderService {
             for (int i = 0; i < nights; i++) {
                 LocalDate date = checkInDate.plusDays(i);
                 roomInventoryRepository.releaseRoom(date, roomTypeId, qty);
+                redisRoomStock.releaseRoom(roomTypeId, date, qty);
             }
         }
         RefundListVO refund = new RefundListVO();

@@ -39,4 +39,12 @@ public class RedisRoomStock {
         }
         return true;
     }
+
+    // 歸還庫存  已消失就不硬建，留給下次 initRedisRoom 從DB重建
+    public void releaseRoom(Integer roomTypeId, LocalDate date, int qty) {
+        String key = roomKey(roomTypeId, date);
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
+            redisTemplate.opsForValue().increment(key, qty);
+        }
+    }
 }
