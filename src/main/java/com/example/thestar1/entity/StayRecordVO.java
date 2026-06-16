@@ -2,6 +2,7 @@ package com.example.thestar1.entity;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.Column;
@@ -41,7 +42,8 @@ public class StayRecordVO {
 	
 	@Column(name= "CHECK_OUT_TIME")
 	private LocalDateTime checkOutTime;
-	
+
+	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ORDER_LIST_ID")
 	private OrderListVO orderListvo;

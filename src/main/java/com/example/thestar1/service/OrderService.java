@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
@@ -228,7 +229,12 @@ public class OrderService {
     }
 
     @Transactional
-    public void cancelOrder(Integer orderId, String reason) {
+    public void cancelOrder(Integer memberId, Integer orderId, String reason) {
+
+        if (!Objects.equals(memberId, orderRepository.findById(orderId).orElseThrow().getMemberId())) {
+            throw new IllegalArgumentException("無法修改其他會員訂單");
+        }
+
         int row = orderRepository.customerCancelOrder(orderId);
         if (row == 0) {
             throw new IllegalArgumentException("訂單狀態非以付款,不能取消");

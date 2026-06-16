@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class OrderQueryService {
@@ -31,6 +32,7 @@ public class OrderQueryService {
         this.roomTypeRepository = roomTypeRepository;
     }
 
+    //會員查詢依訂單狀態分類
     public Page<OrderVO> findMemberOrder(Integer memberId, Byte orderStaus, int page, int size) {
 
         Pageable pageable = PageRequest.of(
@@ -41,6 +43,8 @@ public class OrderQueryService {
 
     }
 
+
+    //查詢訂單明細
     @Transactional(readOnly = true)
     public List<OrderDetailDTO> findOrderDetail(Integer orderId) {
 
@@ -62,14 +66,23 @@ public class OrderQueryService {
         return dtoList;
     }
 
+    //會員查詢自己的訂單
     @Transactional(readOnly = true)
-    public List<OrderDetailDTO> getMemberOrderDetail(Integer memberId, Integer orderId){
+    public List<OrderDetailDTO> getMemberOrderDetail(Integer memberId, Integer orderId) {
 
-        if(!orderRepository.existsByMemberIdAndOrderId(memberId,orderId)){
+        if (!orderRepository.existsByMemberIdAndOrderId(memberId, orderId)) {
             throw new IllegalArgumentException("非本人訂單");
         }
 
         return findOrderDetail(orderId);
+    }
+
+    //後台查詢訂單用
+    public Page<OrderVO> findAllOrders(Byte orderStatus, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdTime"));
+
+        return orderRepository.findByOrderStatus(orderStatus, pageable);
     }
 
 }

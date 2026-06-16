@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -62,6 +63,7 @@ public class OrderVO {
     @Column(name = "UPDATED_TIME")
     private LocalDateTime updatedTime;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "ordervo", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<OrderListVO> orderList = new ArrayList<>();
 

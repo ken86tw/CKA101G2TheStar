@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class DevLoginController {
+public class FakeLoginController {
 
     @GetMapping("/dev/login/{memberId}")
     public String fakeLogin(@PathVariable Integer memberId, HttpSession session) {
@@ -19,7 +19,7 @@ public class DevLoginController {
 
     @GetMapping("/dev/employeelogin/{employeeId}")
     public  String fakeEmployeeLogin(@PathVariable Integer employeeId, HttpSession session){
-        session.setAttribute("loginemployee", employeeId);
+        session.setAttribute("loginEmployee", employeeId);
         return"fake employee login OK employeeId = " + employeeId;
     }
 

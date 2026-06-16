@@ -8,13 +8,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class DevOrderConfirm {
+public class FakeOrderConfirm {
 
     private final OrderService orderService;
     private final OrderRepository orderRepository;
 
 
-    public DevOrderConfirm(OrderService orderService, OrderRepository orderRepository) {
+    public FakeOrderConfirm(OrderService orderService, OrderRepository orderRepository) {
         this.orderService = orderService;
         this.orderRepository = orderRepository;
     }

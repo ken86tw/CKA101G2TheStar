@@ -49,7 +49,7 @@ public class CancelOrderTest {
         orderService.confirmOrder(mtn, total, (byte) 0, "ECPAY123");
 
         // 3. 主動取消
-        orderService.cancelOrder(orderId, "測試取消");
+        orderService.cancelOrder(1,orderId, "測試取消");
 
         // 4. 清快取後驗證
         entityManager.clear();
