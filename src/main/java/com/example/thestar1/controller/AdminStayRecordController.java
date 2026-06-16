@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/thestar/stayrecord")
+@RequestMapping("/thestar/admin/stayrecord")
 public class AdminStayRecordController {
 
     private final StayRecordService stayRecordService;

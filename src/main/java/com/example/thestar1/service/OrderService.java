@@ -229,6 +229,7 @@ public class OrderService {
     }
 
     @Transactional
+
     public void cancelOrder(Integer memberId, Integer orderId, String reason) {
 
         if (!Objects.equals(memberId, orderRepository.findById(orderId).orElseThrow().getMemberId())) {

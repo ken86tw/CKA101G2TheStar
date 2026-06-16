@@ -43,8 +43,28 @@ public class OrderQueryService {
 
     }
 
+    //會員查詢自己的訂單明細
+    @Transactional(readOnly = true)
+    public List<OrderDetailDTO> findMemberOrderDetail(Integer memberId, Integer orderId) {
 
-    //查詢訂單明細
+        if (!orderRepository.existsByMemberIdAndOrderId(memberId, orderId)) {
+            throw new IllegalArgumentException("非本人訂單");
+        }
+
+        return findOrderDetail(orderId);
+    }
+
+
+    //後台查詢訂單用
+    public Page<OrderVO> findAllOrders(Byte orderStatus, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdTime"));
+
+        return orderRepository.findByOrderStatus(orderStatus, pageable);
+    }
+
+
+    //後台查詢訂單明細
     @Transactional(readOnly = true)
     public List<OrderDetailDTO> findOrderDetail(Integer orderId) {
 
@@ -66,23 +86,8 @@ public class OrderQueryService {
         return dtoList;
     }
 
-    //會員查詢自己的訂單
-    @Transactional(readOnly = true)
-    public List<OrderDetailDTO> getMemberOrderDetail(Integer memberId, Integer orderId) {
 
-        if (!orderRepository.existsByMemberIdAndOrderId(memberId, orderId)) {
-            throw new IllegalArgumentException("非本人訂單");
-        }
 
-        return findOrderDetail(orderId);
-    }
 
-    //後台查詢訂單用
-    public Page<OrderVO> findAllOrders(Byte orderStatus, int page, int size) {
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdTime"));
-
-        return orderRepository.findByOrderStatus(orderStatus, pageable);
-    }
 
 }

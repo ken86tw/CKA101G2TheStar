@@ -8,11 +8,14 @@ import com.example.thestar1.entity.OrderVO;
 import com.example.thestar1.service.OrderQueryService;
 import com.example.thestar1.service.OrderService;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.boot.web.server.servlet.Session;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/thestar/order")
@@ -53,6 +56,35 @@ public class OrderController {
         orderService.cancelOrder(memberId, orderId, reason);
 
         return ResponseEntity.ok("訂單" + orderId + "取消訂單成功");
+    }
+
+    @GetMapping("/member/orders")
+    public ResponseEntity<Page<OrderVO>> memberFindOrder(@RequestParam Byte orderStatus,
+                                                         @RequestParam(defaultValue = "0") int page,
+                                                         @RequestParam(defaultValue = "10") int size,
+                                                         HttpSession session) {
+
+        MemberVO member = (MemberVO) session.getAttribute("loginMember");
+
+        if (member == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Integer memberId = member.getMemberId();
+
+        return ResponseEntity.ok(orderQueryService.findMemberOrder(memberId, orderStatus, page, size));
+    }
+
+    @GetMapping("/member/orders/{orderId}")
+    public ResponseEntity<List<OrderDetailDTO>> memberFindOrderList(@PathVariable Integer orderId,
+                                                                    HttpSession session) {
+        MemberVO member = (MemberVO) session.getAttribute("loginMember");
+        if (member == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Integer memberId = member.getMemberId();
+
+        return ResponseEntity.ok(orderQueryService.findMemberOrderDetail(memberId,orderId));
     }
 
 }
