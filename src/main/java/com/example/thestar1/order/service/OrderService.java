@@ -70,7 +70,7 @@ public class OrderService {
 
             Integer roomTypeId = item.getRoomTypeId();
             int qty = item.getQty();
-            if (qty < 0) {
+            if (qty <= 0) {
                 throw new IllegalArgumentException("錯誤數量，房型數量必須大於零");
             }
 
@@ -249,7 +249,7 @@ public class OrderService {
 
         int row = orderRepository.customerCancelOrder(orderId);
         if (row == 0) {
-            throw new IllegalArgumentException("訂單狀態非以付款,不能取消");
+            throw new IllegalArgumentException("訂單狀態非已付款,不能取消");
         }
         OrderVO vo = orderRepository.findById(orderId).orElseThrow();
         LocalDate checkInDate = vo.getCheckInDate();

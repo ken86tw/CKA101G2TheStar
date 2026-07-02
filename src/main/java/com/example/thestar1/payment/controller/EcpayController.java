@@ -79,7 +79,7 @@ public class EcpayController {
 
         //從綠界回傳的參數裡拿出 訂單編號 實付金額 綠界交易編號
         String merchantTradeNo = params.get("MerchantTradeNo");
-        Integer paidAmount = Integer.valueOf(params.get("TradeA mt"));
+        Integer paidAmount = Integer.valueOf(params.get("TradeAmt"));
         String ecpayTradeNo = params.get("TradeNo");
 
         //改訂單狀態為已付款 這裡的(byte)1代表付款方式是信用卡
