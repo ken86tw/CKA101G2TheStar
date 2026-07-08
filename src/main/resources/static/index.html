@@ -899,8 +899,14 @@
                     <p>選擇日期與房型，為您保留專屬客房</p></div>
                 <div v-if="confirmOrder" class="panel" style="max-width: 760px;margin:0 auto;text-align: center"><h3
                         style="font-size: 28px">預定完成</h3>
-                    <p class="oid" style="margin-top: 14px">No. {{confirmOrder.orderId}}</p>
+                    <p class="oid" style="margin-top: 14px">訂單編號 No. {{confirmOrder.orderId}}</p>
                     <p>{{confirmOrder.checkInDate}} 入住 - {{confirmOrder.checkOutDate}} 退房</p>
+                    <table style="margin-top:20px;text-align:left">
+                        <thead><tr><th>房型</th><th>每晚</th><th>數量</th><th>小計</th></tr></thead>
+                        <tbody><tr v-for="(d,k) in confirmDetail" :key="k">
+                            <td>{{ d.roomTypeName }}</td><td>${{ d.roomPrice.toLocaleString() }}</td>
+                            <td>×{{ d.QTY }}</td><td class="money">${{ d.subtotal.toLocaleString() }}</td></tr></tbody>
+                    </table>
                     <p class="money" style="font-size:24px">應付
                         ${{(confirmOrder.totalAmount - confirmOrder.discountAmount).toLocaleString()}}</p>
                     <div style="margin-top: 26px">
@@ -1321,6 +1327,7 @@
                 member: {id: 1, on: null}, employee: {id: 1, on: null},
                 form: {checkInDate: d(1), checkOutDate: d(2), couponId: null, rooms: [{roomTypeId: null, qty: 1}]},
                 confirmOrder: null,
+                confirmDetail: [],
                 orders: {status: 0, page: 0, size: 10, list: [], totalPages: 0, counts: {}, open: {}, detail: {}},
                 admin: {status: 0, page: 0, size: 10, list: [], totalPages: 0, counts: {}, open: {}, detail: {}},
                 stay: {
@@ -1441,6 +1448,11 @@
                     });
                     this.log('✔ 下單', r);
                     this.confirmOrder = r;
+                    try {
+                        this.confirmDetail = await this.api(`/thestar/order/member/order/detail/${r.orderId}`);
+                    } catch {
+                        this.confirmDetail = [];
+                    }
                 } catch (e) {
                     this.toast('err', '預訂失敗', this.errMsg(e));
                 }
