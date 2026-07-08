@@ -17,10 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
@@ -66,9 +63,13 @@ public class OrderService {
 
         //算出 單個房型的住房期間費用 加到暫存明細中.
         //在最後建立訂單時在將全部的暫存明細放進訂單vo的維持關聯
+        Set<Integer> set = new HashSet<>();
         for (CreateRoomOrderDTO.RoomItem item : dto.getRooms()) {
 
             Integer roomTypeId = item.getRoomTypeId();
+            if(!set.add(roomTypeId)){
+                throw new IllegalArgumentException("同一房型不可重複選擇，請調整數量。");
+            }
             int qty = item.getQty();
             if (qty <= 0) {
                 throw new IllegalArgumentException("錯誤數量，房型數量必須大於零");
@@ -204,7 +205,7 @@ public class OrderService {
     @Scheduled(fixedDelay = 20000)
     @Transactional
     public void cleanExpiredOrder() {
-        LocalDateTime time = LocalDateTime.now().minusSeconds(100);
+        LocalDateTime time = LocalDateTime.now().minusSeconds(180);
 
         List<OrderVO> expiredOrdeList = orderRepository.findByOrderStatusAndCreatedTimeBefore((byte) 0, time);
 
@@ -249,7 +250,7 @@ public class OrderService {
 
         int row = orderRepository.customerCancelOrder(orderId);
         if (row == 0) {
-            throw new IllegalArgumentException("訂單狀態非已付款,不能取消");
+            throw new IllegalArgumentException("訂單狀態目前不能取消");
         }
         OrderVO vo = orderRepository.findById(orderId).orElseThrow();
         LocalDate checkInDate = vo.getCheckInDate();
