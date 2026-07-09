@@ -204,7 +204,7 @@ public class OrderService {
     @Scheduled(fixedDelay = 20000)
     @Transactional
     public void cleanExpiredOrder() {
-        LocalDateTime time = LocalDateTime.now().minusSeconds(100);
+        LocalDateTime time = LocalDateTime.now().minusSeconds(180);
 
         List<OrderVO> expiredOrdeList = orderRepository.findByOrderStatusAndCreatedTimeBefore((byte) 0, time);
 
