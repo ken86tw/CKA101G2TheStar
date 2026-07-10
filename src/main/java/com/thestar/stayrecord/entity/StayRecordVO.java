@@ -1,4 +1,5 @@
 package com.thestar.stayrecord.entity;
+
 import com.thestar.order.entity.OrderListVO;
 
 import java.time.LocalDateTime;
@@ -11,118 +12,115 @@ import org.hibernate.annotations.CreationTimestamp;
 @Table(name = "STAY_RECORD")
 public class StayRecordVO {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY )
-	@Column(name = "STAY_ID",updatable = false)
-	private Integer stayId;
-	
-	@Column(name = "ROOM_ID")
-	private Integer roomId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "STAY_ID", updatable = false)
+    private Integer stayId;
 
-	@Column(name = "STAY_CUSTOMER")
-	private String stayCustomer;
+    @Column(name = "ROOM_ID")
+    private Integer roomId;
 
-	@JsonIgnore
-	@Lob
-	@Column(name = "STAY_CUSTOMER_PHOTO")
-	private byte[] stayCustomerPhoto;
+    @Column(name = "STAY_CUSTOMER")
+    private String stayCustomer;
 
-	@Column(name = "CHECK_IN_EMPLOYEE_ID")
-	private Integer checkInEmployeeId;
-	
-	@Column(name = "CHECK_OUT_EMPLOYEE_ID")
-	private Integer checkOutEmployeeId;
-	
-	@CreationTimestamp
-	@Column(name= "CHECK_IN_TIME")
-	private LocalDateTime checkInTime;
-	
-	@Column(name= "CHECK_OUT_TIME")
-	private LocalDateTime checkOutTime;
+    @JsonIgnore
+    @Lob
+    @Column(name = "STAY_CUSTOMER_PHOTO", columnDefinition = "LONGBLOB")
+    private byte[] stayCustomerPhoto;
 
-	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "ORDER_LIST_ID")
-	private OrderListVO orderListvo;
+    @Column(name = "CHECK_IN_EMPLOYEE_ID")
+    private Integer checkInEmployeeId;
 
-	public StayRecordVO() {
-		super();
-	}
+    @Column(name = "CHECK_OUT_EMPLOYEE_ID")
+    private Integer checkOutEmployeeId;
 
-	public Integer getStayId() {
-		return stayId;
-	}
+    @CreationTimestamp
+    @Column(name = "CHECK_IN_TIME")
+    private LocalDateTime checkInTime;
 
-	public void setStayId(Integer stayId) {
-		this.stayId = stayId;
-	}
+    @Column(name = "CHECK_OUT_TIME")
+    private LocalDateTime checkOutTime;
 
-	public Integer getRoomId() {
-		return roomId;
-	}
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ORDER_LIST_ID")
+    private OrderListVO orderListvo;
 
-	public void setRoomId(Integer roomId) {
-		this.roomId = roomId;
-	}
+    public StayRecordVO() {
+        super();
+    }
 
-	public Integer getCheckInEmployeeId() {
-		return checkInEmployeeId;
-	}
+    public Integer getStayId() {
+        return stayId;
+    }
 
-	public void setCheckInEmployeeId(Integer checkInEmployeeId) {
-		this.checkInEmployeeId = checkInEmployeeId;
-	}
+    public void setStayId(Integer stayId) {
+        this.stayId = stayId;
+    }
 
-	public Integer getCheckOutEmployeeId() {
-		return checkOutEmployeeId;
-	}
+    public Integer getRoomId() {
+        return roomId;
+    }
 
-	public void setCheckOutEmployeeId(Integer checkOutEmployeeId) {
-		this.checkOutEmployeeId = checkOutEmployeeId;
-	}
+    public void setRoomId(Integer roomId) {
+        this.roomId = roomId;
+    }
 
-	public LocalDateTime getCheckInTime() {
-		return checkInTime;
-	}
+    public Integer getCheckInEmployeeId() {
+        return checkInEmployeeId;
+    }
 
-	public void setCheckInTime(LocalDateTime checkInTime) {
-		this.checkInTime = checkInTime;
-	}
+    public void setCheckInEmployeeId(Integer checkInEmployeeId) {
+        this.checkInEmployeeId = checkInEmployeeId;
+    }
 
-	public LocalDateTime getCheckOutTime() {
-		return checkOutTime;
-	}
+    public Integer getCheckOutEmployeeId() {
+        return checkOutEmployeeId;
+    }
 
-	public void setCheckOutTime(LocalDateTime checkOutTime) {
-		this.checkOutTime = checkOutTime;
-	}
+    public void setCheckOutEmployeeId(Integer checkOutEmployeeId) {
+        this.checkOutEmployeeId = checkOutEmployeeId;
+    }
 
-	public OrderListVO getOrderListvo() {
-		return orderListvo;
-	}
+    public LocalDateTime getCheckInTime() {
+        return checkInTime;
+    }
 
-	public void setOrderListvo(OrderListVO orderListvo) {
-		this.orderListvo = orderListvo;
-	}
+    public void setCheckInTime(LocalDateTime checkInTime) {
+        this.checkInTime = checkInTime;
+    }
 
-	public String getStayCustomer() {
-		return stayCustomer;
-	}
+    public LocalDateTime getCheckOutTime() {
+        return checkOutTime;
+    }
 
-	public void setStayCustomer(String stayCustomer) {
-		this.stayCustomer = stayCustomer;
-	}
+    public void setCheckOutTime(LocalDateTime checkOutTime) {
+        this.checkOutTime = checkOutTime;
+    }
 
-	public byte[] getStayCustomerPhoto() {
-		return stayCustomerPhoto;
-	}
+    public OrderListVO getOrderListvo() {
+        return orderListvo;
+    }
 
-	public void setStayCustomerPhoto(byte[] stayCustomerPhoto) {
-		this.stayCustomerPhoto = stayCustomerPhoto;
-	}
+    public void setOrderListvo(OrderListVO orderListvo) {
+        this.orderListvo = orderListvo;
+    }
 
+    public String getStayCustomer() {
+        return stayCustomer;
+    }
 
+    public void setStayCustomer(String stayCustomer) {
+        this.stayCustomer = stayCustomer;
+    }
 
+    public byte[] getStayCustomerPhoto() {
+        return stayCustomerPhoto;
+    }
+
+    public void setStayCustomerPhoto(byte[] stayCustomerPhoto) {
+        this.stayCustomerPhoto = stayCustomerPhoto;
+    }
 
 
 }
