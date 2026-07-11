@@ -45,6 +45,8 @@ public class AdminStayRecordController {
         } catch (IOException e) {
             throw new IllegalStateException("照片錯誤");
         }
+        //廣播要放在service之後 交易commit完才通知 其他員工的房間格子即時變紅
+        simpMessagingTemplate.convertAndSend("/topic/rooms", (Object) Map.of("roomId", dto.getRoomId(), "roomStatus", 1));
 
         return ResponseEntity.status(HttpStatus.CREATED).body("check in OK");
     }
@@ -59,9 +61,11 @@ public class AdminStayRecordController {
         }
 
         Integer memberId = stayRecordService.checkOut(roomId, employeeId);
-        simpMessagingTemplate.convertAndSend("/topic/orders", (Object)
-                Map.of("event", "completed"));
+        //交易commit後才廣播 房況變動所有員工即時看到
+        simpMessagingTemplate.convertAndSend("/topic/rooms", (Object) Map.of("roomId", roomId, "roomStatus", 0));
+        //整單全退完訂單才真的變已完成 部分退房不用吵大家
         if (memberId != null) {
+            simpMessagingTemplate.convertAndSend("/topic/orders", (Object) Map.of("event", "completed"));
             simpMessagingTemplate.convertAndSend("/topic/member/" + memberId, (Object) Map.of("event", "completed"));
         }
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("房號" + roomId + "退房成功");
