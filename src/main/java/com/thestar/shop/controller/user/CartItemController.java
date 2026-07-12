@@ -4,6 +4,7 @@ import com.thestar.member.entity.MemberVO;
 import com.thestar.shop.entity.CartItemVO;
 import com.thestar.shop.service.CartItemService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Controller
@@ -20,30 +23,19 @@ public class CartItemController {
 	@Autowired
 	CartItemService cartItemSvc;
 
-	// ===== 取得登入會員 ID 的共用方法 =====
-	private Integer getLoginMemberId(HttpSession session) {
-		MemberVO loginMember = (MemberVO) session.getAttribute("loginMember");
-		if (loginMember == null) {
-			return null;
-		}
-		return loginMember.getMemberId();
-	}
-
 	// 顯示購物車
 	@GetMapping
-	public String listCart(HttpSession session, ModelMap model) {
-
+	public String listCart(ModelMap model, HttpSession session, HttpServletRequest request) {
 		Integer memberId = getLoginMemberId(session);
-		if (memberId == null) {
-			return "redirect:/login.html";
-		}
+		if (memberId == null)
+			return redirectToLogin(request);
 
 		List<CartItemVO> list = cartItemSvc.getByMemberId(memberId);
 
 		// 計算總計
 		int total = 0;
 		for (CartItemVO item : list) {
-			if (item.getProduct() != null) {
+			if (item.getProduct() != null && item.getCartItemProdQty() != null) {
 				total += item.getProduct().getProductPrice() * item.getCartItemProdQty();
 			}
 		}
@@ -57,12 +49,16 @@ public class CartItemController {
 	@PostMapping("add")
 	public String addToCart(@RequestParam("productId") Integer productId,
 			@RequestParam("qty") Integer qty,
-			HttpSession session) {
+			HttpSession session,
+			HttpServletRequest request) {
 
 		Integer memberId = getLoginMemberId(session);
-		if (memberId == null) {
-			return "redirect:/login.html";
-		}
+		if (memberId == null)
+			return redirectToLogin(request);
+
+		// 防呆：不允許 0 或負數數量
+		if (qty == null || qty <= 0)
+			qty = 1;
 
 		// 檢查購物車是否已有此商品
 		CartItemVO existing = cartItemSvc.getByMemberIdAndProductId(memberId, productId);
@@ -85,16 +81,16 @@ public class CartItemController {
 	// 刪除購物車項目
 	@PostMapping("delete")
 	public String deleteFromCart(@RequestParam("cartItemId") Integer cartItemId,
-			HttpSession session) {
+			HttpSession session,
+			HttpServletRequest request) {
 
 		Integer memberId = getLoginMemberId(session);
-		if (memberId == null) {
-			return "redirect:/login.html";
-		}
+		if (memberId == null)
+			return redirectToLogin(request);
 
 		// 確認這個購物車項目屬於此會員，防止別人刪別人的東西
-		CartItemVO item = cartItemSvc.getOneCartItem(cartItemId);
-		if (item != null && item.getMemberId().equals(memberId)) {
+		CartItemVO cartItemVO = cartItemSvc.getOneCartItem(cartItemId);
+		if (cartItemVO != null && memberId.equals(cartItemVO.getMemberId())) {
 			cartItemSvc.deleteCartItem(cartItemId);
 		}
 
@@ -105,20 +101,39 @@ public class CartItemController {
 	@PostMapping("update")
 	public String updateCart(@RequestParam("cartItemId") Integer cartItemId,
 			@RequestParam("qty") Integer qty,
-			HttpSession session) {
+			HttpSession session,
+			HttpServletRequest request) {
 
 		Integer memberId = getLoginMemberId(session);
-		if (memberId == null) {
-			return "redirect:/login.html";
-		}
+		if (memberId == null)
+			return redirectToLogin(request);
 
 		// 確認這個購物車項目屬於此會員
 		CartItemVO cartItemVO = cartItemSvc.getOneCartItem(cartItemId);
-		if (cartItemVO != null && cartItemVO.getMemberId().equals(memberId)) {
+		if (cartItemVO != null && memberId.equals(cartItemVO.getMemberId())) {
 			cartItemVO.setCartItemProdQty(qty);
 			cartItemSvc.updateCartItem(cartItemVO);
 		}
 
 		return "redirect:/shop/cart";
+	}
+
+	// 取得登入會員 ID 的共用方法
+	private Integer getLoginMemberId(HttpSession session) {
+		if (session == null)
+			return null;
+		MemberVO loginMember = (MemberVO) session.getAttribute("loginMember");
+		if (loginMember == null || loginMember.getMemberId() == null)
+			return null;
+		return loginMember.getMemberId();
+	}
+
+	// 未登入時導向登入頁，登入後導回原本頁面
+	private String redirectToLogin(HttpServletRequest request) {
+		String target = request.getRequestURI();
+		if (request.getQueryString() != null && !request.getQueryString().isBlank()) {
+			target += "?" + request.getQueryString();
+		}
+		return "redirect:/login.html?redirect=" + URLEncoder.encode(target, StandardCharsets.UTF_8);
 	}
 }

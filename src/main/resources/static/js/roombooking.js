@@ -14,7 +14,7 @@ createApp({
         const d = n => new Date(today.getTime() + n * 864e5).toISOString().slice(0, 10);
         return {
             STATUS, ROOM_TYPES, nav: 'book', gateTab: 'member',
-            member: {id: 1, on: null}, employee: {id: 1, on: null},
+			member: {id: 1,on: null,name: ''},employee: {id: 1,on: null,name: ''},
             form: {checkInDate: d(1), checkOutDate: d(2), couponId: null, rooms: [{roomTypeId: null, qty: 1}]},
             confirmOrder: null,
             confirmDetail: [],
@@ -67,6 +67,12 @@ createApp({
                 this.member.on = me.memberId;
                 this.connectWs();   // 會員身分確認後連線 訂閱自己專屬的通知頻道
             }
+			if (me.loggedIn) {
+			  this.member.id = me.memberId;
+			  this.member.on = me.memberId;
+			  this.member.name = me.memberName;
+			  this.connectWs();   // 會員身分確認後連線 訂閱自己專屬的通知頻道
+			}
         } catch { /* 沒登入就停在登入頁 */
         }
     },
@@ -130,6 +136,7 @@ createApp({
                 this._stomp.deactivate(); this._stomp = null;
             }
             this.member.on = null;
+			this.member.name = '';
             this.employee.on = null;
             this.nav = 'book';
             this.orders.list = [];

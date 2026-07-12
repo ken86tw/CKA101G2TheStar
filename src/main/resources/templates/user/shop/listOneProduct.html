@@ -258,12 +258,6 @@ footer { background: #1e3a4a; color: #7a9aaa; text-align: center; padding: 40px 
 </footer>
 
 <script>
-// 登出
-function logout() {
-	fetch('/api/member/logout', { method: 'POST' })
-		.then(() => window.location.href = '/shop');
-}
-
 // 縮圖切換主圖
 function switchImage(thumb) {
 	document.getElementById('mainImg').src = thumb.src;

@@ -63,8 +63,8 @@
                 </nav>
                 <div class="hright">
                     <div class="ident">
-                        <div v-if="member.on">貴賓 <b>#{{ member.on }}</b></div>
-                        <div v-if="employee.on">員工 <b>#{{ employee.on }}</b></div>
+                        <div v-if="member.on">貴賓， <b>{{ member.name? member.name + '（#' + member.on + '）': '#' + member.on }}</b></div>
+                        <div v-if="employee.on">員工， <b>#{{ employee.on }}</b></div>
                     </div>
                     <button class="btn line" @click="logout">登出</button>
                 </div>
