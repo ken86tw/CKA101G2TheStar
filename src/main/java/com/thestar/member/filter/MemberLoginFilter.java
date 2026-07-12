@@ -62,7 +62,10 @@ public class MemberLoginFilter extends OncePerRequestFilter {
     }
 
     private boolean needsMemberLogin(String path) {
-        return path.equals("/thestar/order/create")
+        return path.equals("/profile.html")
+                || path.equals("/api/member/profile")
+                || path.startsWith("/api/member/profile/")
+                || path.equals("/thestar/order/create")
                 || path.startsWith("/thestar/order/member")
                 || path.startsWith("/thestar/order/cancel")
                 || path.startsWith("/thestar/ecpay/checkout")
@@ -81,6 +84,11 @@ public class MemberLoginFilter extends OncePerRequestFilter {
     }
 
     private String buildRedirectTarget(HttpServletRequest request, String path) {
+        if (!"GET".equalsIgnoreCase(request.getMethod())
+                && !"HEAD".equalsIgnoreCase(request.getMethod())) {
+            return getPostLoginLandingPage(path);
+        }
+
         String queryString = request.getQueryString();
 
         if (queryString == null || queryString.isBlank()) {
@@ -88,5 +96,18 @@ public class MemberLoginFilter extends OncePerRequestFilter {
         }
 
         return path + "?" + queryString;
+    }
+    
+    private String getPostLoginLandingPage(String path) {
+        if (path.equals("/shop/cart") || path.startsWith("/shop/cart/")) {
+            return "/shop/cart";
+        }
+
+        if (path.startsWith("/thestar/order/")
+                || path.startsWith("/thestar/ecpay/")) {
+            return "/roombooking.html";
+        }
+
+        return "/index.html";
     }
 }
