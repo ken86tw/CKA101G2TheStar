@@ -60,7 +60,7 @@ public class RestaurantBookingController {
 		model.addAttribute("reviewMap", reviewMap);
 		
 		// 5. 導向指定的網頁路徑
-		return "user/booking/list"; 
+		return "user/restaurant/booking/list"; 
 	}
 	
 	
@@ -87,7 +87,7 @@ public class RestaurantBookingController {
 
 			model.addAttribute("reservationVO", reservationVO);
 		}
-		return "user/booking/add";
+		return "user/restaurant/booking/add";
 	}
 
 	/**
@@ -105,7 +105,7 @@ public class RestaurantBookingController {
 			model.addAttribute("availableSessions", availableSessions);
 		}
 
-		return "user/booking :: bookingOptions";
+		return "user/restaurant/booking :: bookingOptions";
 	}
 
 	/**
@@ -130,7 +130,7 @@ public class RestaurantBookingController {
 			// 💡 如果 reservationVO.getDate() 回傳的是 java.sql.Date，轉成 LocalDate 再帶入
 			LocalDate localDate = (reservationVO.getDate() != null) ? ((java.sql.Date) reservationVO.getDate()).toLocalDate() : null;
 			prepareFormDropLists(model, guests, localDate);
-			return "user/booking";
+			return "user/restaurant/booking";
 		}
 		reservationVO.setRestaurantTableVO(tableVO);
 
@@ -151,7 +151,7 @@ public class RestaurantBookingController {
 			model.addAttribute("errorMessage", "輸入資料有誤，請檢查欄位。");
 			LocalDate localDate = (reservationVO.getDate() != null) ? ((java.sql.Date) reservationVO.getDate()).toLocalDate() : null;
 			prepareFormDropLists(model, guests, localDate);
-			return "user/booking";
+			return "user/restaurant/booking";
 		}
 
 		try {
@@ -170,13 +170,13 @@ public class RestaurantBookingController {
 			}
 
 			redirectAttributes.addFlashAttribute("successMessage", "恭喜您！訂位預約成功！");
-			return "redirect:/restaurant/booking";
+			return "redirect:/restaurant/booking/list";
 
 		} catch (Exception e) {
 			model.addAttribute("errorMessage", "訂位失敗：" + e.getMessage());
 			LocalDate localDate = (reservationVO.getDate() != null) ? ((java.sql.Date) reservationVO.getDate()).toLocalDate() : null;
 			prepareFormDropLists(model, guests, localDate);
-			return "user/booking";
+			return "user/restaurant/booking";
 		}
 	}
 

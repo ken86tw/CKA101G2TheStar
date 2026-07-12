@@ -42,29 +42,48 @@ public class UserReviewController {
         Double averageStars = reviewService.getAverageStars();
         model.addAttribute("reviewList", reviewList);
         model.addAttribute("averageStars", averageStars != null ? averageStars : 0.0);
-        return "user/review/list";
+        return "user/restaurant/review/list";
     }
     
     @GetMapping("/reviews/add")
-    public String addReviewPage(HttpSession session, Model model) {
+    public String addReviewPage(
+        @RequestParam(value = "resId", required = false) Integer reservationId, 
+        HttpSession session, 
+        Model model
+    ) {
         // 1. 從 Session 取得當前登入的會員 ID
+        Integer memberId = 1; 
         
-        
-        // 安全機制：沒登入就踢去登入頁
         if (memberId == null) {
             return "redirect:/login"; 
         }
 
-        // 2. 撈取會員資料（為了對應 HTML 的 ${member.memberName}）
+        // 2. 撈取會員資料
         MemberVO member = memberService.getMemberById(memberId);
         model.addAttribute("member", member);
 
-        // 3. 撈取該會員「已完成、未評論」的訂位紀錄（為了對應 HTML 的 ${reservations}）
-        List<RestaurantReservationVO> reservations = restaurantReservationService.getUnreviewedReservationsByMemberId(memberId);
-        model.addAttribute("reservations", reservations);
+        // 3. 處理訂位紀錄邏輯
+        if (reservationId != null) {
+            // 【情況 A】有帶 ?resId=7
+            RestaurantReservationVO singleReservation = restaurantReservationService.getOneReservation(reservationId);
+            
+            if (singleReservation != null) {
+                // 包成 List 丟給前端，畫面上就只會出現這 1 筆
+                model.addAttribute("reservations", List.of(singleReservation));
+                model.addAttribute("isLocked", true); // 告訴前端：要把下拉選單鎖死
+            } else {
+                // 安全防護：如果網址的 ID 根本不存在，退回預設狀態
+                model.addAttribute("reservations", restaurantReservationService.getUnreviewedReservationsByMemberId(memberId));
+                model.addAttribute("isLocked", false);
+            }
+        } else {
+            // 【情況 B】沒有帶參數，讓使用者自己選
+            model.addAttribute("reservations", restaurantReservationService.getUnreviewedReservationsByMemberId(memberId));
+            model.addAttribute("isLocked", false);
+        }
 
-        // 4. 回傳 Thymeleaf 頁面路徑 (位於 templates/restaurant/addReview.html)
-        return "user/review/add"; 
+        // 4. 回傳 Thymeleaf 頁面路徑
+        return "restaurant/user/review/add"; 
     }
     
     @PostMapping("/submitReview")

@@ -84,7 +84,7 @@
 
                 <!-- 💡 情況 B：如果沒有評論紀錄，顯示引導評論按鈕並正確帶入 resId 參數 -->
                 <div class="text-end mt-3" th:if="${!reviewMap.containsKey(res.reservationId)}">
-                    <a th:href="@{/user/review/add(resId=${res.reservationId})}" class="btn btn-outline-warning btn-sm fw-bold">
+                    <a th:href="@{/restaurant/reviews/add(resId=${res.reservationId})}" class="btn btn-outline-warning btn-sm fw-bold">
                         ⭐ 撰寫五星好評
                     </a>
                 </div>
