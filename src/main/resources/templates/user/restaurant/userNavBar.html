@@ -41,6 +41,9 @@
                         <a class="nav-link" th:href="@{/restaurant/menu}" th:classappend="${activePage == 'menu'} ? 'active'">美味菜單</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" th:href="@{/restaurant/booking/add}" th:classappend="${activePage == 'bookingadd'} ? 'active'">線上訂位</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" th:href="@{/restaurant/booking/list}" th:classappend="${activePage == 'booking'} ? 'active'">我的訂位</a>
                     </li>
                     <li class="nav-item">
