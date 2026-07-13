@@ -14,4 +14,8 @@ public interface RoomRepository extends JpaRepository<RoomVO , Integer> {
 
 
     List<RoomVO> findByRoomTypeIdOrderByRoomId(Integer roomTypeId);
+    
+    List<RoomVO> findByRoomTypeIdAndRoomStatusAndRoomSwitchStatus
+	(Integer roomTypeId, Integer roomStatus,
+			Boolean roomSwitchStatus);
 }
