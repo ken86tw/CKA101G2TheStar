@@ -9,6 +9,8 @@ import jakarta.mail.Session;
 import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.AuthenticationFailedException;
+import jakarta.mail.SendFailedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +21,8 @@ import java.util.Properties;
 @Service
 public class MemberVerificationMailService {
 
-    // 這裡保留你原本 MailService 的概念：Gmail SSL 465 直接寄信。
-    // 不要把真正密碼上傳到 GitHub，正式值放 application.properties。
+    // Gmail SSL 465 直接寄信。
+    // 為了保護真實密碼，不上傳到 GitHub，正式值放 application.properties。
     @Value("${app.mail.gmail:my@Gmail}")
     private String myGmail;
 
@@ -47,8 +49,14 @@ public class MemberVerificationMailService {
         try {
             sendVerificationMail(member.getMemberEmail(), member.getMemberName(), verifyUrl);
             return true;
+        } catch (IllegalStateException e) {
+            System.err.println("會員新增成功，但驗證信寄送失敗");
+            System.err.println("原因：" + e.getMessage());
+            return false;
+
         } catch (Exception e) {
-            System.out.println("會員新增成功，但驗證信寄送失敗");
+            System.err.println("會員新增成功，但寄信發生未預期錯誤");
+            System.err.println("原因：" + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -78,7 +86,7 @@ public class MemberVerificationMailService {
                 || "myGmailPassword".equals(myGmailPassword)) {
             throw new IllegalStateException("尚未設定 Gmail 帳號或應用程式密碼");
         }
-
+        
         try {
             Properties props = new Properties();
             props.put("mail.smtp.host", "smtp.gmail.com");
@@ -103,9 +111,56 @@ public class MemberVerificationMailService {
             Transport.send(message);
             System.out.println("驗證信傳送成功：" + to);
 
+        } catch (AuthenticationFailedException e) {
+            System.err.println("[驗證信失敗] Gmail 帳號或應用程式密碼錯誤");
+            System.err.println("寄件帳號：" + myGmail);
+            System.err.println("收件人：" + to);
+            System.err.println("錯誤訊息：" + e.getMessage());
+
+            throw new IllegalStateException(
+                    "Gmail 登入失敗，請檢查帳號與應用程式密碼",
+                    e
+            );
+
+        } catch (SendFailedException e) {
+            String smtpMessage = e.getMessage() == null
+                    ? ""
+                    : e.getMessage();
+
+            if (smtpMessage.contains("5.4.5")
+                    || smtpMessage.contains("Daily user sending limit exceeded")) {
+
+                System.err.println("[驗證信失敗] Gmail 今日寄信額度已用完");
+                System.err.println("寄件帳號：" + myGmail);
+                System.err.println("收件人：" + to);
+                System.err.println("SMTP 訊息：" + smtpMessage);
+
+                throw new IllegalStateException(
+                        "Gmail 今日寄信額度已用完，請稍後再試或更換寄件帳號",
+                        e
+                );
+            }
+
+            System.err.println("[驗證信失敗] Gmail SMTP 拒絕寄送");
+            System.err.println("寄件帳號：" + myGmail);
+            System.err.println("收件人：" + to);
+            System.err.println("SMTP 訊息：" + smtpMessage);
+
+            throw new IllegalStateException(
+                    "Gmail SMTP 拒絕寄送：" + smtpMessage,
+                    e
+            );
+
         } catch (MessagingException e) {
-            System.out.println("驗證信傳送失敗：" + to);
-            throw new IllegalStateException("驗證信傳送失敗", e);
+            System.err.println("[驗證信失敗] 郵件系統發生錯誤");
+            System.err.println("寄件帳號：" + myGmail);
+            System.err.println("收件人：" + to);
+            System.err.println("錯誤原因：" + e.getMessage());
+
+            throw new IllegalStateException(
+                    "驗證信寄送失敗：" + e.getMessage(),
+                    e
+            );
         }
     }
 }

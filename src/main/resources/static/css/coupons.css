@@ -1,0 +1,818 @@
+[v-cloak] {
+    display: none;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    color: #2f2a24;
+    background: #f5f2ec;
+    font-family:
+        "Noto Sans TC",
+        "Microsoft JhengHei",
+        Arial,
+        sans-serif;
+}
+
+a {
+    color: inherit;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+/* =========================================================
+   頂部導覽列
+   ========================================================= */
+
+.coupon-site-header {
+    position: relative;
+    z-index: 100;
+    color: #4d4034;
+    background: #d9c5ad;
+    border-bottom: 1px solid #c7ad91;
+}
+
+.coupon-site-header .navbar {
+    width: min(1400px, calc(100% - 48px));
+    min-height: 90px;
+    margin: 0 auto;
+    padding: 12px 0;
+    background: transparent;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 36px;
+}
+
+.coupon-site-header .navbar-brand {
+    flex-shrink: 0;
+    color: #493a2e;
+    text-decoration: none;
+
+    display: flex;
+    flex-direction: column;
+}
+
+/*
+.coupon-site-header .brand-zh {
+    font-family:
+        "Noto Serif TC",
+        "Microsoft JhengHei",
+        serif;
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: 6px;
+}
+*/
+
+.coupon-site-header .brand-en {
+    margin-top: 4px;
+    color: #765f49;
+    font-family: Georgia, serif;
+    font-size: 12px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+
+.coupon-site-header .nav-links {
+    flex: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 23px;
+}
+
+.coupon-site-header .nav-links > a {
+    position: relative;
+    padding: 9px 0;
+    color: #4d4034;
+    text-decoration: none;
+    font-size: 14px;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+}
+
+.coupon-site-header .nav-links > a:not(.cart-link)::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 3px;
+    left: 0;
+
+    height: 1px;
+    background: #7c6248;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.2s ease;
+}
+
+.coupon-site-header .nav-links > a:hover {
+    color: #7b5d3d;
+}
+
+.coupon-site-header .nav-links > a:hover::after {
+    transform: scaleX(1);
+}
+
+.coupon-site-header .cart-link {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    color: #4d4034;
+    border: 1px solid rgba(77, 64, 52, 0.45);
+    border-radius: 50%;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.coupon-site-header .cart-link:hover {
+    color: #6b5037;
+    background: rgba(255, 255, 255, 0.28);
+    border-color: #745b43;
+}
+
+.coupon-site-header .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.coupon-site-header .notify-btn,
+.coupon-site-header .member-avatar {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    color: #4d4034;
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(77, 64, 52, 0.45);
+    border-radius: 50%;
+    cursor: pointer;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.coupon-site-header .notify-btn:hover,
+.coupon-site-header .member-avatar:hover {
+    background: rgba(255, 255, 255, 0.42);
+    border-color: #745b43;
+}
+
+.coupon-site-header .notify-dot {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+
+    width: 7px;
+    height: 7px;
+    background: #a96343;
+    border: 1px solid #f7eee5;
+    border-radius: 50%;
+}
+
+.coupon-site-header .login-btn {
+    padding: 9px 18px;
+    color: #4d4034;
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(77, 64, 52, 0.48);
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 14px;
+
+    transition:
+        color 0.2s ease,
+        background 0.2s ease;
+}
+
+.coupon-site-header .login-btn:hover {
+    color: #5f472f;
+    background: rgba(255, 255, 255, 0.55);
+}
+
+.coupon-site-header .member-menu {
+    position: relative;
+}
+
+.coupon-site-header .member-dropdown {
+    position: absolute;
+    top: calc(100% + 13px);
+    right: 0;
+    z-index: 200;
+
+    width: 220px;
+    padding: 10px;
+    color: #403a33;
+    background: #ffffff;
+    border: 1px solid #ddd4c8;
+    border-radius: 10px;
+    box-shadow: 0 14px 35px rgba(42, 35, 27, 0.18);
+
+    display: none;
+}
+
+.coupon-site-header .member-menu.open .member-dropdown,
+.coupon-site-header .member-dropdown.show {
+    display: block;
+}
+
+.coupon-site-header .member-greeting {
+    margin-bottom: 6px;
+    padding: 12px 13px;
+    color: #6d5a45;
+    border-bottom: 1px solid #eee7de;
+    font-weight: 600;
+}
+
+.coupon-site-header .member-dropdown a,
+.coupon-site-header .member-dropdown button {
+    width: 100%;
+    padding: 11px 13px;
+    color: #50483f;
+    background: transparent;
+    border: 0;
+    border-radius: 6px;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+
+    display: block;
+
+    transition:
+        color 0.2s ease,
+        background 0.2s ease;
+}
+
+.coupon-site-header .member-dropdown a:hover,
+.coupon-site-header .member-dropdown button:hover {
+    color: #7e6242;
+    background: #f4efe7;
+}
+
+.coupon-site-header .member-dropdown .current-member-page {
+    color: #785b3d;
+    background: #efe6d9;
+    font-weight: 600;
+}
+
+/* =========================================================
+   優惠券頁面主要區域
+   ========================================================= */
+
+.coupon-page {
+    width: min(1160px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 52px 0 90px;
+}
+
+.page-title-section {
+    margin-bottom: 34px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.page-label {
+    margin: 0 0 9px;
+    color: #a67c4e;
+    font-family: Georgia, serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+}
+
+.page-title-section h1 {
+    margin: 0;
+    color: #332d27;
+    font-family:
+        Georgia,
+        "Noto Serif TC",
+        serif;
+    font-size: clamp(36px, 5vw, 54px);
+    font-weight: 500;
+    letter-spacing: 2px;
+}
+
+.page-description {
+    margin: 15px 0 0;
+    color: #766e65;
+    font-size: 15px;
+    line-height: 1.8;
+}
+
+.back-home-button {
+    flex-shrink: 0;
+    min-width: 115px;
+    padding: 11px 20px;
+    color: #594c3e;
+    background: transparent;
+    border: 1px solid #b9aa99;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+
+    transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.back-home-button:hover {
+    color: #ffffff;
+    background: #82694e;
+    border-color: #82694e;
+}
+
+/* =========================================================
+   統計區塊
+   ========================================================= */
+
+.coupon-summary {
+    margin-bottom: 28px;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #e1d9cf;
+    border-radius: 12px;
+    box-shadow:
+        0 9px 25px rgba(68, 56, 43, 0.06);
+
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.summary-item {
+    min-height: 76px;
+    padding: 8px 16px;
+    border-right: 1px solid #e8e1d8;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.summary-item:last-child {
+    border-right: 0;
+}
+
+.summary-number {
+    color: #836646;
+    font-family: Georgia, serif;
+    font-size: 31px;
+    line-height: 1;
+}
+
+.summary-label {
+    margin-top: 8px;
+    color: #776f66;
+    font-size: 13px;
+}
+
+/* =========================================================
+   分類按鈕
+   ========================================================= */
+
+.coupon-tabs {
+    margin-bottom: 30px;
+    padding-bottom: 11px;
+    border-bottom: 1px solid #d8d0c6;
+
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+}
+
+.coupon-tabs button {
+    flex-shrink: 0;
+    padding: 11px 17px;
+    color: #756c62;
+    background: transparent;
+    border: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+
+    transition:
+        color 0.2s ease,
+        background 0.2s ease;
+}
+
+.coupon-tabs button:hover {
+    color: #654e36;
+    background: #ebe4da;
+}
+
+.coupon-tabs button.active {
+    color: #ffffff;
+    background: #82694e;
+}
+
+.tab-count {
+    margin-left: 5px;
+    opacity: 0.82;
+}
+
+/* =========================================================
+   載入、錯誤、無資料
+   ========================================================= */
+
+.message-box {
+    min-height: 190px;
+    padding: 45px 22px;
+    color: #777067;
+    background: #ffffff;
+    border: 1px solid #dfd7cd;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow:
+        0 9px 24px rgba(67, 56, 44, 0.05);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.error-message {
+    color: #974d4d;
+}
+
+.retry-button {
+    margin-top: 18px;
+    padding: 10px 19px;
+    color: #ffffff;
+    background: #82694e;
+    border: 0;
+    border-radius: 5px;
+    cursor: pointer;
+
+    transition: background 0.2s ease;
+}
+
+.retry-button:hover {
+    background: #6d563f;
+}
+
+/* =========================================================
+   優惠券卡片
+   ========================================================= */
+
+.coupon-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 25px;
+}
+
+.coupon-card {
+    min-height: 300px;
+    background: #ffffff;
+    border: 1px solid #ddd4c9;
+    border-radius: 13px;
+    box-shadow:
+        0 12px 28px rgba(65, 53, 40, 0.08);
+    overflow: hidden;
+
+    display: grid;
+    grid-template-columns: 190px 1fr;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.coupon-card:hover {
+    transform: translateY(-3px);
+    box-shadow:
+        0 17px 35px rgba(65, 53, 40, 0.12);
+}
+
+.coupon-card.used,
+.coupon-card.expired {
+    opacity: 0.76;
+}
+
+.coupon-card.used:hover,
+.coupon-card.expired:hover {
+    transform: none;
+}
+
+.coupon-value-section {
+    position: relative;
+    padding: 26px 18px;
+    color: #ffffff;
+    background: #80684e;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.coupon-card.available .coupon-value-section {
+    background:
+        linear-gradient(
+            145deg,
+            #947554,
+            #6e543c
+        );
+}
+
+.coupon-card.not-started .coupon-value-section {
+    background:
+        linear-gradient(
+            145deg,
+            #737d8e,
+            #555e6d
+        );
+}
+
+.coupon-card.used .coupon-value-section {
+    background:
+        linear-gradient(
+            145deg,
+            #918c85,
+            #716d67
+        );
+}
+
+.coupon-card.expired .coupon-value-section {
+    background:
+        linear-gradient(
+            145deg,
+            #b0a89f,
+            #8f8880
+        );
+}
+
+.coupon-status-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+
+    padding: 5px 10px;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    border-radius: 999px;
+    font-size: 12px;
+}
+
+.coupon-discount {
+    margin-top: 18px;
+    font-family:
+        Georgia,
+        "Noto Serif TC",
+        serif;
+    font-size: 29px;
+    line-height: 1.35;
+    text-align: center;
+}
+
+.coupon-code {
+    max-width: 100%;
+    margin-top: 13px;
+    opacity: 0.72;
+    font-size: 11px;
+    letter-spacing: 1px;
+    overflow-wrap: anywhere;
+    text-align: center;
+}
+
+.coupon-content {
+    padding: 27px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.coupon-title-row h2 {
+    margin: 0;
+    color: #382f27;
+    font-family:
+        Georgia,
+        "Noto Serif TC",
+        serif;
+    font-size: 23px;
+    font-weight: 500;
+}
+
+.coupon-description {
+    min-height: 49px;
+    margin: 11px 0 20px;
+    color: #777067;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.coupon-information {
+    display: grid;
+    gap: 9px;
+}
+
+.information-row {
+    display: grid;
+    grid-template-columns: 76px 1fr;
+    gap: 12px;
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.information-label {
+    color: #9b9185;
+}
+
+.information-value {
+    color: #514a42;
+    overflow-wrap: anywhere;
+}
+
+.coupon-footer {
+    margin-top: auto;
+    padding-top: 19px;
+    border-top: 1px dashed #d7cfc5;
+    color: #948b81;
+    font-size: 12px;
+
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+/* =========================================================
+   平板
+   ========================================================= */
+
+@media (max-width: 1120px) {
+
+    .coupon-site-header .navbar {
+        width: min(100% - 34px, 1400px);
+        gap: 22px;
+    }
+
+    .coupon-site-header .nav-links {
+        gap: 16px;
+    }
+
+    .coupon-site-header .nav-links > a {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 960px) {
+
+    .coupon-site-header .navbar {
+        min-height: auto;
+        padding: 18px 0;
+
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .coupon-site-header .nav-links {
+        width: 100%;
+        padding-bottom: 5px;
+        justify-content: flex-start;
+        overflow-x: auto;
+    }
+
+    .coupon-site-header .member-dropdown {
+        right: auto;
+        left: 0;
+    }
+
+    .coupon-summary {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .summary-item {
+        border-right: 0;
+        border-bottom: 1px solid #e8e1d8;
+    }
+
+    .summary-item:nth-last-child(-n + 2) {
+        border-bottom: 0;
+    }
+
+    .coupon-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================================
+   手機
+   ========================================================= */
+
+@media (max-width: 680px) {
+
+    .coupon-site-header .navbar {
+        width: min(100% - 24px, 1400px);
+    }
+
+    .coupon-site-header .brand-zh {
+        font-size: 21px;
+    }
+
+    .coupon-site-header .nav-links {
+        gap: 13px;
+    }
+
+    .coupon-site-header .nav-links > a {
+        font-size: 13px;
+    }
+
+    .coupon-page {
+        width: min(100% - 24px, 1160px);
+        padding: 37px 0 65px;
+    }
+
+    .page-title-section {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .page-title-section h1 {
+        font-size: 37px;
+    }
+
+    .coupon-summary {
+        padding: 12px;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .summary-item {
+        min-height: 68px;
+        padding: 10px 6px;
+        border-bottom: 1px solid #e8e1d8;
+    }
+
+    .summary-item:last-child {
+        grid-column: 1 / -1;
+        border-bottom: 0;
+    }
+
+    .summary-number {
+        font-size: 27px;
+    }
+
+    .coupon-tabs {
+        margin-bottom: 23px;
+    }
+
+    .coupon-tabs button {
+        padding: 10px 14px;
+    }
+
+    .coupon-card {
+        grid-template-columns: 1fr;
+    }
+
+    .coupon-value-section {
+        min-height: 165px;
+    }
+
+    .coupon-content {
+        padding: 23px 20px;
+    }
+
+    .coupon-description {
+        min-height: auto;
+    }
+
+    .information-row {
+        grid-template-columns: 72px 1fr;
+    }
+
+    .coupon-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+/* 優惠券頁導覽列改為純色，移除陰影與漸層 */
+.navbar {
+    background: #d8c6ad;
+    box-shadow: none;
+    filter: none;
+}
