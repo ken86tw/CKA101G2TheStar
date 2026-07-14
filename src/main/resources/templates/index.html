@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -203,88 +203,7 @@
 	<div id="app" v-cloak>
 		<header :class="currentPage === 'home' ? 'hero' : 'page-header'"
 			id="home">
-			<nav class="navbar">
-				<a href="#" class="navbar-brand" @click.prevent="goPage('home')">
-					<span class="brand-zh">東方之星</span> <span class="brand-en">The
-						Star</span>
-				</a>
-
-				<div class="nav-links">
-					<a href="#" :class="{ active: currentPage === 'home' }"
-						@click.prevent="goPage('home')">首頁</a> <a href="#"
-						@click.prevent="goHomeAnchor('about-preview')">關於我們</a> <a
-						href="/articles.html">文章</a> <a href="/roombooking.html">訂房</a> <a
-						href="/restaurant">餐廳</a> <a href="#"
-						:class="{ active: currentPage === 'facilities' }"
-						@click.prevent="goPage('facilities')">設施</a> <a href="#"
-						@click.prevent="goHomeAnchor('faq')">FAQ</a> <a href="/shop">購物</a>
-					<!-- 					<a href="/shop/cart" class="cart-link" title="購物車" aria-label="購物車"> -->
-					<!-- 						<i class="fa-solid fa-cart-shopping"></i> -->
-					<!-- 					</a> -->
-					<!-- 通知按鈕 -->
-					<div class="nav-actions">
-						<button class="notify-btn" type="button" title="通知"
-							@click.stop="toggleNotificationPanel">
-
-							<i class="fa-regular fa-bell"></i> <span class="notify-dot"
-								:style="{display: hasNotify ? 'block' : 'none'}"> </span>
-						</button>
-						<!-- 通知下拉視窗 -->
-						<div class="notification-panel"
-							:class="{ show: notificationPanelOpen }" @click.stop>
-							<div class="notification-panel-header">
-								<div>
-									<strong>會員通知</strong> <span v-if="notificationUnreadCount > 0">
-										未讀 {{ notificationUnreadCount }} 則 </span> <span v-else>
-										沒有未讀通知 </span>
-								</div>
-								<button type="button" @click="markAllNotificationsAsRead">
-									全部已讀</button>
-							</div>
-
-							<div class="notification-list">
-								<div v-if="notificationLoading" class="notification-empty">
-									通知讀取中</div>
-								<div v-else-if="notifications.length === 0"
-									class="notification-empty">目前沒有通知</div>
-
-								<template v-else>
-									<button v-for="notification in notifications"
-										:key="notification.memberNotifyId" type="button"
-										class="notification-item"
-										:class="{unread: Number(notification.isRead) === 0}"
-										@click="openNotification(notification)">
-
-										<span class="notification-content"> {{
-											notification.content }} </span> <span class="notification-time">
-											{{ formatNotificationTime(notification.createdTime) }} </span>
-									</button>
-								</template>
-							</div>
-						</div>
-						<!-- 登入按鈕 -->
-						<button v-if="authReady && !loggedIn" type="button"
-							class="login-btn login-btn-as-button" @click="openLoginModal">登入</button>
-
-						<div v-else-if="authReady" class="member-menu">
-							<button class="member-avatar" type="button" :title="displayName"
-								@click.stop="toggleMemberMenu">
-								<i class="fa-regular fa-user"></i>
-							</button>
-							<!-- 會員選單 -->
-							<div class="member-dropdown" :class="{ show: memberDropdownOpen }" @click.stop>
-								<div class="member-greeting">貴賓，{{ displayName }}</div>
-								<a href="/profile.html">我的會員資料</a> 
-								<a href="/roombooking.html?tab=orders">我的訂房預訂 </a> 
-								<a href="/restaurant/booking/list">我的餐廳預訂</a> 
-								<a href="/shop/order/myOrders">我的購物訂單</a> 
-								<a href="/coupons.html">我的優惠券</a>
-								<button type="button" @click="logoutMember">登出</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</nav>
+			<div th:replace="~{user/common/frontNavbar :: navbar('home', false, '', true)}"></div>
 
 			<div class="hero-content" v-if="currentPage === 'home'">
 				<h2>東方之星度假飯店</h2>
@@ -520,10 +439,6 @@
 				</section>
 			</template>
 		</main>
-		<footer class="site-footer">
-			<div>© 2026 東方之星 The Star．All Rights Reserved</div>
-			<a href="/thestar/admin/login" class="staff-entry"> 員工專區 </a>
-		</footer>
 
 		<div class="login-modal-mask" v-if="loginModalOpen"
 			@click.self="closeLoginModal">
@@ -621,23 +536,23 @@
     },
 
     mounted() {
-    	  const initialAnchor = window.location.hash.replace('#', '');
+      const initialAnchor = window.location.hash.replace('#', '');
 
-    	  this.cleanIndexUrl();
-    	  this.loadRememberedLogin();
-    	  this.checkMemberStatus();
+      this.cleanIndexUrl();
+      this.loadRememberedLogin();
+      this.checkMemberStatus();
 
-    	  document.addEventListener('click', () => {
-    	    this.memberDropdownOpen = false;
-    	    this.notificationPanelOpen = false;
-    	  });
+      document.addEventListener('click', () => {
+        this.memberDropdownOpen = false;
+        this.notificationPanelOpen = false;
+      });
 
-    	  if (initialAnchor === 'about-preview' || initialAnchor === 'faq') {
-    	    this.goHomeAnchor(initialAnchor);
-    	  }
-    	},
+      if (initialAnchor === 'about-preview' || initialAnchor === 'faq') {
+        this.goHomeAnchor(initialAnchor);
+      }
+    },
     beforeUnmount() {
-    	this.stopNotificationPolling();
+    	  this.stopNotificationPolling();
     },
 
     methods: {

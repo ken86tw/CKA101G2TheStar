@@ -19,7 +19,7 @@
 </head>
 <body>
 
-    <nav th:replace="~{user/restaurant/userNavBar :: front-navbar('booking')}"></nav>
+    <div th:replace="~{user/common/frontNavbar :: navbar('restaurant-booking', false, 'site-navbar-dark restaurant-navbar', false)}"></div>
 
 	<div class="container my-5">
 		<div class="row justify-content-center">
@@ -38,11 +38,18 @@
 					<form th:action="@{/restaurant/booking/submit}"
 						th:object="${reservationVO}" method="POST">
 
+						<!-- members -->
 						<div class="mb-3">
-							<label class="form-label">會員編號 (Member ID)</label> <input
-								type="number" class="form-control"
-								th:field="*{memberVO.memberId}" readonly>
-							<div class="form-text">已鎖定當前登入之會員。</div>
+						    <label class="form-label">
+						        訂位會員
+						    </label>
+						
+						    <input type="text" class="form-control" 
+						    	th:value="${loginMember.memberName + '（' + loginMember.memberEmail + '）'}" readonly>
+						
+<!-- 						    <div class="form-text"> -->
+<!--  						        訂位會自動綁定目前登入會員，不需要輸入會員編號。 -->
+<!-- 						    </div> -->
 						</div>
 
 						<div class="mb-3">
@@ -148,5 +155,6 @@ function updateBookingOptions() {
 }
 </script>
 
+<script src="/js/header-auth.js"></script>
 </body>
 </html>

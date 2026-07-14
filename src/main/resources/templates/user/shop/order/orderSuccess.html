@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>東方之星 The Star｜訂單完成</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="/css/common.css">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -46,28 +47,7 @@ footer { background: #1e3a4a; color: #7a9aaa; text-align: center; padding: 40px 
 </head>
 <body>
 
-<nav class="navbar">
-  <a href="/" class="navbar-brand">
-    <span class="brand-zh">東方之星</span>
-    <span class="brand-en">The Star</span>
-  </a>
-  <div class="navbar-links">
-    <a href="/">首頁</a>
-    <a href="/roombooking.html">訂房</a>
-    <a href="/restaurant">餐廳</a>
-    <a href="/shop" class="active">購物</a>
-    <a href="/shop/cart"><i class="fa-solid fa-cart-shopping"></i></a>
-    <button th:if="${session.loginMember != null}"
-      onclick="logout()"
-      class="navbar-login">
-      <i class="fa-regular fa-user me-1"></i>
-      <span th:text="${session.loginMember.memberName}">會員</span>
-    </button>
-    <a th:if="${session.loginMember == null}" href="/login.html" class="navbar-login">
-      <i class="fa-regular fa-user me-1"></i>登入
-    </a>
-  </div>
-</nav>
+<div th:replace="~{user/common/frontNavbar :: navbar('shop', true, 'shop-navbar site-navbar-dark', false)}"></div>
 
 <div class="success-container">
 
@@ -167,5 +147,6 @@ function logout() {
 }
 </script>
 
+<script src="/js/header-auth.js"></script>
 </body>
 </html>

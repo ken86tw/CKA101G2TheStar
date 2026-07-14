@@ -70,46 +70,7 @@ footer { background: #1e3a4a; color: #7a9aaa; text-align: center; padding: 40px 
 </head>
 <body>
 
-<nav class="navbar shop-navbar">
-  <a href="/index.html" class="navbar-brand">
-    <span class="brand-zh">東方之星</span>
-    <span class="brand-en">The Star</span>
-  </a>
-  <div class="navbar-links">
-    <a href="/index.html">首頁</a>
-    <a href="/index.html#about-preview">關於我們</a>
-    <a href="/articles.html">文章</a>
-    <a href="/roombooking.html">訂房</a>
-    <a href="/restaurant">餐廳</a>
-    <a href="/facilities.html">設施</a>
-    <a href="/index.html#faq">FAQ</a>
-    <a href="/shop" class="active">購物</a>
-    <a href="/shop/cart" class="cart-link" title="購物車" aria-label="購物車">
-      <i class="fa-solid fa-cart-shopping"></i>
-    </a>
-  </div>
-  <div class="nav-actions" style="display:flex !important; flex-direction:row !important; align-items:center !important; grid-template-columns:none !important; grid-template-rows:none !important; height:auto !important; min-width:auto !important;">
-      <button class="notify-btn" id="notifyBtn" type="button" title="通知">
-        <i class="fa-regular fa-bell"></i>
-        <span class="notify-dot" id="notifyDot"></span>
-      </button>
-      <a href="/login.html" class="navbar-login" id="loginLink" style="display: none;">登入</a>
-      <div class="member-menu" id="memberMenu" style="display: none;">
-        <button class="member-avatar" id="memberAvatar" type="button" title="會員選單">
-          <i class="fa-regular fa-user"></i>
-        </button>
-        <div class="member-dropdown" id="memberDropdown">
-          <div class="member-greeting" id="memberGreeting">貴賓，會員</div>
-          <a href="/profile.html">我的會員資料</a>
-          <a href="/roombooking.html?tab=orders">我的訂房預訂</a>
-          <a href="#" class="js-coming-soon" data-message="我的餐廳預訂頁尚未完成">我的餐廳預訂</a>
-          <a href="/shop/order/myOrders">我的購物訂單</a>
-          <a href="#" class="js-coming-soon" data-message="我的優惠券頁尚未完成">我的優惠券</a>
-          <button type="button" id="logoutBtn">登出</button>
-        </div>
-      </div>
-  </div>
-</nav>
+<div th:replace="~{user/common/frontNavbar :: navbar('shop', true, 'shop-navbar site-navbar-dark', false)}"></div>
 
 <div class="page-header">
   <h1>我的訂單</h1>

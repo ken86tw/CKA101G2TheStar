@@ -14,7 +14,7 @@
 <body>
 
     <!-- 2. 替換為共用 Navbar，傳入 'review' -->
-    <nav th:replace="~{user/restaurant/userNavBar :: front-navbar('review')}"></nav>
+    <div th:replace="~{user/common/frontNavbar :: navbar('restaurant-review', false, 'site-navbar-dark restaurant-navbar', false)}"></div>
 
 <div class="container my-5">
     <div class="text-center mb-5">
@@ -49,5 +49,6 @@
     <!-- 3. 替換為共用 Footer -->
     <footer th:replace="~{user/restaurant/userNavBar :: front-footer}"></footer>
 
+<script src="/js/header-auth.js"></script>
 </body>
 </html>

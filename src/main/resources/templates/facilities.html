@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,60 +13,7 @@
 </head>
 <body>
   <header class="page-header">
-    <nav class="navbar">
-        <a href="/index.html" class="navbar-brand">
-		  <span class="brand-zh">東方之星</span>
-		  <span class="brand-en">The Star</span>
-		</a>
-
-      <div class="nav-links">
-        <a href="/index.html">首頁</a>
-        <a href="/index.html#about-preview">關於我們</a>
-        <a href="/articles.html">文章</a>
-		<a href="/roombooking.html">訂房</a>
-		<a href="/restaurant">餐廳</a>
-		<a href="/facilities.html" class="active">設施</a>
-        <a href="/index.html#faq">FAQ</a>
-        
-		<a href="/shop">購物</a>
-		<a href="/shop/cart"
-		   class="cart-link"
-		   title="購物車"
-		   aria-label="購物車">
-		  <i class="fa-solid fa-cart-shopping"></i>
-		</a>
-
-        <div class="nav-actions">
-          <button class="notify-btn" id="notifyBtn" type="button" title="通知">
-            <i class="fa-regular fa-bell"></i>
-            <span class="notify-dot" id="notifyDot"></span>
-          </button>
-
-          <a href="/login.html" class="login-btn" id="loginLink" style="display: none;">登入</a>
-
-          <div class="member-menu" id="memberMenu" style="display:none;">
-            <button class="member-avatar" id="memberAvatar" type="button">
-              <i class="fa-regular fa-user"></i>
-            </button>
-
-            <div class="member-dropdown" id="memberDropdown">
-			  <div class="member-greeting" id="memberGreeting">貴賓，會員</div>
-			
-			  <a href="/profile.html">我的會員資料</a>
-			  <a href="/roombooking.html?tab=orders">我的訂房預訂</a>
-			  <a href="#"
-			     class="js-coming-soon"
-			     data-message="我的餐廳預訂頁尚未完成">我的餐廳預訂</a>
-			
-			  <a href="/shop/order/myOrders">我的購物訂單</a>
-			  <a href="/coupons.html">我的優惠券</a>
-			
-			  <button type="button" id="logoutBtn">登出</button>
-			</div>
-          </div>
-        </div>
-      </div>
-    </nav>
+    <div th:replace="~{user/common/frontNavbar :: navbar('facilities', false, '', false)}"></div>
 
     <div class="sub-hero">
       <h2>飯店設施</h2>
