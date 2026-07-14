@@ -32,7 +32,8 @@ public class UserReviewController {
     @Autowired
     private RestaurantReservationService restaurantReservationService;
     
-    Integer memberId = 1;
+//    Integer memberId = 1;
+    
     
     
 	
@@ -52,14 +53,21 @@ public class UserReviewController {
         Model model
     ) {
         // 1. 從 Session 取得當前登入的會員 ID
-        Integer memberId = 1; 
-        
-        if (memberId == null) {
-            return "redirect:/login"; 
-        }
+//        Integer memberId = 1; 
+//        
+//        if (memberId == null) {
+//            return "redirect:/login"; 
+//        }
+
+    	//members
+    	MemberVO member = getCurrentMember(session);
+    	if (member == null) {
+    	    return "redirect:/login.html" + "?redirect=/restaurant/review/add";
+    	}
+    	Integer memberId = member.getMemberId();
 
         // 2. 撈取會員資料
-        MemberVO member = memberService.getMemberById(memberId);
+//        MemberVO member = memberService.getMemberById(memberId);
         model.addAttribute("member", member);
 
         // 3. 處理訂位紀錄邏輯
@@ -95,9 +103,14 @@ public class UserReviewController {
 
         // 安全機制
         
-        if (memberId == null) {
-            return "redirect:/login";
-        }
+//        if (memberId == null) {
+//            return "redirect:/login";
+//        }
+    	
+    	//members
+    	MemberVO member = getCurrentMember(session);
+    	if (member == null) {return "redirect:/login.html" + "?redirect=/restaurant/review/add";}
+    	Integer memberId = member.getMemberId();
 
         // 執行商業邏輯：
         // 1. 新增一筆 Review 紀錄到資料庫
@@ -109,6 +122,14 @@ public class UserReviewController {
     }
     
     
-    
+    private MemberVO getCurrentMember(HttpSession session) {
+        MemberVO loginMember = (MemberVO) session.getAttribute("loginMember");
+
+        if (loginMember == null || loginMember.getMemberId() == null) {
+            return null;
+        }
+
+        return memberService.getMemberById(loginMember.getMemberId());
+    }
 
 }

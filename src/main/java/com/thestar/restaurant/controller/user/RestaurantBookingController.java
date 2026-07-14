@@ -2,6 +2,7 @@ package com.thestar.restaurant.controller.user;
 
 import java.time.LocalDate; // 👈 1. 換成新版的 LocalDate
 import java.util.List;
+import jakarta.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,6 +23,7 @@ import com.thestar.restaurant.entity.RestaurantTableVO;
 import com.thestar.restaurant.service.AvailableTableService;
 import com.thestar.restaurant.service.RestaurantReservationService;
 import com.thestar.restaurant.service.RestaurantReviewService;
+import com.thestar.member.service.MemberAuthService;
 
 @Controller
 @RequestMapping("/restaurant/booking")
@@ -35,11 +37,20 @@ public class RestaurantBookingController {
 	
 	@Autowired
 	private RestaurantReviewService reviewService;
+	
+//	members
+	@Autowired
+	private MemberAuthService memberAuthService;
 
 	@GetMapping("/list")
-	public String listMemberBookings(Model model) {
+	public String listMemberBookings(Model model, HttpSession session) {
 		// 1. 依需求暫時寫死目前登入會員 ID 為 1
-		Integer currentMemberId = 1; 
+//		Integer currentMemberId = 1; 
+		MemberVO loginMember = (MemberVO) session.getAttribute("loginMember");
+		if (loginMember == null) {
+	        return "redirect:/login.html" + "?redirect=/restaurant/booking/list";
+	    }
+	    Integer currentMemberId = loginMember.getMemberId();
 		
 		// 2. 呼叫 Service 取得該會員的所有訂位紀錄
 		List<RestaurantReservationVO> myReservations = reservationService.getByMemberId(currentMemberId);
@@ -58,6 +69,7 @@ public class RestaurantBookingController {
 		// 4. 將訂位列表與評論 Map 帶到前端
 		model.addAttribute("myReservations", myReservations);
 		model.addAttribute("reviewMap", reviewMap);
+		model.addAttribute("loginMember", loginMember);			//members
 		
 		// 5. 導向指定的網頁路徑
 		return "user/restaurant/booking/list"; 
@@ -65,15 +77,26 @@ public class RestaurantBookingController {
 	
 	
 	@GetMapping("/add")
-	public String bookingPage(Model model) {
+	public String bookingPage(Model model, HttpSession session) {
 		availableTableService.initializeMonthlyTables();
-
+		
+		//members
+		MemberVO loginMember = getCurrentMember(session);
+		if (loginMember == null) {
+		    return "redirect:/login.html" + "?redirect=/restaurant/booking/add";
+		}
+		model.addAttribute("loginMember",loginMember);
+		
 		if (!model.containsAttribute("reservationVO")) {
 			RestaurantReservationVO reservationVO = new RestaurantReservationVO();
-			MemberVO member = new MemberVO();
-			member.setMemberId(1); // 預設目前登入會員
-			reservationVO.setMemberVO(member);
+			
+//			MemberVO member = new MemberVO();
+//			member.setMemberId(1); // 預設目前登入會員
+//			reservationVO.setMemberVO(member);
 
+			//members
+			reservationVO.setMemberVO(loginMember);
+			
 			int defaultGuests = 2;
 			List<LocalDate> availableDates = availableTableService.getAvailableDatesByGuests(defaultGuests); // 👈 換成 LocalDate
 			model.addAttribute("availableDates", availableDates);
@@ -116,7 +139,14 @@ public class RestaurantBookingController {
 			BindingResult result, 
 			@RequestParam("guests") int guests, 
 			Model model, 
-			RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes,
+	        HttpSession session) {
+		//members
+		//後端重新取得真正登入會員
+		MemberVO loginMember = getCurrentMember(session);
+		if (loginMember == null) {return "redirect:/login.html" + "?redirect=/restaurant/booking/add";}
+		//前端0信任原則，資料丟回login帳號
+		reservationVO.setMemberVO(loginMember);
 
 		// 🛠️ 1. 人數桌型分流判定並綁定到 Entity
 		RestaurantTableVO tableVO = new RestaurantTableVO();
@@ -180,6 +210,23 @@ public class RestaurantBookingController {
 		}
 	}
 
+	/**
+	 * 取得目前真正登入的會員members
+	 */
+	private MemberVO getCurrentMember(HttpSession session) {
+	    MemberVO loginMember =
+	            (MemberVO) session.getAttribute("loginMember");
+
+	    if (loginMember == null
+	            || loginMember.getMemberId() == null) {
+	        return null;
+	    }
+
+	    return memberAuthService.getMemberById(
+	            loginMember.getMemberId()
+	    );
+	}
+	
 	/**
 	 * 💡 抽取出來的私有方法：專門用來在流程失敗時重塞下拉選單資料
 	 */
