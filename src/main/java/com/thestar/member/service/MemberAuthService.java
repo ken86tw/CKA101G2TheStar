@@ -26,12 +26,20 @@ public class MemberAuthService {
     private static final long VERIFY_EXPIRE_MINUTES = 10L;
 
     private final MemberRepository memberRepository;
-    private final MemberVerificationMailService verificationMailService;
 
-    public MemberAuthService(MemberRepository memberRepository,
-                             MemberVerificationMailService verificationMailService) {
+    private final MemberVerificationMailService
+            verificationMailService;
+
+    private final MemberCouponService
+            memberCouponService;
+    
+    public MemberAuthService(
+            MemberRepository memberRepository,
+            MemberVerificationMailService verificationMailService,
+            MemberCouponService memberCouponService) {
         this.memberRepository = memberRepository;
         this.verificationMailService = verificationMailService;
+        this.memberCouponService = memberCouponService;
     }
 
     @Transactional
@@ -113,9 +121,31 @@ public class MemberAuthService {
         member.setMemberStatus((byte) 1);
         member.setVerifyToken(null);
         member.setVerifyExpireTime(null);
-        memberRepository.save(member);
 
-        return new MemberVerifyResponse(true, "會員信箱驗證成功，帳號已啟用");
+        MemberVO savedMember = memberRepository.save(member);
+        boolean newMemberCouponIssued = memberCouponService.issueNewMemberCoupon(savedMember.getMemberId());
+        boolean birthdayCouponIssued = memberCouponService.issueBirthdayCouponForMember(savedMember.getMemberId());
+        StringBuilder message =
+                new StringBuilder(
+                        "會員信箱驗證成功，帳號已啟用"
+                );
+
+        if (newMemberCouponIssued) {
+            message.append(
+                    "，新會員優惠券已發放至您的帳戶"
+            );
+        }
+
+        if (birthdayCouponIssued) {
+            message.append(
+                    "，本月壽星優惠券也已發放至您的帳戶"
+            );
+        }
+
+        return new MemberVerifyResponse(
+                true,
+                message.toString()
+        );
     }
 
 
