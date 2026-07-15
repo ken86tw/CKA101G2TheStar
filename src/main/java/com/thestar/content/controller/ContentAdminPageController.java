@@ -8,6 +8,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Controller
 @RequestMapping("/thestar/admin/content")
@@ -50,9 +53,11 @@ public class ContentAdminPageController {
 
     @PostMapping("/article/add")
     public String articleCreate(@ModelAttribute ArticleVO article,
+                                @RequestParam(value = "coverFile", required = false) MultipartFile coverFile,
                                 @AuthenticationPrincipal EmployeeUserDetails principal,
                                 RedirectAttributes redirectAttributes) {
         try {
+            applyCoverImage(article, coverFile);
             contentAdminService.saveArticle(article, principal.getEmployeeId());
             redirectAttributes.addFlashAttribute("message", "新增文章成功");
         } catch (RuntimeException e) {
@@ -72,6 +77,7 @@ public class ContentAdminPageController {
 
     @PostMapping("/article/edit/{id}")
     public String articleUpdate(@PathVariable Integer id, @ModelAttribute ArticleVO article,
+                                @RequestParam(value = "coverFile", required = false) MultipartFile coverFile,
                                 @AuthenticationPrincipal EmployeeUserDetails principal,
                                 RedirectAttributes redirectAttributes) {
         ArticleVO old = contentAdminService.findArticle(id);
@@ -79,6 +85,12 @@ public class ContentAdminPageController {
         article.setEmployeeId(old.getEmployeeId());
         article.setViewCount(old.getViewCount());
         article.setCoverImage(old.getCoverImage());
+        try {
+            applyCoverImage(article, coverFile);
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/thestar/admin/content/article/edit/" + id;
+        }
         if (article.getStatus() == null) {
             article.setStatus(old.getStatus());
         }
@@ -120,5 +132,20 @@ public class ContentAdminPageController {
         model.addAttribute("currentEmployeeName", principal.getEmployee().getEmployeeName());
         model.addAttribute("isSuperAdmin", principal.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_SUPER_ADMIN")));
+    }
+
+    private void applyCoverImage(ArticleVO article, MultipartFile coverFile) {
+        if (coverFile == null || coverFile.isEmpty()) {
+            return;
+        }
+        String contentType = coverFile.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new IllegalArgumentException("封面檔案必須是圖片");
+        }
+        try {
+            article.setCoverImage(coverFile.getBytes());
+        } catch (IOException e) {
+            throw new IllegalArgumentException("封面圖片讀取失敗", e);
+        }
     }
 }

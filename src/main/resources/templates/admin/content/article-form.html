@@ -14,7 +14,7 @@
         </div>
         <form class="admin-card admin-form" th:object="${article}"
               th:action="${mode == 'add'} ? @{/thestar/admin/content/article/add} : @{'/thestar/admin/content/article/edit/' + ${article.articleId}}"
-              method="post">
+              method="post" enctype="multipart/form-data">
             <div class="admin-form-grid">
                 <div class="field">
                     <label for="title">標題</label>
@@ -35,6 +35,11 @@
                     <option value="1">發布</option>
                     <option value="0">下架</option>
                 </select>
+            </div>
+            <div class="field">
+                <label for="coverFile">封面圖片</label>
+                <input id="coverFile" name="coverFile" type="file" accept="image/jpeg,image/png,image/gif,image/webp">
+                <small th:if="${article.coverImage != null and article.coverImage.length > 0}">目前已有封面；未選新檔會保留原圖。</small>
             </div>
             <div class="form-actions">
                 <button class="admin-button" type="submit">儲存</button>

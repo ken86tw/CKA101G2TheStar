@@ -13,6 +13,8 @@ public class ArticlePublicDTO {
     private String content;
     private Integer viewCount;
     private LocalDateTime createAt;
+    private boolean hasCoverImage;
+    private String coverImageUrl;
 
     public static ArticlePublicDTO from(ArticleVO article) {
         ArticlePublicDTO dto = new ArticlePublicDTO();
@@ -22,6 +24,10 @@ public class ArticlePublicDTO {
         dto.contentPreview = preview(article.getContent());
         dto.viewCount = article.getViewCount();
         dto.createAt = article.getCreateAt();
+        dto.hasCoverImage = article.getCoverImage() != null && article.getCoverImage().length > 0;
+        dto.coverImageUrl = dto.hasCoverImage
+                ? "/thestar/content/articles/" + article.getArticleId() + "/cover"
+                : null;
         return dto;
     }
 
@@ -64,5 +70,13 @@ public class ArticlePublicDTO {
 
     public LocalDateTime getCreateAt() {
         return createAt;
+    }
+
+    public boolean isHasCoverImage() {
+        return hasCoverImage;
+    }
+
+    public String getCoverImageUrl() {
+        return coverImageUrl;
     }
 }
