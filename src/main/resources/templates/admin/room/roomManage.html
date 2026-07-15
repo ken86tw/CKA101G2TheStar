@@ -56,8 +56,16 @@
 				<tbody>
 					<tr th:each="room : ${roomList}">
 						<td th:text="${room.roomId}"></td>
-						<td th:text="${room.roomTypeId}"></td>
-						<td><span class="status-badge"
+						<td>
+						<span th:switch="${room.roomTypeId}">
+       					<span th:case="1">雙人房</span>
+        					<span th:case="2">四人房</span>
+       					<span th:case="3">總統套房</span>
+    						</span>
+    						</td>
+    						
+						<td>
+						<span class="status-badge"
 							th:text="${room.roomStatus == 1 ? '空房' : (room.roomStatus == 2 ? '入住中' : '維修中')}"></span>
 						</td>
 						<td><span th:text="${room.roomSwitchStatus ? '已上架' : '已下架'}"></span>

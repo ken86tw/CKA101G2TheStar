@@ -397,7 +397,12 @@ createApp({
         },
         pay(orderId) {
             this.toast('warn', '前往綠界結帳', `No.${orderId}`);
-            window.location.href = `/thestar/ecpay/checkout/${orderId}`;
+            // 付完款瀏覽器導回的前端頁：本機開就回本機、ngrok 開就回 ngrok(依目前所在網域三元判斷)
+            const backHost = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+                ? 'http://localhost:8080'
+                : location.origin;
+            const clientBackUrl = encodeURIComponent(`${backHost}/result.html`);
+            window.location.href = `/thestar/ecpay/checkout/${orderId}?clientBackUrl=${clientBackUrl}`;
         },
         async devConfirm(orderId) {
             if (!confirm(`模擬付款（不經綠界，直接標記 No.${orderId} 已付款）？`)) return;

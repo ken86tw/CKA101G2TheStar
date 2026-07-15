@@ -32,7 +32,9 @@ public class EcpayController {
 
     //進結帳頁 回傳一段會自動送出的html表單 讓瀏覽器直接跳去綠界付款
     @GetMapping(value = "/checkout/{orderId}", produces = MediaType.TEXT_HTML_VALUE)
-    public String orderCheckOut(@PathVariable Integer orderId, HttpSession session) {
+    public String orderCheckOut(@PathVariable Integer orderId,
+                                @RequestParam(required = false) String clientBackUrl,
+                                HttpSession session) {
 
         //會員從session拿 不信任前端傳的id 避免有人付別人的單
         MemberVO member = (MemberVO) session.getAttribute("loginMember");
@@ -58,11 +60,13 @@ public class EcpayController {
         String merchantTradeNo = orderService.renewMerchantTradeNo(orderId);
 
         //送給綠界的金額直接用存好的總額扣掉折扣 這裡只讀不重算 結帳跟回調驗證三邊金額才會一致
+        //clientBackUrl由前端依目前所在網域(本機/ngrok)帶進來 沒帶就用設定檔預設值
         return ecpayService.buildCheckoutForm(
                 merchantTradeNo,
                 order.getTotalAmount() - order.getDiscountAmount(),
                 itemName,
-                orderId);
+                orderId,
+                clientBackUrl);
 
 
     }
