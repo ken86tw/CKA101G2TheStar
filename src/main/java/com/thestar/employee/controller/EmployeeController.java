@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/thestar/admin/employee")
+@RequestMapping("/admin/employee")
 public class EmployeeController {
 
     private final EmployeeService employeeService;

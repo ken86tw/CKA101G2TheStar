@@ -10,7 +10,7 @@ import com.thestar.employee.security.EmployeeUserDetails;
 import com.thestar.employee.security.PermissionCodes;
 
 @Controller
-@RequestMapping("/thestar/admin")
+@RequestMapping("/admin")
 public class AdminHomeController {
 
     @GetMapping("/home")

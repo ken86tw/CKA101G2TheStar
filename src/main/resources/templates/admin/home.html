@@ -21,7 +21,7 @@
         <div class="admin-user">
             <span class="admin-avatar" th:text="${#strings.substring(currentEmployeeName, 0, 1)}"></span>
             <span th:text="${currentEmployeeName}"></span>
-            <form th:action="@{/thestar/admin/logout}" method="post">
+            <form th:action="@{/admin/logout}" method="post">
                 <button type="submit" class="admin-button line sm">登出</button>
             </form>
         </div>
@@ -29,19 +29,19 @@
 
     <aside class="admin-sidebar">
         <div class="side-section">
-            <a class="side-link active" th:href="@{/thestar/admin/home}"><span class="side-icon">⌂</span>控制中心</a>
+            <a class="side-link active" th:href="@{/admin/home}"><span class="side-icon">⌂</span>控制中心</a>
         </div>
         <div class="side-section">
             <p class="side-title">用戶管理</p>
-            <a class="side-link" th:classappend="${!canManageEmployees} ? ' locked'" th:href="${canManageEmployees} ? @{/thestar/admin/employee/list} : @{/thestar/admin/home(error='沒有員工管理權限')}">
+            <a class="side-link" th:classappend="${!canManageEmployees} ? ' locked'" th:href="${canManageEmployees} ? @{/admin/employee/list} : @{/admin/home(error='沒有員工管理權限')}">
                 <span class="side-icon">◎</span>員工管理
             </a>
         </div>
         <div class="side-section">
             <p class="side-title">內容管理</p>
-            <a class="side-link" th:href="@{/thestar/admin/content/news}"><span class="side-icon">▤</span>最新消息管理</a>
-            <a class="side-link" th:href="@{/thestar/admin/content/article}"><span class="side-icon">✎</span>文章管理</a>
-            <a class="side-link" th:href="@{/thestar/admin/content/review}"><span class="side-icon">☰</span>文章評論管理</a>
+            <a class="side-link" th:href="@{/admin/content/news}"><span class="side-icon">▤</span>最新消息管理</a>
+            <a class="side-link" th:href="@{/admin/content/article}"><span class="side-icon">✎</span>文章管理</a>
+            <a class="side-link" th:href="@{/admin/content/review}"><span class="side-icon">☰</span>文章評論管理</a>
         </div>
     </aside>
 
@@ -56,19 +56,19 @@
         <p class="admin-message error" th:if="${param.error}" th:text="${param.error}"></p>
 
         <div class="admin-dashboard">
-            <a class="dashboard-tile" th:classappend="${!canManageEmployees} ? ' locked'" th:href="${canManageEmployees} ? @{/thestar/admin/employee/list} : @{/thestar/admin/home(error='沒有員工管理權限')}">
+            <a class="dashboard-tile" th:classappend="${!canManageEmployees} ? ' locked'" th:href="${canManageEmployees} ? @{/admin/employee/list} : @{/admin/home(error='沒有員工管理權限')}">
                 <h2>員工管理</h2>
                 <p>新增、編輯員工資料與在職狀態。</p>
             </a>
-            <a class="dashboard-tile" th:href="@{/thestar/admin/content/news}">
+            <a class="dashboard-tile" th:href="@{/admin/content/news}">
                 <h2>最新消息管理</h2>
                 <p>發布飯店公告、活動消息與維護通知。</p>
             </a>
-            <a class="dashboard-tile" th:href="@{/thestar/admin/content/article}">
+            <a class="dashboard-tile" th:href="@{/admin/content/article}">
                 <h2>文章管理</h2>
                 <p>管理攻略、住宿體驗與美食推薦文章。</p>
             </a>
-            <a class="dashboard-tile" th:href="@{/thestar/admin/content/review}">
+            <a class="dashboard-tile" th:href="@{/admin/content/review}">
                 <h2>文章評論管理</h2>
                 <p>查看會員留言並移除不適當內容。</p>
             </a>

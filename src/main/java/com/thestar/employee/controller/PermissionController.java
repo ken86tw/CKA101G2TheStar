@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/thestar/admin/permission")
+@RequestMapping("/admin/permission")
 public class PermissionController {
 
     private final RoleService roleService;

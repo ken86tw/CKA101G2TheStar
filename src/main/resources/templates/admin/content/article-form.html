@@ -13,7 +13,7 @@
             </div>
         </div>
         <form class="admin-card admin-form" th:object="${article}"
-              th:action="${mode == 'add'} ? @{/thestar/admin/content/article/add} : @{'/thestar/admin/content/article/edit/' + ${article.articleId}}"
+              th:action="${mode == 'add'} ? @{/admin/content/article/add} : @{'/admin/content/article/edit/' + ${article.articleId}}"
               method="post" enctype="multipart/form-data">
             <div class="admin-form-grid">
                 <div class="field">
@@ -43,7 +43,7 @@
             </div>
             <div class="form-actions">
                 <button class="admin-button" type="submit">儲存</button>
-                <a class="admin-button line" th:href="@{/thestar/admin/content/article}">取消</a>
+                <a class="admin-button line" th:href="@{/admin/content/article}">取消</a>
             </div>
         </form>
     </main>

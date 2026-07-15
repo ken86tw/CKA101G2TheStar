@@ -317,11 +317,11 @@ createApp({
                 return;
             }
             try {
-                const r = await this.api(`/thestar/admin/order?orderStatus=${this.admin.status}&page=${this.admin.page}&size=${this.admin.size}`);
+                const r = await this.api(`/admin/order?orderStatus=${this.admin.status}&page=${this.admin.page}&size=${this.admin.size}`);
                 this.admin.list = r.content || [];
                 this.admin.totalPages = r.totalPages || 0;
                 this.admin.open = {};
-                this.refreshCounts(this.admin, '/thestar/admin/order');
+                this.refreshCounts(this.admin, '/admin/order');
             } catch {
                 this.admin.list = [];
             }
@@ -342,7 +342,7 @@ createApp({
                 return;
             }
             try {
-                const url = kind === 'admin' ? `/thestar/admin/order/detail/${orderId}` : `/thestar/order/member/order/detail/${orderId}`;
+                const url = kind === 'admin' ? `/admin/order/detail/${orderId}` : `/thestar/order/member/order/detail/${orderId}`;
                 box.detail[orderId] = await this.api(url);
                 box.open[orderId] = true;
             } catch {
@@ -409,7 +409,7 @@ createApp({
         },
         async loadPending() {
             try {
-                this.stay.pending = await this.api('/thestar/admin/order/find/order');
+                this.stay.pending = await this.api('/admin/order/find/order');
             } catch (e) {
                 this.stay.pending = [];
                 this.toast('err', '查詢失敗', this.errMsg(e));
@@ -421,7 +421,7 @@ createApp({
                 return;
             }
             try {
-                this.stay.lines = await this.api(`/thestar/admin/stayrecord/checkin-order/${this.stay.orderId}`);
+                this.stay.lines = await this.api(`/admin/stayrecord/checkin-order/${this.stay.orderId}`);
                 this.stay.rooms = [];
                 this.stay.activeListId = null;
                 this.stay.activeTypeName = '';
@@ -444,7 +444,7 @@ createApp({
             this.stay.checkin.orderListId = line.orderListId;
             this.stay.checkin.roomId = null;
             try {
-                this.stay.rooms = await this.api(`/thestar/admin/stayrecord/checkin-rooms/${line.orderListId}`);
+                this.stay.rooms = await this.api(`/admin/stayrecord/checkin-rooms/${line.orderListId}`);
             } catch (e) {
                 this.stay.rooms = [];
                 this.toast('err', '房間載入失敗', this.errMsg(e));
@@ -477,15 +477,15 @@ createApp({
                 if (this.stay.checkinPhoto)
                     fd.append('stayCustomerPhoto',
                         this.stay.checkinPhoto);
-                await this.api('/thestar/admin/stayrecord/checkin',
+                await this.api('/admin/stayrecord/checkin',
                     {
                         method: 'POST',
                         body: fd
                     });
                 this.toast('ok', '入住成功', `房號 ${this.stay.checkin.roomId} · ${this.stay.checkin.stayCustomer || ''}`);
                 // 重新整理:明細的已入住/剩餘 + 房間狀態(剛配的變紅)
-                this.stay.lines = await this.api(`/thestar/admin/stayrecord/checkin-order/${this.stay.orderId}`);
-                this.stay.rooms = await this.api(`/thestar/admin/stayrecord/checkin-rooms/${this.stay.activeListId}`);
+                this.stay.lines = await this.api(`/admin/stayrecord/checkin-order/${this.stay.orderId}`);
+                this.stay.rooms = await this.api(`/admin/stayrecord/checkin-rooms/${this.stay.activeListId}`);
                 this.stay.checkin.roomId = null;
                 this.stay.checkin.stayCustomer = '';
                 if (this.stay.checkinPhotoUrl) URL.revokeObjectURL(this.stay.checkinPhotoUrl);
@@ -509,7 +509,7 @@ createApp({
             }
             if (!confirm(`房號 ${this.stay.checkoutRoomId} 確認退房？`)) return;
             try {
-                const r = await this.api(`/thestar/admin/stayrecord/checkout/${this.stay.checkoutRoomId}`, {method: 'POST'});
+                const r = await this.api(`/admin/stayrecord/checkout/${this.stay.checkoutRoomId}`, {method: 'POST'});
                 this.toast('ok', '退房成功', r);
                 // 退房後清空房號 有載過在住清單就重整讓退掉的那間消失
                 this.stay.checkoutRoomId = null;
@@ -521,7 +521,7 @@ createApp({
         // 載入所有未退房的在住房間
         async loadStaying() {
             try {
-                this.stay.staying = await this.api('/thestar/admin/stayrecord/find/all');
+                this.stay.staying = await this.api('/admin/stayrecord/find/all');
             } catch (e) {
                 this.stay.staying = [];
                 this.toast('err', '查詢失敗', this.errMsg(e));
@@ -535,7 +535,7 @@ createApp({
                 if (f.stayCustomer) q.set('stayCustomer', f.stayCustomer);
                 if (f.checkInTime) q.set('checkInTime', f.checkInTime);
                 if (f.checkOutTime) q.set('checkOutTime', f.checkOutTime);
-                this.stay.records = await this.api(`/thestar/admin/stayrecord/find?${q}`);
+                this.stay.records = await this.api(`/admin/stayrecord/find?${q}`);
                 this.toast('ok', '查詢完成', `共 ${this.stay.records.length} 筆`);
             } catch (e) {
                 this.toast('err', '查詢失敗', this.errMsg(e));
@@ -549,8 +549,8 @@ createApp({
             this.stay.detailPhotoOk = true;
             this.stay.showDetail = true;
             try {
-                this.stay.detail = await this.api(`/thestar/admin/stayrecord/find/order/${r.stayId}`);
-                this.stay.detailLines = await this.api(`/thestar/admin/order/detail/${this.stay.detail.orderId}`);
+                this.stay.detail = await this.api(`/admin/stayrecord/find/order/${r.stayId}`);
+                this.stay.detailLines = await this.api(`/admin/order/detail/${this.stay.detail.orderId}`);
 
             } catch (e) {
                 this.toast('err', '詳情查詢失敗', this.errMsg(e));
@@ -560,7 +560,7 @@ createApp({
         async loadRefunds() {
             try {
                 this.refund.list = await
-                    this.api('/thestar/admin/refund/find');
+                    this.api('/admin/refund/find');
             } catch (e) {
                 this.refund.list = [];
                 this.toast('err', '退款清單查詢失敗', this.errMsg(e));
@@ -571,7 +571,7 @@ createApp({
             if (!confirm(`退款單 #${r.refundId} · $${r.amount} 確認執行退款？`)) return;
             try {
                 const msg = await
-                    this.api(`/thestar/admin/refund/process/${r.refundId}`, {method: 'POST'});
+                    this.api(`/admin/refund/process/${r.refundId}`, {method: 'POST'});
                 this.toast('ok', '退款完成', msg);
                 this.loadRefunds();
             } catch (e) {

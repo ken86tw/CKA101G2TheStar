@@ -11,7 +11,7 @@
                 <h1>最新消息管理</h1>
                 <p>管理公告、活動消息與系統維護通知。</p>
             </div>
-            <a th:href="@{/thestar/admin/content/article/add}" class="admin-button">+ 新增文章</a>
+            <a th:href="@{/admin/content/article/add}" class="admin-button">+ 新增文章</a>
         </div>
         <p class="admin-message" th:if="${message}" th:text="${message}"></p>
         <p class="admin-message error" th:if="${error}" th:text="${error}"></p>
@@ -31,8 +31,8 @@
                     <td th:text="${#temporals.format(news.updateAt, 'yyyy/MM/dd HH:mm')}"></td>
                     <td class="admin-actions">
                         <a class="admin-button line sm" th:href="@{'/articles.html'(article=${news.articleId})}" target="_blank">查看</a>
-                        <a class="admin-button line sm" th:href="@{'/thestar/admin/content/article/edit/' + ${news.articleId}}">編輯</a>
-                        <form th:action="@{'/thestar/admin/content/news/' + ${news.articleId} + '/delete'}" method="post"
+                        <a class="admin-button line sm" th:href="@{'/admin/content/article/edit/' + ${news.articleId}}">編輯</a>
+                        <form th:action="@{'/admin/content/news/' + ${news.articleId} + '/delete'}" method="post"
                               onsubmit="return confirm('確定要刪除這篇文章嗎？')">
                             <button class="admin-button danger sm" type="submit">刪除</button>
                         </form>

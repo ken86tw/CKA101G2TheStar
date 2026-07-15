@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @Controller
-@RequestMapping("/thestar/admin/content")
+@RequestMapping("/admin/content")
 public class ContentAdminPageController {
 
     private final ContentAdminService contentAdminService;
@@ -33,7 +33,7 @@ public class ContentAdminPageController {
     public String newsDelete(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         contentAdminService.deleteArticle(id);
         redirectAttributes.addFlashAttribute("message", "最新消息已刪除");
-        return "redirect:/thestar/admin/content/news";
+        return "redirect:/admin/content/news";
     }
 
     @GetMapping("/article")
@@ -63,7 +63,7 @@ public class ContentAdminPageController {
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/thestar/admin/content/article";
+        return "redirect:/admin/content/article";
     }
 
     @GetMapping("/article/edit/{id}")
@@ -89,14 +89,14 @@ public class ContentAdminPageController {
             applyCoverImage(article, coverFile);
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/thestar/admin/content/article/edit/" + id;
+            return "redirect:/admin/content/article/edit/" + id;
         }
         if (article.getStatus() == null) {
             article.setStatus(old.getStatus());
         }
         contentAdminService.saveArticle(article, principal.getEmployeeId());
         redirectAttributes.addFlashAttribute("message", "文章已更新");
-        return "redirect:/thestar/admin/content/article";
+        return "redirect:/admin/content/article";
     }
 
     @PostMapping("/article/{id}/toggle-status")
@@ -104,14 +104,14 @@ public class ContentAdminPageController {
                                 RedirectAttributes redirectAttributes) {
         contentAdminService.updateArticleStatus(id, published);
         redirectAttributes.addFlashAttribute("message", published ? "文章已發布" : "文章已下架");
-        return "redirect:/thestar/admin/content/article";
+        return "redirect:/admin/content/article";
     }
 
     @PostMapping("/article/{id}/delete")
     public String articleDelete(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         contentAdminService.deleteArticle(id);
         redirectAttributes.addFlashAttribute("message", "文章已刪除");
-        return "redirect:/thestar/admin/content/article";
+        return "redirect:/admin/content/article";
     }
 
     @GetMapping("/review")
@@ -125,7 +125,7 @@ public class ContentAdminPageController {
     public String reviewDelete(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         contentAdminService.deleteReview(id);
         redirectAttributes.addFlashAttribute("message", "評論已刪除");
-        return "redirect:/thestar/admin/content/review";
+        return "redirect:/admin/content/review";
     }
 
     private void addShell(Model model, EmployeeUserDetails principal) {

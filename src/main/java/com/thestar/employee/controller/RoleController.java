@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/thestar/admin/role")
+@RequestMapping("/admin/role")
 public class RoleController {
 
     private final RoleService roleService;

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequestMapping("/thestar/admin/coupon")
+@RequestMapping("/admin/coupon")
 public class CouponAdminPageController {
 
     private final MemberCouponService memberCouponService;
@@ -73,7 +73,7 @@ public class CouponAdminPageController {
             );
         }
 
-        return "redirect:/thestar/admin/coupon/list";
+        return "redirect:/admin/coupon/list";
     }
 
     @PostMapping("/birthday/issue-current-month")
@@ -92,6 +92,6 @@ public class CouponAdminPageController {
             redirectAttributes.addFlashAttribute("error", exception.getMessage());
         }
 
-        return "redirect:/thestar/admin/coupon/list";
+        return "redirect:/admin/coupon/list";
     }
 }

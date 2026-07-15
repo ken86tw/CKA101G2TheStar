@@ -29,7 +29,7 @@
         <p class="error-msg" th:if="${param.error}">帳號或密碼錯誤，或帳號已停用</p>
         <p class="success-msg" th:if="${param.logout}">已登出</p>
 
-        <form th:action="@{/thestar/admin/login}" method="post">
+        <form th:action="@{/admin/login}" method="post">
             <div class="field">
                 <label for="email">Employee Email</label>
                 <input id="email" type="email" name="email" required autofocus>

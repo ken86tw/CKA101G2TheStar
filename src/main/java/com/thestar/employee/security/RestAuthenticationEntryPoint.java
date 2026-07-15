@@ -21,7 +21,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
                           AuthenticationException authException) throws IOException {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains(MediaType.TEXT_HTML_VALUE)) {
-            response.sendRedirect(request.getContextPath() + "/thestar/admin/login");
+            response.sendRedirect(request.getContextPath() + "/admin/login");
             return;
         }
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

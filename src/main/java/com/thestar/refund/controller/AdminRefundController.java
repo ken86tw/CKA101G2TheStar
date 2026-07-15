@@ -14,7 +14,7 @@ import java.util.Map;
 
 
 @RestController
-@RequestMapping("/thestar/admin/refund")
+@RequestMapping("/admin/refund")
 public class AdminRefundController {
 
     private final RefundService refundService;

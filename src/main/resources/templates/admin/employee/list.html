@@ -21,7 +21,7 @@
         <div class="admin-user">
             <span class="admin-avatar" th:text="${#strings.substring(currentEmployeeName, 0, 1)}"></span>
             <span th:text="${currentEmployeeName}"></span>
-            <form th:action="@{/thestar/admin/logout}" method="post">
+            <form th:action="@{/admin/logout}" method="post">
                 <button type="submit" class="admin-button line sm">登出</button>
             </form>
         </div>
@@ -29,17 +29,17 @@
 
     <aside class="admin-sidebar">
         <div class="side-section">
-            <a class="side-link" th:href="@{/thestar/admin/home}"><span class="side-icon">⌂</span>控制中心</a>
+            <a class="side-link" th:href="@{/admin/home}"><span class="side-icon">⌂</span>控制中心</a>
         </div>
         <div class="side-section">
             <p class="side-title">用戶管理</p>
-            <a class="side-link active" th:href="@{/thestar/admin/employee/list}"><span class="side-icon">◎</span>員工管理</a>
+            <a class="side-link active" th:href="@{/admin/employee/list}"><span class="side-icon">◎</span>員工管理</a>
         </div>
         <div class="side-section">
             <p class="side-title">內容管理</p>
-            <a class="side-link" th:href="@{/thestar/admin/content/news}"><span class="side-icon">▤</span>最新消息管理</a>
-            <a class="side-link" th:href="@{/thestar/admin/content/article}"><span class="side-icon">✎</span>文章管理</a>
-            <a class="side-link" th:href="@{/thestar/admin/content/review}"><span class="side-icon">☰</span>文章評論管理</a>
+            <a class="side-link" th:href="@{/admin/content/news}"><span class="side-icon">▤</span>最新消息管理</a>
+            <a class="side-link" th:href="@{/admin/content/article}"><span class="side-icon">✎</span>文章管理</a>
+            <a class="side-link" th:href="@{/admin/content/review}"><span class="side-icon">☰</span>文章評論管理</a>
         </div>
     </aside>
 
@@ -49,7 +49,7 @@
             <h1>員工管理</h1>
             <p>管理員工資料、在職狀態與後台角色</p>
         </div>
-        <a th:href="@{/thestar/admin/employee/add}" class="admin-button">+ 新增員工</a>
+        <a th:href="@{/admin/employee/add}" class="admin-button">+ 新增員工</a>
     </div>
 
     <p class="admin-message" th:if="${message}" th:text="${message}"></p>
@@ -83,15 +83,15 @@
                 <span th:unless="${emp.status == 1}" class="admin-badge off">離職</span>
             </td>
             <td class="admin-actions">
-                    <a class="admin-button line sm" th:href="@{'/thestar/admin/employee/edit/' + ${emp.employeeId}}">編輯</a>
-                    <a class="admin-button line sm" th:if="${isSuperAdmin}" th:href="@{'/thestar/admin/employee/' + ${emp.employeeId} + '/roles'}">角色</a>
-                <form th:action="@{'/thestar/admin/employee/' + ${emp.employeeId} + '/toggle-status'}"
+                    <a class="admin-button line sm" th:href="@{'/admin/employee/edit/' + ${emp.employeeId}}">編輯</a>
+                    <a class="admin-button line sm" th:if="${isSuperAdmin}" th:href="@{'/admin/employee/' + ${emp.employeeId} + '/roles'}">角色</a>
+                <form th:action="@{'/admin/employee/' + ${emp.employeeId} + '/toggle-status'}"
                       method="post" style="display:inline">
                     <input type="hidden" name="enabled" th:value="${emp.status == 1} ? 'false' : 'true'">
                         <button type="submit" class="admin-button line sm"
                             th:text="${emp.status == 1} ? '設為離職' : '恢復在職'"></button>
                 </form>
-                <form th:if="${isSuperAdmin}" th:action="@{'/thestar/admin/employee/' + ${emp.employeeId} + '/delete'}"
+                <form th:if="${isSuperAdmin}" th:action="@{'/admin/employee/' + ${emp.employeeId} + '/delete'}"
                       method="post" style="display:inline" onsubmit="return confirm('確定要刪除這位員工嗎？此動作無法復原。')">
                     <button type="submit" class="admin-button danger sm">刪除</button>
                 </form>

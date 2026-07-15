@@ -26,7 +26,7 @@
                     <td th:text="${review.likeCount}"></td>
                     <td th:text="${#temporals.format(review.createdAt, 'yyyy/MM/dd HH:mm')}"></td>
                     <td class="admin-actions">
-                        <form th:action="@{'/thestar/admin/content/review/' + ${review.reviewId} + '/delete'}" method="post">
+                        <form th:action="@{'/admin/content/review/' + ${review.reviewId} + '/delete'}" method="post">
                             <button class="admin-button danger sm" type="submit">刪除</button>
                         </form>
                     </td>

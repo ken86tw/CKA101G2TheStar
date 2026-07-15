@@ -24,7 +24,7 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains(MediaType.TEXT_HTML_VALUE)) {
             String message = URLEncoder.encode("沒有權限執行此操作", StandardCharsets.UTF_8);
-            response.sendRedirect(request.getContextPath() + "/thestar/admin/home?error=" + message);
+            response.sendRedirect(request.getContextPath() + "/admin/home?error=" + message);
             return;
         }
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);

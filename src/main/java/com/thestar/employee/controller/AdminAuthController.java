@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 的表單登入（formLogin）與 logout filter 直接處理，此處僅保留取得目前登入員工資訊的端點。
  */
 @RestController
-@RequestMapping("/thestar/admin")
+@RequestMapping("/admin")
 public class AdminAuthController {
 
     @GetMapping("/me")

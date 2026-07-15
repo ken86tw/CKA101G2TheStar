@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  * 這裡的頁面 Controller 直接呼叫同一組 Service，避免邏輯重複。
  */
 @Controller
-@RequestMapping("/thestar/admin/employee")
+@RequestMapping("/admin/employee")
 public class EmployeePageController {
 
     private final EmployeeService employeeService;
@@ -81,7 +81,7 @@ public class EmployeePageController {
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/thestar/admin/employee/list";
+        return "redirect:/admin/employee/list";
     }
 
     @GetMapping("/edit/{id}")
@@ -113,7 +113,7 @@ public class EmployeePageController {
                         RedirectAttributes redirectAttributes) {
         employeeService.update(id, dto);
         redirectAttributes.addFlashAttribute("message", "修改成功");
-        return "redirect:/thestar/admin/employee/list";
+        return "redirect:/admin/employee/list";
     }
 
     @PostMapping("/{id}/toggle-status")
@@ -121,7 +121,7 @@ public class EmployeePageController {
                                 RedirectAttributes redirectAttributes) {
         employeeService.updateStatus(id, enabled);
         redirectAttributes.addFlashAttribute("message", enabled ? "已恢復在職" : "已設為離職");
-        return "redirect:/thestar/admin/employee/list";
+        return "redirect:/admin/employee/list";
     }
 
     @PostMapping("/{id}/delete")
@@ -132,7 +132,7 @@ public class EmployeePageController {
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/thestar/admin/employee/list";
+        return "redirect:/admin/employee/list";
     }
 
     @GetMapping("/{id}/roles")
@@ -155,7 +155,7 @@ public class EmployeePageController {
                                RedirectAttributes redirectAttributes) {
         employeeService.assignRoles(id, roleIds == null ? List.of() : roleIds);
         redirectAttributes.addFlashAttribute("message", "角色指派已更新");
-        return "redirect:/thestar/admin/employee/list";
+        return "redirect:/admin/employee/list";
     }
 
     private <T> java.util.Map<Integer, String> lookupNames(List<T> items,

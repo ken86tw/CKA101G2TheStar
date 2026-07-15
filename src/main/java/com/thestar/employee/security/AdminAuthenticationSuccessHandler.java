@@ -23,7 +23,7 @@ public class AdminAuthenticationSuccessHandler extends SavedRequestAwareAuthenti
 
     public AdminAuthenticationSuccessHandler(EmployeeService employeeService) {
         this.employeeService = employeeService;
-        setDefaultTargetUrl("/thestar/admin/home");
+        setDefaultTargetUrl("/admin/home");
     }
 
     @Override
