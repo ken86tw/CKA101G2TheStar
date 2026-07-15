@@ -48,6 +48,20 @@ public class ContentAdminService {
         return articleRepository.findById(id).orElseThrow(() -> new NoSuchElementException("查無文章"));
     }
 
+    public ArticleVO findPublishedArticleAndIncreaseViews(Integer id) {
+        ArticleVO article = articleRepository.findByArticleIdAndStatus(id, (byte) 1)
+                .orElseThrow(() -> new NoSuchElementException("查無文章"));
+        articleRepository.incrementViewCount(id);
+        article.setViewCount((article.getViewCount() == null ? 0 : article.getViewCount()) + 1);
+        return article;
+    }
+
+    @Transactional(readOnly = true)
+    public ArticleVO findPublishedArticle(Integer id) {
+        return articleRepository.findByArticleIdAndStatus(id, (byte) 1)
+                .orElseThrow(() -> new NoSuchElementException("查無文章"));
+    }
+
     public ArticleVO saveArticle(ArticleVO article, Integer fallbackEmployeeId) {
         if (article.getTitle() == null || article.getTitle().isBlank()) {
             throw new IllegalArgumentException("標題為必填");

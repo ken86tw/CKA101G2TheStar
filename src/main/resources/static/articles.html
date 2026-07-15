@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文章專欄｜東方之星 The Star</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/articles.css">
+</head>
+<body>
+<header class="article-header">
+  <nav class="navbar">
+    <a href="/" class="navbar-brand"><span class="brand-zh">東方之星</span><span class="brand-en">The Star</span></a>
+    <div class="nav-links">
+      <a href="/">首頁</a><a href="/#about-preview">關於我們</a><a class="active" href="/articles.html">文章</a>
+      <a href="/roombooking.html">訂房</a><a href="/restaurant">餐廳</a><a href="/facilities.html">設施</a><a href="/shop">購物</a>
+    </div>
+  </nav>
+  <div class="article-hero"><p>THE STAR JOURNAL</p><h1>旅遊文章與最新消息</h1><div class="gold-line"></div></div>
+</header>
+
+<main id="articleApp">
+  <section id="listView" class="article-section">
+    <div class="section-heading"><span>JOURNAL</span><h2>探索東方之星</h2><p>從住宿靈感、在地美食到飯店最新消息，為下一趟旅程做好準備。</p></div>
+    <div id="articleMessage" class="state-message" role="status">文章載入中...</div>
+    <div id="articleGrid" class="article-grid"></div>
+    <div class="pagination"><button id="prevPage" type="button">上一頁</button><span id="pageInfo"></span><button id="nextPage" type="button">下一頁</button></div>
+  </section>
+
+  <article id="detailView" class="detail-section" hidden>
+    <button id="backToList" class="back-button" type="button">← 回文章列表</button>
+    <div id="detailCover" class="detail-cover" hidden><img id="detailCoverImage" alt=""></div>
+    <div class="detail-meta"><span id="detailCategory"></span><time id="detailDate"></time><span id="detailViews"></span></div>
+    <h1 id="detailTitle"></h1>
+    <div id="detailContent" class="detail-content"></div>
+    <section class="reviews">
+      <div class="reviews-heading"><h2>旅人留言</h2><span id="reviewCount"></span></div>
+      <form id="reviewForm" class="review-form">
+        <label for="reviewContent">分享你的想法</label>
+        <textarea id="reviewContent" maxlength="1000" required placeholder="登入會員後即可留言"></textarea>
+        <button type="submit">送出留言</button><p id="reviewFormMessage" role="status"></p>
+      </form>
+      <div id="reviewList" class="review-list"></div>
+    </section>
+  </article>
+</main>
+
+<footer class="article-footer"><a href="/">東方之星 The Star</a><span>享受每一段值得記錄的旅程</span></footer>
+<script src="/js/articles.js"></script>
+</body>
+</html>
