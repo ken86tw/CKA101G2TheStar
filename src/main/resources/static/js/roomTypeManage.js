@@ -1,6 +1,5 @@
 /**
  * THE STAR Hotel - 房型管理系統互動模組
- * 專為飯店後台設計，強調流暢性與簡約美感
  */
 document.addEventListener('DOMContentLoaded', () => {
     console.log("THE STAR 系統交互已啟動 (v2.0)");
@@ -8,14 +7,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. 初始化導覽列與標籤狀態
     initNavigation();
 
-    // 2. 優雅的刪除處理 (加入了 CSS 動畫延遲，體驗更平滑)
+    // 2. 優雅的刪除處理
     initDeleteConfirmations();
     
-    // 3. 即時圖片預覽 (結合透明度過渡，符合圖片細膩風格)
+    // 3. 即時圖片預覽
     initImagePreview();
 });
 
-// 優化導覽列切換：加入 CSS 類別變更，讓樣式即時響應
+// 優化導覽列切換
 function initNavigation() {
     const navLinks = document.querySelectorAll('.nav-links a');
     navLinks.forEach(link => {
@@ -26,16 +25,15 @@ function initNavigation() {
     });
 }
 
-// 刪除確認：飯店後台不需要過多干擾，使用簡潔的確認機制
+// 刪除確認
 function initDeleteConfirmations() {
-    // 這裡對應我們 HTML 中的按鈕類別
-    const deleteButtons = document.querySelectorAll('.btn-del, .btn-icon');
+    const deleteButtons = document.querySelectorAll('.btn-icon');
     
     deleteButtons.forEach(btn => {
         btn.addEventListener('click', function(e) {
-            // 若按鈕包含刪除圖示或相關 Class，則攔截並確認
-            if (this.querySelector('.fa-trash') || this.classList.contains('btn-del')) {
-                if (!confirm("確認執行此刪除操作？")) {
+            // 檢查是否為刪除按鈕 (包含 trash 圖示的才彈出確認)
+            if (this.querySelector('.fa-trash')) {
+                if (!confirm("確定刪除此項目嗎？此操作無法復原。")) {
                     e.preventDefault();
                 }
             }
@@ -43,23 +41,32 @@ function initDeleteConfirmations() {
     });
 }
 
-// 即時圖片預覽：配合 THE STAR 的簡潔預覽區域
+// 即時圖片預覽：增強了對新增與編輯模式的兼容性
 function initImagePreview() {
-    const fileInput = document.querySelector('input[type="file"]');
-    const previewImg = document.querySelector('#previewImg'); // 建議在 HTML 表單給圖片 ID
+    const fileInput = document.getElementById('imageInput');
+    const previewImg = document.getElementById('previewImg');
 
+    // 確保這兩個元素都存在才執行，避免在其他頁面報錯
     if (fileInput && previewImg) {
         fileInput.addEventListener('change', function() {
             if (this.files && this.files[0]) {
                 const reader = new FileReader();
+                
                 reader.onload = (e) => {
-                    previewImg.style.opacity = 0; // 隱藏後淡入
+                    // 設定圖片來源並顯示
                     previewImg.src = e.target.result;
+                    previewImg.style.display = 'block';
                     
-                    // 利用 CSS Transition 產生飯店等級的優雅過渡
+                    // 加入淡入效果
+                    previewImg.style.opacity = 0;
                     previewImg.style.transition = "opacity 0.6s ease-in-out";
-                    setTimeout(() => { previewImg.style.opacity = 1; }, 50);
+                    
+                    // 用 setTimeout 確保樣式變更生效
+                    setTimeout(() => { 
+                        previewImg.style.opacity = 1; 
+                    }, 50);
                 };
+                
                 reader.readAsDataURL(this.files[0]);
             }
         });
