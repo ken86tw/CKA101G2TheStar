@@ -1,7 +1,6 @@
 package com.thestar.order.service;
 
 import com.thestar.room.service.RedisRoomStock;
-import com.thestar.member.service.MemberCouponService;
 
 import com.thestar.order.dto.CreateRoomOrderDTO;
 import com.thestar.order.entity.OrderListVO;
@@ -29,19 +28,17 @@ public class OrderService {
     private final RoomTypeRepository roomTypeRepository;
     private final RefundListRepository refundListRepository;
     private final RedisRoomStock redisRoomStock;
-    private final MemberCouponService memberCouponService;
 
 
     @Autowired
     public OrderService(OrderRepository orderRepository, RoomInventoryRepository roomInventoryRepository
             , RoomTypeRepository roomTypeRepository, RefundListRepository refundListRepository
-            , RedisRoomStock redisRoomStock, MemberCouponService memberCouponService) {
+            , RedisRoomStock redisRoomStock) {
         this.orderRepository = orderRepository;
         this.roomInventoryRepository = roomInventoryRepository;
         this.roomTypeRepository = roomTypeRepository;
         this.refundListRepository = refundListRepository;
         this.redisRoomStock = redisRoomStock;
-        this.memberCouponService = memberCouponService;
     }
 
     @Transactional
@@ -91,10 +88,6 @@ public class OrderService {
 
         }
         
-        int discountAmount = 0;
-        if (dto.getMemberCouponId() != null) {
-            discountAmount =memberCouponService.useCouponForRoomOrder(memberId,dto.getMemberCouponId(),totalAmount);
-        }
         
 
         //使用內部類別建立一個這個訂單所有房型的每日住房清單 因為庫存資料庫是用房型跟天數作為雙主鍵
@@ -148,7 +141,7 @@ public class OrderService {
             ordervo.setCheckInDate(checkInDate);
             ordervo.setCheckOutDate(checkOutDate);
             ordervo.setTotalAmount(totalAmount);
-            ordervo.setDiscountAmount(discountAmount);
+            ordervo.setDiscountAmount(0);
             ordervo.setPaidAmount(0);
             ordervo.setMerchantTradeNo(generateMerchantTradeNo());
 
@@ -223,7 +216,6 @@ public class OrderService {
             LocalDate checkInDate = expiredOrder.getCheckInDate();
             LocalDate checkOutDate = expiredOrder.getCheckOutDate();
             long nights = checkOutDate.toEpochDay() - checkInDate.toEpochDay();
-            memberCouponService.restoreCouponForUnpaidOrder(expiredOrder.getMemberCouponId());
 
             for (OrderListVO orderList : expiredOrder.getOrderList()) {
                 Integer roomTypeId = orderList.getRoomTypeId();

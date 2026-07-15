@@ -30,11 +30,11 @@ public class FakeOrderConfirm {
 
         String merChantTradeNo = order.getMerchantTradeNo();
 
-        int paidAmount = order.getTotalAmount() - order.getDiscountAmount();
+        int totalAmount = order.getTotalAmount();
 
         String ecPay = "dev" + System.currentTimeMillis();
 
-        orderService.confirmOrder(merChantTradeNo, paidAmount, (byte) 1, ecPay);
+        orderService.confirmOrder(merChantTradeNo, totalAmount, (byte) 1, ecPay);
 
         simpMessagingTemplate.convertAndSend("/topic/orders", (Object) Map.of("event", "paid"));
 

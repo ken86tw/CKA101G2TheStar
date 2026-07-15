@@ -222,35 +222,8 @@
                             </tr>
                             </tbody>
                         </table>
-                        <div class="field" style="margin-top:22px">
-                            <label>優惠券 Coupon</label>
-                            <select v-model.number="form.memberCouponId" :disabled="couponsLoading">
-                                <option :value="null">{{ couponsLoading ? '優惠券載入中…' : '不使用優惠券' }}</option>
-                                <option v-for="coupon in availableCoupons" :key="coupon.memberCouponId"
-                                        :value="coupon.memberCouponId">
-                                    {{ coupon.couponName }}｜{{ couponDiscountText(coupon) }}｜{{ couponEndDate(coupon.usageEndTime) }} 到期
-                                </option>
-                            </select>
-                            <p v-if="!couponsLoading && availableCoupons.length === 0" class="coupon-note">
-                                目前沒有可使用的優惠券，<a href="/coupons.html">查看我的優惠券</a>
-                            </p>
-                        </div>
-                        <div v-if="selectedCoupon" class="coupon-preview">
-                            <div>
-                                <span class="coupon-preview-label">Selected Coupon</span>
-                                <strong>{{ selectedCoupon.couponName }}</strong>
-                                <p>{{ selectedCoupon.description || '此優惠券可套用於本次訂房' }}</p>
-                            </div>
-                            <div class="coupon-preview-value">
-                                <b>{{ couponDiscountText(selectedCoupon) }}</b>
-                                <small>有效至 {{ couponEndDate(selectedCoupon.usageEndTime) }}</small>
-                            </div>
-                        </div>
-                        <p style="text-align:right;margin-top:16px">合計 ${{ bookTotal.toLocaleString() }}</p>
-                        <p v-if="couponDiscount > 0" style="text-align:right;color:#a85b50;margin-top:4px">
-                            優惠折抵 −${{ couponDiscount.toLocaleString() }}</p>
-                        <p class="money" style="font-size:24px;text-align:right;margin-top:6px">
-                            應付 ${{ payableTotal.toLocaleString() }}</p>
+                        <p class="money" style="font-size:24px;text-align:right;margin-top:16px">
+                            應付 ${{ bookTotal.toLocaleString() }}</p>
                         <p class="hint" style="text-align:right">實際金額以訂單成立後為準</p>
                         <div style="margin-top:26px;display:flex;justify-content:space-between">
                             <button class="btn ghost" @click="book.step='list'">‹ 返回修改</button>
