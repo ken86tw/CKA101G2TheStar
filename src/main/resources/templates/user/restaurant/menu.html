@@ -15,7 +15,7 @@
 <body>
 
     <!-- 2. 替換為你新路徑的共用 Navbar -->
-    <nav th:replace="~{user/restaurant/userNavBar :: front-navbar('menu')}"></nav>
+    <div th:replace="~{user/common/frontNavbar :: navbar('restaurant-menu', false, 'site-navbar-dark restaurant-navbar', false)}"></div>
 
 <div class="container my-5">
     <h1 class="text-center mb-5 fw-bold">⭐ 璀璨精選菜單 ⭐</h1>
@@ -46,5 +46,6 @@
     <!-- 3. 替換為你新路徑的共用 Footer -->
     <footer th:replace="~{user/restaurant/userNavBar :: front-footer}"></footer>
 
+<script src="/js/header-auth.js"></script>
 </body>
 </html>

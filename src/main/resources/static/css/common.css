@@ -465,3 +465,263 @@ a {
 .nav-actions > .member-menu > .member-avatar {
   margin-left: auto;
 }
+
+/* 會員通知下拉視窗 */
+
+.notification-panel {
+  display: none;
+  position: absolute;
+  top: 48px;
+  right: 48px;
+  z-index: 150;
+  width: 360px;
+  max-height: 430px;
+  color: #3a3329;
+  background: #fffdf8;
+  border: 1px solid #e5dccd;
+  box-shadow: 0 14px 36px rgba(35, 33, 28, 0.16);
+  overflow: hidden;
+}
+
+.notification-panel.show {
+  display: block;
+}
+
+.notification-panel-header {
+  min-height: 58px;
+  padding: 12px 15px;
+  border-bottom: 1px solid #ebe2d5;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.notification-panel-header > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.notification-panel-header strong {
+  color: #493b2c;
+  font-size: 15px;
+}
+
+.notification-panel-header span {
+  color: #948575;
+  font-size: 12px;
+}
+
+.notification-panel-header button {
+  padding: 6px 9px;
+  color: #80633f;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.notification-panel-header button:hover {
+  color: #a07848;
+}
+
+.notification-list {
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  width: 100%;
+  padding: 14px 16px;
+  color: #534a40;
+  background: #fffdf8;
+  border: 0;
+  border-bottom: 1px solid #eee6da;
+  text-align: left;
+  cursor: pointer;
+
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.notification-item:hover {
+  background: #f7f1e8;
+}
+
+.notification-item.unread {
+  background: #f5eadb;
+}
+
+.notification-item.unread::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin-bottom: 1px;
+  background: #b64b3f;
+  border-radius: 50%;
+}
+
+.notification-content {
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.notification-time {
+  color: #998d80;
+  font-size: 11px;
+}
+
+.notification-empty {
+  padding: 34px 20px;
+  color: #93887c;
+  text-align: center;
+  font-size: 13px;
+}
+
+/* 網站底部與員工入口 */
+.site-footer {
+  padding: 24px 6%;
+  color: #8fa5af;
+  background: #1e3a4a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  font-size: 13px;
+}
+
+.site-footer .staff-entry {
+  color: #c9a84c;
+  padding-left: 18px;
+  border-left: 1px solid rgba(201, 168, 76, 0.35);
+}
+
+.site-footer .staff-entry:hover {
+  color: #f1d29b;
+}
+
+@media (max-width: 640px) {
+  .site-footer {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .site-footer .staff-entry {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+/* ========== 全站共用導覽列 ========== */
+.site-navbar-dark {
+  top: 0;
+  z-index: 100;
+  min-height: 68px;
+  background: rgba(30, 45, 55, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(201, 168, 76, 0.2);
+}
+
+.restaurant-navbar {
+  position: sticky;
+}
+
+/* 讓前台 Navbar 所有文字一律保持純白 */
+.site-navbar-dark .navbar-links > a,
+.site-navbar-dark .restaurant-nav-trigger {
+  color: #c9d8e0;
+}
+
+.site-navbar-dark .navbar-links > a:hover,
+.site-navbar-dark .restaurant-nav-trigger:hover {
+  color: #ffffff;
+}
+
+.restaurant-nav-menu {
+  position: relative;
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+}
+
+.restaurant-nav-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: 0.2s;
+}
+
+.shop-navbar .restaurant-nav-trigger,
+.site-navbar-dark .restaurant-nav-trigger {
+  padding: 8px 9px;
+}
+
+.restaurant-nav-trigger i {
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+.restaurant-nav-menu:hover .restaurant-nav-trigger,
+.restaurant-nav-menu:focus-within .restaurant-nav-trigger,
+.restaurant-nav-menu.active-menu .restaurant-nav-trigger {
+  color: var(--color-gold-light);
+  border-bottom-color: #d4a95f;
+}
+
+.restaurant-nav-menu:hover .restaurant-nav-trigger i,
+.restaurant-nav-menu:focus-within .restaurant-nav-trigger i {
+  transform: rotate(180deg);
+}
+
+.restaurant-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 180;
+  min-width: 180px;
+  padding: 6px 0;
+  background: #fffdf8;
+  border: 1px solid #e5dccd;
+  box-shadow: 0 14px 36px rgba(35, 33, 28, 0.16);
+}
+
+.restaurant-nav-menu:hover .restaurant-dropdown,
+.restaurant-nav-menu:focus-within .restaurant-dropdown {
+  display: block;
+}
+
+.navbar .restaurant-dropdown a {
+  display: block;
+  width: 100%;
+  padding: 11px 16px;
+  color: #3a3329;
+  background: transparent;
+  border: 0;
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.5;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.navbar .restaurant-dropdown a:hover,
+.navbar .restaurant-dropdown a.active {
+  color: #9c7c4f;
+  background: #f5efe5;
+  border: 0;
+}
+
+@media (max-width: 980px) {
+  .restaurant-nav-menu {
+    align-self: auto;
+  }
+}

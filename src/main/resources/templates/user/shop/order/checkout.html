@@ -6,9 +6,40 @@
 <title>東方之星 The Star｜結帳</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@300;400;500;700&family=Cormorant+Garamond:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/common.css">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Noto Sans TC', sans-serif; background: #f5f8fa; color: #2c3e50; }
+/* 購物頁 navbar 樣式 */
+.shop-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(30, 45, 55, 0.92);
+  backdrop-filter: blur(8px);
+  height: 68px;
+  border-bottom: 1px solid rgba(201, 168, 76, 0.2);
+  box-shadow: none;
+}
+
+.shop-navbar .navbar-links > a {
+  color: #c9d8e0;
+}
+
+.shop-navbar .navbar-links > a:hover {
+  color: #fff;
+}
+
+.shop-navbar .navbar-links > a.active {
+  color: #c9a84c;
+}
+
+.shop-navbar .navbar-login {
+  color: #fff;
+}
+/*
 .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(30,45,55,0.92); backdrop-filter: blur(8px); padding: 0 48px; height: 68px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(201,168,76,0.2); }
 .navbar-brand { text-decoration: none; display: flex; flex-direction: column; }
 .navbar-brand .brand-zh { font-family: 'Noto Serif TC', serif; font-size: 16px; font-weight: 700; color: #fff; letter-spacing: 2px; }
@@ -18,6 +49,7 @@ body { font-family: 'Noto Sans TC', sans-serif; background: #f5f8fa; color: #2c3
 .navbar-links a:hover { color: #fff; background: rgba(201,168,76,0.15); }
 .navbar-links a.active { color: #c9a84c; border-bottom: 2px solid #c9a84c; }
 .navbar-login { background: #c9a84c; color: #fff !important; padding: 8px 20px !important; border-radius: 4px !important; border: 0; cursor: pointer; font-size: 14px; letter-spacing: 1px; }
+*/
 .page-header { background: linear-gradient(135deg, #1e3a4a 0%, #2d5a6b 50%, #1a2f3a 100%); padding: 120px 0 60px; text-align: center; }
 .page-header h1 { font-family: 'Noto Serif TC', serif; font-size: 2rem; color: #fff; letter-spacing: 6px; }
 .gold-line { width: 60px; height: 2px; background: linear-gradient(90deg, transparent, #c9a84c, transparent); margin: 16px auto; }
@@ -63,28 +95,7 @@ footer { background: #1e3a4a; color: #7a9aaa; text-align: center; padding: 40px 
 </head>
 <body>
 
-<nav class="navbar">
-  <a href="/" class="navbar-brand">
-    <span class="brand-zh">東方之星</span>
-    <span class="brand-en">The Star</span>
-  </a>
-  <div class="navbar-links">
-    <a href="/">首頁</a>
-    <a href="/roombooking.html">訂房</a>
-    <a href="/restaurant">餐廳</a>
-    <a href="/shop" class="active">購物</a>
-    <a href="/shop/cart"><i class="fa-solid fa-cart-shopping"></i></a>
-    <button th:if="${session.loginMember != null}"
-      onclick="logout()"
-      class="navbar-login">
-      <i class="fa-regular fa-user me-1"></i>
-      <span th:text="${session.loginMember.memberName}">會員</span>
-    </button>
-    <a th:if="${session.loginMember == null}" href="/login.html" class="navbar-login">
-      <i class="fa-regular fa-user me-1"></i>登入
-    </a>
-  </div>
-</nav>
+<div th:replace="~{user/common/frontNavbar :: navbar('cart', true, 'shop-navbar site-navbar-dark', false)}"></div>
 
 <div class="page-header">
   <h1>結帳</h1>
@@ -222,11 +233,7 @@ function selectPickup(val) {
   }
 }
 
-function logout() {
-  fetch('/api/member/logout', { method: 'POST' })
-    .then(() => window.location.href = '/shop');
-}
 </script>
-
+<script src="/js/header-auth.js"></script>
 </body>
 </html>

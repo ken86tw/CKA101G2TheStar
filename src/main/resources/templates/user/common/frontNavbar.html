@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- 2. 前台共用 Navbar (傳入 activePage 來動態高亮當前分頁) -->
+<nav th:fragment="navbar(activePage, showCart, navbarClass, vueMode)"
+     class="navbar"
+     th:classappend="${navbarClass}">
+
+  <a href="/index.html" class="navbar-brand">
+    <span class="brand-zh">東方之星</span>
+    <span class="brand-en">The Star</span>
+  </a>
+
+  <div class="nav-links navbar-links">
+    <a href="/index.html"
+       th:classappend="${activePage == 'home'} ? 'active' : ''">首頁</a>
+
+    <a href="/index.html#about-preview">關於我們</a>
+
+    <a href="/articles.html"
+       th:classappend="${activePage == 'articles'} ? 'active' : ''">文章</a>
+
+    <a href="/roombooking.html"
+       th:classappend="${activePage == 'booking'} ? 'active' : ''">訂房</a>
+
+    <div class="restaurant-nav-menu"
+         th:classappend="${#strings.startsWith(activePage, 'restaurant')} ? 'active-menu' : ''">
+
+      <a href="/restaurant"
+         class="restaurant-nav-trigger">
+        餐廳
+        <i class="fa-solid fa-chevron-down"></i>
+      </a>
+
+      <div class="restaurant-dropdown">
+        <a href="/restaurant/index"
+           th:classappend="${activePage == 'restaurant-index'} ? 'active' : ''">
+          餐廳首頁介紹
+        </a>
+
+        <a href="/restaurant/menu"
+           th:classappend="${activePage == 'restaurant-menu'} ? 'active' : ''">
+          美味菜單
+        </a>
+
+        <a href="/restaurant/booking/add"
+           th:classappend="${activePage == 'restaurant-booking'} ? 'active' : ''">
+          線上訂位
+        </a>
+
+        <a href="/restaurant/review"
+           th:classappend="${activePage == 'restaurant-review'} ? 'active' : ''">
+          顧客評論
+        </a>
+      </div>
+    </div>
+
+    <a href="/facilities.html"
+       th:classappend="${activePage == 'facilities'} ? 'active' : ''">設施</a>
+
+    <a href="/index.html#faq">FAQ</a>
+
+    <a href="/shop"
+       th:classappend="${activePage == 'shop'} ? 'active' : ''">購物</a>
+
+    <a th:if="${showCart}"
+       href="/shop/cart"
+       class="cart-link"
+       th:classappend="${activePage == 'cart'} ? 'active' : ''"
+       title="購物車"
+       aria-label="購物車">
+      <i class="fa-solid fa-cart-shopping"></i>
+    </a>
+
+    <!-- 通知按鈕 -->
+    <div th:if="${vueMode}" class="nav-actions">
+      <button class="notify-btn"
+              type="button"
+              title="通知"
+              @click.stop="toggleNotificationPanel">
+        <i class="fa-regular fa-bell"></i>
+        <span class="notify-dot"
+              :style="{display: hasNotify ? 'block' : 'none'}"></span>
+      </button>
+
+      <!-- 通知下拉視窗 -->
+      <div class="notification-panel"
+           :class="{ show: notificationPanelOpen }"
+           @click.stop>
+        <div class="notification-panel-header">
+          <div>
+            <strong>會員通知</strong>
+            <span v-if="notificationUnreadCount > 0">
+              未讀 {{ notificationUnreadCount }} 則
+            </span>
+            <span v-else>沒有未讀通知</span>
+          </div>
+
+          <button type="button"
+                  @click="markAllNotificationsAsRead">
+            全部已讀
+          </button>
+        </div>
+
+        <div class="notification-list">
+          <div v-if="notificationLoading"
+               class="notification-empty">
+            通知讀取中
+          </div>
+
+          <div v-else-if="notifications.length === 0"
+               class="notification-empty">
+            目前沒有通知
+          </div>
+
+          <template v-else>
+            <button v-for="notification in notifications"
+                    :key="notification.memberNotifyId"
+                    type="button"
+                    class="notification-item"
+                    :class="{unread: Number(notification.isRead) === 0}"
+                    @click="openNotification(notification)">
+              <span class="notification-content">
+                {{ notification.content }}
+              </span>
+              <span class="notification-time">
+                {{ formatNotificationTime(notification.createdTime) }}
+              </span>
+            </button>
+          </template>
+        </div>
+      </div>
+
+      <!-- 登入按鈕 -->
+      <button v-if="authReady && !loggedIn"
+              type="button"
+              class="login-btn login-btn-as-button"
+              @click="openLoginModal">
+        登入
+      </button>
+
+      <div v-else-if="authReady"
+           class="member-menu">
+        <button class="member-avatar"
+                type="button"
+                :title="displayName"
+                @click.stop="toggleMemberMenu">
+          <i class="fa-regular fa-user"></i>
+        </button>
+
+        <!-- 會員選單 -->
+        <div class="member-dropdown"
+             :class="{ show: memberDropdownOpen }"
+             @click.stop>
+          <div class="member-greeting">
+            貴賓，{{ displayName }}
+          </div>
+
+          <a href="/profile.html">我的會員資料</a>
+          <a href="/roombooking.html?tab=orders">我的訂房預訂</a>
+          <a href="/restaurant/booking/list">我的餐廳預訂</a>
+          <a href="/shop/order/myOrders">我的購物訂單</a>
+          <a href="/coupons.html">我的優惠券</a>
+
+          <button type="button"
+                  @click="logoutMember">
+            登出
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div th:unless="${vueMode}"
+         class="nav-actions">
+      <button class="notify-btn"
+              id="notifyBtn"
+              type="button"
+              title="通知">
+        <i class="fa-regular fa-bell"></i>
+        <span class="notify-dot"
+              id="notifyDot"></span>
+      </button>
+
+      <a href="/login.html"
+         class="navbar-login login-btn"
+         id="loginLink"
+         style="display: none;">
+        登入
+      </a>
+
+      <div class="member-menu"
+           id="memberMenu"
+           style="display: none;">
+        <button class="member-avatar"
+                id="memberAvatar"
+                type="button"
+                title="會員選單">
+          <i class="fa-regular fa-user"></i>
+        </button>
+
+        <div class="member-dropdown"
+             id="memberDropdown">
+          <div class="member-greeting"
+               id="memberGreeting">
+            貴賓，會員
+          </div>
+
+          <a href="/profile.html">我的會員資料</a>
+          <a href="/roombooking.html?tab=orders">我的訂房預訂</a>
+          <a href="/restaurant/booking/list">我的餐廳預訂</a>
+          <a href="/shop/order/myOrders">我的購物訂單</a>
+          <a href="/coupons.html">我的優惠券</a>
+
+          <button type="button"
+                  id="logoutBtn">
+            登出
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+</body>
+</html>

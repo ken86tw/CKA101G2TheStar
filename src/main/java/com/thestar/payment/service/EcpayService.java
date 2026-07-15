@@ -76,7 +76,11 @@ public class EcpayService {
     }
 
     //組出要送去綠界的結帳表單 把訂單資訊塞成綠界要的參數 算好章 再包成一段會自動送出的html
-    public String buildCheckoutForm(String merChantTradeNo, int totalAmount, String itemName, Integer orderId){
+    public String buildCheckoutForm(String merChantTradeNo, int totalAmount, String itemName, Integer orderId, String clientBackUrlOverride){
+        //前端有帶回導頁網址就用它(本機回本機、ngrok回ngrok) 沒帶就退回設定檔預設值
+        String backUrl = (clientBackUrlOverride != null && !clientBackUrlOverride.isBlank())
+                ? clientBackUrlOverride
+                : clientBackUrl;
         //綠界必填參數一個一個放進map
         Map<String, String>params = new HashMap<>();
         params.put("MerchantID", merchantId);
@@ -88,7 +92,7 @@ public class EcpayService {
         params.put("ItemName", itemName);
         params.put("ReturnURL",returnUrl);
         //付完款使用者點「返回商店」導回前端，帶上 orderId 讓結果頁知道是哪張訂單
-        params.put("ClientBackURL", clientBackUrl + "?orderId=" + orderId);
+        params.put("ClientBackURL", backUrl + "?orderId=" + orderId);
         params.put("ChoosePayment","Credit");
         params.put("EncryptType","1");
 

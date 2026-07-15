@@ -65,12 +65,20 @@ public class MemberLoginFilter extends OncePerRequestFilter {
         return path.equals("/profile.html")
                 || path.equals("/api/member/profile")
                 || path.startsWith("/api/member/profile/")
+                || path.equals("/api/member/coupons")
+                || path.startsWith("/api/member/notifications")
+                || path.equals("/coupons.html")
                 || path.equals("/thestar/order/create")
                 || path.startsWith("/thestar/order/member")
                 || path.startsWith("/thestar/order/cancel")
                 || path.startsWith("/thestar/ecpay/checkout")
                 || path.equals("/shop/cart")
-                || path.startsWith("/shop/cart/");
+                || path.startsWith("/shop/cart/")
+                || path.equals("/restaurant/booking")
+                || path.startsWith("/restaurant/booking/")
+                || path.equals("/restaurant/review/add")
+                || path.equals("/restaurant/submitReview");
+        		
     }
 
     private boolean isApiRequest(String path, HttpServletRequest request) {
@@ -107,6 +115,13 @@ public class MemberLoginFilter extends OncePerRequestFilter {
                 || path.startsWith("/thestar/ecpay/")) {
             return "/roombooking.html";
         }
+        
+        if (path.equals("/restaurant/booking")
+                || path.startsWith("/restaurant/booking/")
+                || path.startsWith("/restaurant/ubmitReview/")) {
+            return "/restaurant/booking/add";
+        }
+
 
         return "/index.html";
     }
