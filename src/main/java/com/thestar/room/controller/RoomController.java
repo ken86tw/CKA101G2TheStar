@@ -3,11 +3,13 @@ package com.thestar.room.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.thestar.room.entity.RoomTypeVO;
 import com.thestar.room.entity.RoomVO;
@@ -48,43 +50,47 @@ public class RoomController {
 
 	// 執行新增
 	@PostMapping("/insert")
-	public String insert(RoomVO roomVO, @RequestParam("roomTypeId") Integer typeId) {
-		// 手動將 ID 轉成物件
-		RoomTypeVO roomTypeVO = roomTypeService.getOneRoomType(typeId);
-//		roomVO.setRoomTypeVO(typeVO);
+	public String insert(RoomVO roomVO, BindingResult result, RedirectAttributes redirectAttributes) {
+		// 1. 先檢查重複 (使用您剛才學到的 existsById)
+		if (roomService.existsById(roomVO.getRoomId())) {
+			redirectAttributes.addFlashAttribute("error", "錯誤：房間編號 " + roomVO.getRoomId() + " 已存在！");
+			return "redirect:/room/roomForm";
+		}
 
-		roomVO.setRoomTypeId(typeId);
+		// 2. 直接儲存 (因為 roomTypeId 已經由前端表單傳入並綁定到 roomVO 了)
+		// 透過 th:field="*{roomTypeId}"，Spring 會自動幫您設定好
 		roomService.save(roomVO);
 		return "redirect:/room/manage";
 	}
 
 	// 進入修改頁面 (回填資料)
-    @GetMapping("/edit/{roomId}")
-    public String editInput(@PathVariable("roomId") Integer roomId, Model model) {
-        // 1. 根據 ID 查詢現有的房間資料
-        RoomVO roomVO = roomService.findById(roomId);
-        model.addAttribute("roomVO", roomVO);
-        
-        // 2. 帶入房型列表，讓頁面上的下拉選單可以選擇
-        model.addAttribute("roomTypeList", roomTypeService.getAllRoomTypes());
-        
-        // 3. 導向到同一個表單頁面 (roomForm.html)
-        return "admin/room/roomForm";
-    }
+	@GetMapping("/edit/{roomId}")
+	public String editInput(@PathVariable("roomId") Integer roomId, Model model) {
+		// 1. 根據 ID 查詢現有的房間資料
+		RoomVO roomVO = roomService.findById(roomId);
+		model.addAttribute("roomVO", roomVO);
 
-    // 執行修改
-    @PostMapping("/update")
-    public String update(RoomVO roomVO, @RequestParam("roomTypeId") Integer typeId) {
-        // 1. 設定關聯的房型 ID
-        roomVO.setRoomTypeId(typeId);
-        
-        // 2. 呼叫 Service 的更新方法
-        // 注意：這裡假設你的 service 有 update 方法，若沒有，通常也是呼叫 save
-        roomService.save(roomVO);
-        
-        return "redirect:/room/manage";
-    }
-	
+		// 2. 帶入房型列表，讓頁面上的下拉選單可以選擇
+		model.addAttribute("roomTypeList", roomTypeService.getAllRoomTypes());
+
+		// 3. 導向到同一個表單頁面 (roomForm.html)
+		return "admin/room/roomForm";
+	}
+
+	// 執行修改
+	@PostMapping("/update")
+	public String update(RoomVO roomVO, @RequestParam("roomTypeId") Integer typeId) {
+		// 1. 設定關聯的房型 ID
+		RoomVO exist = roomService.findById(roomVO.getRoomId());
+		exist.setRoomTypeId(typeId);
+		exist.setRoomSwitchStatus(roomVO.getRoomSwitchStatus());
+
+		// 2. 呼叫 Service 的更新方法
+		// 注意：這裡假設你的 service 有 update 方法，若沒有，通常也是呼叫 save
+		roomService.save(exist);
+
+		return "redirect:/room/manage";
+	}
 
 	// 執行刪除
 	@PostMapping("/delete")
