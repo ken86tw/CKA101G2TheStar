@@ -56,17 +56,26 @@ public class RoomController {
 
 	// 執行新增
 	@PostMapping("/insert")
-	public String insert(RoomVO roomVO, BindingResult result, RedirectAttributes redirectAttributes) {
-		// 1. 先檢查重複 (使用您剛才學到的 existsById)
-		if (roomService.existsById(roomVO.getRoomId())) {
-			redirectAttributes.addFlashAttribute("error", "錯誤：房間編號 " + roomVO.getRoomId() + " 已存在！");
-			return "redirect:/room/roomForm";
-		}
+	public String insert(RoomVO roomVO, RedirectAttributes redirectAttributes) {
+	    // 1. 後端即時計算當前總數
+	    int currentCount = roomService.findAll().size();
+	    
+	    // 2. 邏輯阻擋：如果已經等於或超過 50，直接攔截並導回列表頁顯示錯誤
+	    if (currentCount >= 50) {
+	        redirectAttributes.addFlashAttribute("errorMessage", "新增失敗：房間總數已達上限！");
+	        return "redirect:/room/manage";
+	    }
 
-		// 2. 直接儲存 (因為 roomTypeId 已經由前端表單傳入並綁定到 roomVO 了)
-		// 透過 th:field="*{roomTypeId}"，Spring 會自動幫您設定好
-		roomService.save(roomVO);
-		return "redirect:/room/manage";
+	    // 3. 原有的重複編號檢查
+	    if (roomService.existsById(roomVO.getRoomId())) {
+	        redirectAttributes.addFlashAttribute("errorMessage", "錯誤：房間編號 " + roomVO.getRoomId() + " 已存在！");
+	        return "redirect:/room/add";
+	    }
+
+	    // 4. 正常儲存
+	    roomService.save(roomVO);
+	    redirectAttributes.addFlashAttribute("successMessage", "房間新增成功！");
+	    return "redirect:/room/manage";
 	}
 
 	// 進入修改頁面 (回填資料)

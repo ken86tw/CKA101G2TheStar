@@ -51,13 +51,11 @@ public class RoomService {
 		return room;
 	}
 
-	
 	// 新增或更新房間
 	public RoomVO save(RoomVO room) {
 		return repository.save(room);
 	}
 
-	
 	// 刪除房間
 	public void deleteById(Integer id) {
 		repository.deleteById(id);
@@ -67,5 +65,11 @@ public class RoomService {
 	public boolean existsById(Integer roomId) {
 		// 這裡直接呼叫 repository 內建的方法
 		return repository.existsById(roomId);
+	}
+
+	// 目前在 room 資料表中，有多少間房間屬於指定的房型 (由 roomTypeId 指定)
+	// 根據房型編號，統計資料庫中該房型目前已配置的房間總數。
+	public long countRoomsByTypeId(Integer roomTypeId) {
+		return repository.countByRoomTypeId(roomTypeId);
 	}
 }

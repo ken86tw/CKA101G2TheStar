@@ -29,14 +29,14 @@
 }
 
 header {
-    position: relative; /* 或 sticky */
-    z-index: 1000;      /* 設定一個夠大的數值，確保它在最上層 */
+	position: relative; /* 或 sticky */
+	z-index: 1000; /* 設定一個夠大的數值，確保它在最上層 */
 }
 
 /* 2. 確保 .admin-header 的 z-index 低於 header */
 .admin-header {
-    position: relative;
-    z-index: 1;         /* 讓它的層級小於 header */
+	position: relative;
+	z-index: 1; /* 讓它的層級小於 header */
 }
 
 html, body {
@@ -101,21 +101,30 @@ a {
 		</header>
 
 		<main class="admin-content">
-			<!-- 成功訊息區塊 -->
-			<div th:if="${successMessage}"
-				style="margin-bottom: 20px; padding: 15px; background-color: #f6f2ea; border: 1px solid #9c7c4f; color: #9c7c4f; text-align: center; border-radius: 4px;">
+			<!-- 統一的訊息顯示區塊：成功與失敗都放在這裡 -->
+			<div th:if="${successMessage}" class="msg-box success">
 				<i class="fa-solid fa-check-circle"></i> <span
 					th:text="${successMessage}"></span>
 			</div>
+			<div th:if="${errorMessage}" class="msg-box error">
+				<i class="fa-solid fa-triangle-exclamation"></i> <span
+					th:text="${errorMessage}"></span>
+			</div>
 
-			<!-- Toolbar 區塊 -->
 			<div class="toolbar">
 				<div class="admin-stats">
-					目前共有 <span th:text="${#lists.size(roomList)}">0</span> 間客房
+					<!-- 調整為與房型管理一致的顯示格式 -->
+					目前共有 <span th:text="${#lists.size(roomList)}">0</span> 間房間， <span
+						style="color: #9c7c4f; font-weight: bold;"> (剩餘可用額度: <span
+						th:text="${50 - #lists.size(roomList)}">50</span> 間)
+					</span>
 				</div>
+
+				<!-- 新增按鈕 -->
 				<a th:href="@{/room/add}" class="btn btn-primary"> <i
 					class="fa-solid fa-plus"></i> 新增房間
-				</a>
+				</a> <span th:if="${#lists.size(roomList) >= 50}"
+					style="color: #a85b50; font-weight: bold;"> 已達最大上限 </span>
 			</div>
 
 			<table class="room-table">

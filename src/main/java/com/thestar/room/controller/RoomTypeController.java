@@ -18,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.thestar.room.dto.RoomTypePhotoDTO;
 import com.thestar.room.entity.RoomTypePhotoVO;
 import com.thestar.room.entity.RoomTypeVO;
+import com.thestar.room.service.RoomService;
 import com.thestar.room.service.RoomTypePhotoService;
 import com.thestar.room.service.RoomTypeService;
 
@@ -26,6 +27,9 @@ import jakarta.validation.Valid;
 @Controller
 @RequestMapping("/roomtype") // 設定網址路徑
 public class RoomTypeController {
+	
+	@Autowired
+	private RoomService roomService;
 
 	@Autowired
 	private RoomTypeService service;
@@ -36,23 +40,24 @@ public class RoomTypeController {
 	// 所有房型總覽
 	@GetMapping("/manage")
 	public String showRoomTypesPage(Model model) {
-		// 取得所有房型資料
-		List<RoomTypeVO> list = service.getAllRoomTypes();
-		// 計算總房型類別數
-		int totalCount = list.size();
-		// 計算所有房型的總庫存數量 (將每個房型的 roomTypeAmount 相加)
-		int totalAmount = list.stream()
-				.mapToInt(room -> room.getRoomTypeAmount() != null ? room.getRoomTypeAmount() : 0).sum();
+	    List<RoomTypeVO> list = service.getAllRoomTypes();
+	    
+	    // 1. 取得所有真實的實體房間總數 (這是「總庫存」)
+	    int actualTotalCount = roomService.findAll().size();
+	    
+	    // 2. 計算剩餘額度：使用總上限 50 - 實際房間總數
+	    // 這樣 總庫存(actualTotalCount) + 剩餘(remaining) 就會等於 50
+	    int remaining = 50 - actualTotalCount;
 
-		// roomTypeManage管理頁面使用，顯示庫存剩餘數量
-		int remaining = 50 - totalAmount;
-
-		// 將資料放入 Model 中
-		model.addAttribute("rooms", list);
-		model.addAttribute("totalCount", totalCount);
-		model.addAttribute("totalAmount", totalAmount);
-		model.addAttribute("remaining", remaining);
-		return "admin/room/roomTypeManage";
+	    model.addAttribute("rooms", list);
+	    model.addAttribute("totalCount", list.size()); // 房型種類數
+	    model.addAttribute("totalAmount", actualTotalCount); // 顯示真實的總房間數
+	    model.addAttribute("remaining", remaining); // 顯示正確的剩餘額度
+	    
+	    // 必須傳入 roomService，讓 HTML 顯示各別房型的實體數量
+	    model.addAttribute("roomService", roomService); 
+	    
+	    return "admin/room/roomTypeManage";
 	}
 
 	// 檢視房型詳細資料
