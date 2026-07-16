@@ -2,99 +2,136 @@
 <html lang="zh-TW" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>房型詳細資訊</title>
+<title>房型詳細資料 | THE STAR</title>
 <link rel="stylesheet" th:href="@{/css/roomTypeManage.css}">
-
 <style>
-.detail-container {
+.form-container {
 	max-width: 600px;
-	margin: 50px auto;
+	margin: 40px auto 50px auto;
 	background: white;
 	padding: 40px;
 	border: 1px solid #e0dcd5;
 }
 
-.detail-group {
+.photo-container {
+	max-width: 600px;
+	margin: 50px auto 0 auto;
+	background: white;
+	padding: 20px 40px;
+	border: 1px solid #e0dcd5;
+	border-bottom: none;
+}
+
+.content-display {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e0dcd5;
+    background-color: #f9f9f9;
+    color: #555;
+    box-sizing: border-box; /* 確保寬度計算包含 padding */
+    min-height: 150px;      /* 給它一個高度 */
+    white-space: pre-wrap;  /* 關鍵：讓資料庫中的換行符號能顯示出來 */
+    font-size: 14px;        /* 設定與 input 接近的字體大小 */
+    font-family: inherit; /* 確保字體與輸入框一致 */
+}
+
+.form-group {
 	margin-bottom: 25px;
 }
 
-.detail-group label {
+.form-group label {
 	display: block;
 	margin-bottom: 8px;
 	color: #888;
 	font-size: 13px;
+	letter-spacing: 1px;
+	font-weight: bold;
 }
 
-.detail-value {
-	padding: 10px;
-	border-bottom: 1px solid #eee;
-	color: #4a4a4a;
+.form-group input, .form-group .content-display, .form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e0dcd5;
+    background-color: #f9f9f9;
+    color: #555;
+    box-sizing: border-box;
+    font-size: 14px; /* 設定與編輯頁輸入框相同的字體大小 */
 }
 
-img {
-	max-width: 100%;
+.photo-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 15px;
+	margin-top: 10px;
+}
+
+.photo-item img {
+	width: 120px;
+	height: 120px;
+	object-fit: cover;
 	border-radius: 4px;
-}
-
-.btn.ghost {
-	display: inline-block;
-	padding: 12px;
-	border: 1px solid #23211c; /* 黑色邊框 */
-	background-color: transparent; /* 平常為透明/白色底 */
-	color: #23211c !important; /* 平常為黑色文字 */
-	text-decoration: none;
-	text-align: center;
-	transition: all 0.3s ease;
-}
-
-/* 移上去時變成黑底白字 */
-.btn.ghost:hover {
-	background-color: #23211c;
-	color: #ffffff !important;
+	border: 1px solid #eee;
 }
 </style>
 </head>
 <body>
+
 	<div class="container">
-		<div class="detail-container">
-			<h1>房型詳細檢視</h1>
-			<div class="detail-group">
-				<label>房型名稱</label>
-				<div class="detail-value" th:text="${roomTypeVO.roomTypeName}"></div>
+		<!-- 圖片顯示區塊 -->
+		<div class="photo-container">
+			<div class="form-group" style="margin-bottom: 0;">
+				<label>房型圖片預覽</label>
+				<div class="photo-grid">
+					<div class="photo-item" th:each="photo : ${photoList}">
+						<img
+							th:src="@{'/roomtypephoto/display/photo/' + ${photo.roomTypePhotoId}}"
+							alt="房型圖片">
+					</div>
+					<div th:if="${#lists.isEmpty(photoList)}"
+						style="color: #999; padding: 10px;">目前無圖片</div>
+				</div>
 			</div>
-			<div class="detail-group">
-				<label>圖片</label> <img
-					th:src="@{'/roomtypephoto/display/' + ${roomTypeVO.roomTypeId}}"
-					alt="房型圖片">
-			</div>
-			<div class="detail-group">
-				<label>庫存數量</label>
-				<div class="detail-value" th:text="${roomTypeVO.roomTypeAmount}"></div>
+		</div>
+
+		<!-- 唯讀資料表單 -->
+		<div class="form-container">
+			<div class="form-group">
+				<label>房型編號</label> <input type="text"
+					th:value="${roomTypeVO.roomTypeId}" disabled />
 			</div>
 
-			<div class="detail-group">
+			<div class="form-group">
+				<label>房型名稱</label> <input type="text"
+					th:value="${roomTypeVO.roomTypeName}" disabled />
+			</div>
+
+			<div class="form-group">
+				<label>庫存數量</label> <input type="text"
+					th:value="${roomTypeVO.roomTypeAmount}" disabled />
+			</div>
+			
+			<div class="form-group">
 				<label>房型說明</label>
-				<div class="detail-value" style="white-space: pre-line;"
-					th:text="${roomTypeVO.roomTypeContent}"></div>
+				<div class="content-display" th:text="${roomTypeVO.roomTypeContent}"></div>
 			</div>
 
-
-
-			<div class="detail-group">
-				<label>價格 (NT$)</label>
-				<div class="detail-value" th:text="${roomTypeVO.roomTypePrice}"></div>
-			</div>
-			<!-- 新增：房型啟用狀態顯示區塊 -->
-			<div class="detail-group">
-				<label>啟用狀態</label>
-				<!-- 假設後端欄位名稱為 roomTypeStatus，您可根據實際 Entity/VO 屬性名修改 -->
-				<div class="detail-value"
-					th:text="${roomTypeVO.roomTypeStatus == 1 ? '已上架' : '未上架'}"></div>
+			<div class="form-group">
+				<label>價格 (NT$)</label> <input type="text"
+					th:value="${roomTypeVO.roomTypePrice}" disabled />
 			</div>
 
+			
+			<div class="form-group">
+				<label>房型狀態</label> <input type="text"
+					th:value="${roomTypeVO.roomTypeStatus ? '啟用' : '未啟用'}" disabled />
+			</div>
 
-			<a th:href="@{/roomtype/manage}" class="btn ghost">返回列表</a>
+			<div class="btn-row">
+				<!-- 注意這裡：因為是房型管理，返回路徑應為 /roomtype/manage -->
+				<a th:href="@{/roomtype/manage}" class="btn ghost">返回列表</a>
+			</div>
 		</div>
 	</div>
+
 </body>
 </html>

@@ -1,5 +1,5 @@
 /**
- * THE STAR Hotel - 房型管理系統互動模組 (全功能整合版 v2.3)
+ * THE STAR Hotel - 房型管理系統互動模組 (全功能整合版 v2.4)
  */
 document.addEventListener('DOMContentLoaded', () => {
     console.log("THE STAR 系統交互已啟動");
@@ -63,14 +63,15 @@ function initImagePreview() {
     }
 }
 
-// 統一表單驗證：名稱、數量、價格、說明
+// 統一表單驗證：包含庫存數量上限控制
 function initFormValidations() {
     const form = document.querySelector('form');
+    const MAX_AMOUNT = 99; // 設定庫存上限值
     
     // 定義驗證規則
     const fields = [
         { id: 'roomTypeName', pattern: /^[\u4e00-\u9fa5a-zA-Z0-9]+$/, errorMsg: "請輸入中文、英文或數字，且不含特殊符號" },
-        { id: 'amountInput', pattern: /^[1-9][0-9]*$/, errorMsg: "請輸入大於 0 的有效整數" },
+        { id: 'amountInput', pattern: /^[1-9][0-9]*$/, errorMsg: `請輸入 1 至 ${MAX_AMOUNT} 之間的庫存數量` },
         { id: 'priceInput', pattern: /^[1-9][0-9]*$/, errorMsg: "請輸入大於 0 的金額" },
         { id: 'contentInput', pattern: /.+/, errorMsg: "房型說明不可為空" }
     ];
@@ -92,13 +93,21 @@ function initFormValidations() {
 
         // 輸入監聽
         input.addEventListener('input', function() {
-            // 若為數字欄位，強制濾除非數字字元
+            let val = this.value;
+
+            // 針對數字欄位進行過濾
             if (field.id === 'amountInput' || field.id === 'priceInput') {
                 this.value = this.value.replace(/[^0-9]/g, '');
-                // 額外防止輸入0
+                val = this.value;
+                
+                // 額外邏輯：庫存上限控制
+                if (field.id === 'amountInput' && parseInt(val) > MAX_AMOUNT) {
+                    this.value = MAX_AMOUNT;
+                }
                 if (this.value === '0') this.value = '';
             }
 
+            // 驗證邏輯
             const isValid = field.pattern.test(this.value.trim());
             const errorSpan = input.nextElementSibling;
             
@@ -118,16 +127,22 @@ function initFormValidations() {
             let hasError = false;
             fields.forEach(field => {
                 const input = document.getElementById(field.id);
-                if (input && (!input.value.trim() || !field.pattern.test(input.value.trim()))) {
-                    hasError = true;
-                    input.style.borderColor = '#a85b50';
-                    if (input.nextElementSibling) input.nextElementSibling.style.display = 'block';
+                if (input) {
+                    const val = input.value.trim();
+                    const isInvalid = !val || !field.pattern.test(val) || 
+                                     (field.id === 'amountInput' && parseInt(val) > MAX_AMOUNT);
+                    
+                    if (isInvalid) {
+                        hasError = true;
+                        input.style.borderColor = '#a85b50';
+                        if (input.nextElementSibling) input.nextElementSibling.style.display = 'block';
+                    }
                 }
             });
 
             if (hasError) {
                 e.preventDefault();
-                alert("表單驗證未通過：請確保所有欄位已填寫正確數值，且房型說明不可為空。");
+                alert("表單驗證未通過，請檢查輸入內容是否超出庫存上限或格式錯誤。");
             }
         });
     }

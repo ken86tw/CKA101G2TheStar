@@ -92,10 +92,20 @@ a {
 		</header>
 
 		<main class="admin-content">
+		
+		<!--   新增後顯示成功訊息 -->
+		<div th:if="${successMessage}" style="margin-bottom: 20px; padding: 15px; background-color: #f6f2ea; border: 1px solid #9c7c4f; color: #9c7c4f; text-align: center; border-radius: 4px;">
+        <i class="fa-solid fa-check-circle"></i> <span th:text="${successMessage}"></span>
+    </div>
+		
+		
 			<div class="toolbar">
 				<div class="admin-stats">
-					目前共有 <span th:text="${totalCount}">0</span> 種房型，總庫存 <span
-						th:text="${totalAmount}">0</span> 間
+					目目前共有 <span th:text="${totalCount}">0</span> 種房型， 總庫存 <span
+						th:text="${totalAmount}">0</span> 間，
+					<!-- 加入剩餘庫存顯示 -->
+					<span style="color: #9c7c4f; font-weight: bold;"> (剩餘可用額度:
+						[[${remaining}]] 間) </span>
 				</div>
 				<a th:href="@{/roomtype/add}" class="btn btn-primary"> <i
 					class="fa-solid fa-plus"></i> 新增房型
@@ -116,7 +126,7 @@ a {
 				<tbody>
 					<tr th:each="room : ${rooms}">
 						<td><img
-							th:src="@{/roomtypephoto/display/{id}(id=${room.roomTypeId})}"
+							th:src="@{/roomtypephoto/display/room/{id}(id=${room.roomTypeId})}"
 							class="table-img" alt="房型圖片"></td>
 						<td th:text="${room.roomTypeName}"></td>
 						<td th:text="${room.roomTypeAmount} + ' 間'"></td>

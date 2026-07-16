@@ -65,21 +65,8 @@ public class RoomTypePhotoService {
 	// 更新圖片
 	@Transactional
 	public void updateRoomTypePhoto(RoomTypePhotoDTO request) {
-		// 1. 直接根據圖片的唯一 ID 取得物件
 		RoomTypePhotoVO photo = roomTypePhotoRepository.findById(request.getRoomTypePhotoId())
 				.orElseThrow(() -> new IllegalArgumentException("找不到該圖片記錄"));
-		try {
-			// 2. 只有在使用者真的有上傳新圖時，才更新 byte[]
-			if (request.getRoomTypePic() != null && !request.getRoomTypePic().isEmpty()) {
-				photo.setRoomTypePic(request.getRoomTypePic().getBytes());
-			}
-
-			// 3. 房型 ID 若有變更（通常不會），可在這裡處理
-			// 若房型關聯是固定的，這裡其實不需要重複 set
-			roomTypePhotoRepository.save(photo);
-		} catch (java.io.IOException e) {
-			throw new RuntimeException("圖片處理失敗", e);
-		}
 
 		try {
 			if (request.getRoomTypePic() != null && !request.getRoomTypePic().isEmpty()) {
@@ -100,9 +87,9 @@ public class RoomTypePhotoService {
 	public List<RoomTypePhotoVO> getAllPhotos() {
 		return roomTypePhotoRepository.findAll();
 	}
-	
+
 	// roomList前台用，抓取第一張圖
 	public RoomTypePhotoVO findFirstByRoomTypeId(Integer roomTypeId) {
-	    return roomTypePhotoRepository.findTop1ByRoomTypeVORoomTypeIdOrderByRoomTypePhotoIdAsc(roomTypeId);
+		return roomTypePhotoRepository.findTop1ByRoomTypeVORoomTypeIdOrderByRoomTypePhotoIdAsc(roomTypeId);
 	}
 }

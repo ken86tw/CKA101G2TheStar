@@ -1,10 +1,13 @@
 /* --- THE STAR 品牌基調 --- */
 :root {
-	--brand-bg: #f7f3ed; /* 頁面底色 */
-	--brand-panel: #fcfbf9; /* 面板/卡片底色 */
-	--brand-text: #4a4a4a; /* 主要文字 */
-	--brand-accent: #9c8a77; /* 輔助色(金褐色) */
-	--border-color: #e0dcd5; /* 分隔線 */
+	--brand-bg: #f7f3ed;
+    --brand-panel: #fcfbf9;
+    --brand-text: #4a4a4a;
+    --brand-accent: #9c8a77; /* 金褐色 */
+    --gold: #9c8a77;        /* 補上這個變數 */
+    --gold-d: #80623a;      /* 補上懸停用的深色 */
+    --ink: #23211c;         /* 補上深墨色 */
+    --border-color: #e0dcd5;
 }
 
 body {

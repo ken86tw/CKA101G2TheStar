@@ -1,5 +1,7 @@
 package com.thestar.room.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,6 +21,7 @@ public class RoomTypePhotoVO {
 	@Column(name = "ROOM_TYPE_PHOTO_ID")
 	private Integer roomTypePhotoId;
 
+	@JsonIgnore // 忽略對應的房型物件，只回傳圖片相關資訊，僅適用於JSON回傳，不影響其他物件功能
 	@ManyToOne  //FK，多個房型圖片對應到一種房型
 	@JoinColumn(name = "ROOM_TYPE_ID")
 	private RoomTypeVO roomTypeVO;
