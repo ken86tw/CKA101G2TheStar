@@ -111,6 +111,7 @@ createApp({
             this.employee.id = emp.employeeId;
             this.employee.on = emp.employeeId;
             this.employee.name = emp.employeeName;
+            this.browsing = false;   // 關掉訪客瀏覽旗:員工不該看到「預訂客房」分頁與查房頁
             this.connectWs();   // 員工身分確認後連線 訂閱 rooms/orders/refunds 頻道
             this.nav = 'admin';
             this.loadAdmin();
