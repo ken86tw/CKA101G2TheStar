@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -129,6 +130,8 @@ public class RestaurantBookingController {
 				.collect(Collectors.toList());
 	}
 
+	
+
 	@PostMapping("/submit")
 	public String submitBooking(@ModelAttribute("reservationVO") RestaurantReservationVO reservationVO,
 			BindingResult result, @RequestParam("guests") int guests, Model model,
@@ -146,13 +149,15 @@ public class RestaurantBookingController {
 		} else if (guests >= 5 && guests <= 10) {
 			tableVO.setTableTypeId(1);
 		} else {
+			// 修正 1：補上 loginMember
+			model.addAttribute("loginMember", loginMember);
 			model.addAttribute("errorMessage", "訂位人數不符合規範（限制 1-10 人）。");
 
 			LocalDate localDate = (reservationVO.getDate() != null)
 					? ((java.sql.Date) reservationVO.getDate()).toLocalDate()
 					: null;
 			prepareFormDropLists(model, guests, localDate);
-			return "user/restaurant/booking";
+			return "user/restaurant/booking/add"; // 💡 提醒：確保這裡路徑跟 GET 一致是 add
 		}
 		reservationVO.setRestaurantTableVO(tableVO);
 
@@ -168,36 +173,43 @@ public class RestaurantBookingController {
 		}
 
 		if (result.hasErrors()) {
+			// 修正 2：補上 loginMember
+			model.addAttribute("loginMember", loginMember);
 			model.addAttribute("errorMessage", "輸入資料有誤，請檢查欄位。");
 			LocalDate localDate = (reservationVO.getDate() != null)
 					? ((java.sql.Date) reservationVO.getDate()).toLocalDate()
 					: null;
 			prepareFormDropLists(model, guests, localDate);
-			return "user/restaurant/booking";
+			return "user/restaurant/booking/add";
 		}
 
 		try {
-			reservationService.addReservation(reservationVO);
+		    LocalDate selectedDate = ((java.sql.Date) reservationVO.getDate()).toLocalDate();
+		    Integer selectedSessionId = reservationVO.getBusinessHoursVO().getSessionId();
 
-			LocalDate selectedDate = ((java.sql.Date) reservationVO.getDate()).toLocalDate();
-			Integer selectedSessionId = reservationVO.getBusinessHoursVO().getSessionId();
+		    // 💡 步驟 A：先扣減桌數（如果沒位子，這裡會直接噴 Exception 跳到 catch）
+		    if (tableVO.getTableTypeId() == 2) {
+		        availableTableService.decreaseSmallTableCount(selectedDate, selectedSessionId);
+		    } else {
+		        availableTableService.decreaseLargeTableCount(selectedDate, selectedSessionId);
+		    }
 
-			if (tableVO.getTableTypeId() == 2) {
-				availableTableService.decreaseSmallTableCount(selectedDate, selectedSessionId);
-			} else {
-				availableTableService.decreaseLargeTableCount(selectedDate, selectedSessionId);
-			}
+		    // 💡 步驟 B：扣桌成功，代表搶到位子了！這時候才真正寫入預約單
+		    reservationService.addReservation(reservationVO);
 
-			redirectAttributes.addFlashAttribute("successMessage", "恭喜您！訂位預約成功！");
-			return "redirect:/restaurant/booking/list";
+		    redirectAttributes.addFlashAttribute("successMessage", "恭喜您！訂位預約成功！");
+		    return "redirect:/restaurant/booking/list";
 
 		} catch (Exception e) {
-			model.addAttribute("errorMessage", "訂位失敗：" + e.getMessage());
-			LocalDate localDate = (reservationVO.getDate() != null)
-					? ((java.sql.Date) reservationVO.getDate()).toLocalDate()
-					: null;
-			prepareFormDropLists(model, guests, localDate);
-			return "user/restaurant/booking";
+		    // 這裡可以完美捕捉「非常抱歉，該時段的...已被訂滿！」的訊息，再也不會噴出無情的 500 錯誤頁面了
+		    model.addAttribute("loginMember", loginMember);
+		    model.addAttribute("errorMessage", "訂位失敗：" + e.getMessage());
+		    
+		    LocalDate localDate = (reservationVO.getDate() != null)
+		            ? ((java.sql.Date) reservationVO.getDate()).toLocalDate()
+		            : null;
+		    prepareFormDropLists(model, guests, localDate);
+		    return "user/restaurant/booking/add";
 		}
 	}
 
