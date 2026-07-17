@@ -433,6 +433,13 @@ public class MemberCouponService {
 	        if (fixedAmount == null || fixedAmount <= 0) {
 	            throw new IllegalStateException("固定金額優惠券設定錯誤");
 	        }
+	        /*
+	         * 固定金額券的訂單金額必須大於折抵金額，
+	         * 避免應付金額變成 0 元。
+	         */
+	        if (totalAmount <= fixedAmount) {
+	            throw new IllegalArgumentException("此優惠券需消費滿 " + (fixedAmount + 1) + " 元才能使用");
+	        }
 	        discountAmount = Math.min(totalAmount, fixedAmount);
 	    } else if (coupon.getDiscountType() != null
 	            && coupon.getDiscountType() == 2) {

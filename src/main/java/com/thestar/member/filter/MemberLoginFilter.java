@@ -122,7 +122,7 @@ public class MemberLoginFilter extends OncePerRequestFilter {
         
         if (path.equals("/restaurant/booking")
                 || path.startsWith("/restaurant/booking/")
-                || path.startsWith("/restaurant/ubmitReview/")) {
+                || path.startsWith("/restaurant/submitReview/")) {
             return "/restaurant/booking/add";
         }
 

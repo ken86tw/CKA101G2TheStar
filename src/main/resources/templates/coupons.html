@@ -2,343 +2,245 @@
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>我的優惠券｜東方之星 The Star</title>
+<title>我的優惠券｜東方之星 The Star</title>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+	href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap"
+	rel="stylesheet">
 
-    <link rel="stylesheet" href="/css/common.css">
-    <link rel="stylesheet" href="/css/coupons.css">
+<link rel="stylesheet" href="/css/common.css">
+<link rel="stylesheet" href="/css/coupons.css">
 
-    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 </head>
 
 <body>
 
-  <header class="coupon-site-header">
-    <div th:replace="~{user/common/frontNavbar :: navbar('member', false, '', false)}"></div>
-  </header>
+	<header class="coupon-site-header">
+		<div
+			th:replace="~{user/common/frontNavbar :: navbar('member', false, '', false)}"></div>
+	</header>
 
-  <main id="app"
-        class="coupon-page"
-        v-cloak>
+	<main id="app" class="coupon-page" v-cloak>
 
-        <section class="page-title-section">
+		<section class="page-title-section">
 
-            <div>
-                <p class="page-label">MEMBER BENEFITS</p>
+			<div>
+				<p class="page-label">MEMBER BENEFITS</p>
 
-                <h1>我的優惠券</h1>
+				<h1>我的優惠券</h1>
 
-                <p class="page-description">
-                    查看目前持有的優惠券、使用狀態及有效期限。
-                </p>
-            </div>
+				<p class="page-description">查看目前持有的優惠券、使用狀態及有效期限。</p>
+			</div>
 
-            <a href="/index.html" class="back-home-button">
-                回到首頁
-            </a>
+			<a href="/index.html" class="back-home-button"> 回到首頁 </a>
 
-        </section>
+		</section>
 
-        <section class="coupon-summary">
+		<section class="coupon-summary">
 
-            <div class="summary-item">
+			<div class="summary-item">
 
-                <span class="summary-number">
-                    {{ coupons.length }}
-                </span>
+				<span class="summary-number"> {{ coupons.length }} </span> <span
+					class="summary-label"> 全部優惠券 </span>
 
-                <span class="summary-label">
-                    全部優惠券
-                </span>
+			</div>
 
-            </div>
+			<div class="summary-item">
 
-            <div class="summary-item">
+				<span class="summary-number"> {{ statusCount.AVAILABLE }} </span> <span
+					class="summary-label"> 可使用 </span>
 
-                <span class="summary-number">
-                    {{ statusCount.AVAILABLE }}
-                </span>
+			</div>
 
-                <span class="summary-label">
-                    可使用
-                </span>
+			<div class="summary-item">
 
-            </div>
+				<span class="summary-number"> {{ statusCount.NOT_STARTED }} </span>
 
-            <div class="summary-item">
+				<span class="summary-label"> 尚未開始 </span>
 
-                <span class="summary-number">
-                    {{ statusCount.NOT_STARTED }}
-                </span>
+			</div>
 
-                <span class="summary-label">
-                    尚未開始
-                </span>
+			<div class="summary-item">
 
-            </div>
+				<span class="summary-number"> {{ statusCount.USED }} </span> <span
+					class="summary-label"> 已使用 </span>
 
-            <div class="summary-item">
+			</div>
 
-                <span class="summary-number">
-                    {{ statusCount.USED }}
-                </span>
+			<div class="summary-item">
 
-                <span class="summary-label">
-                    已使用
-                </span>
+				<span class="summary-number"> {{ statusCount.EXPIRED }} </span> <span
+					class="summary-label"> 已過期 </span>
 
-            </div>
+			</div>
 
-            <div class="summary-item">
+		</section>
 
-                <span class="summary-number">
-                    {{ statusCount.EXPIRED }}
-                </span>
+		<section class="coupon-tabs">
 
-                <span class="summary-label">
-                    已過期
-                </span>
+			<button type="button" :class="{ active: activeTab === 'ALL' }"
+				@click="activeTab = 'ALL'">
 
-            </div>
+				全部 <span class="tab-count"> {{ coupons.length }} </span>
 
-        </section>
+			</button>
 
-        <section class="coupon-tabs">
+			<button type="button" :class="{ active: activeTab === 'AVAILABLE' }"
+				@click="activeTab = 'AVAILABLE'">
 
-            <button
-                type="button"
-                :class="{ active: activeTab === 'ALL' }"
-                @click="activeTab = 'ALL'">
+				可使用 <span class="tab-count"> {{ statusCount.AVAILABLE }} </span>
 
-                全部
+			</button>
 
-                <span class="tab-count">
-                    {{ coupons.length }}
-                </span>
+			<button type="button"
+				:class="{ active: activeTab === 'NOT_STARTED' }"
+				@click="activeTab = 'NOT_STARTED'">
 
-            </button>
+				尚未開始 <span class="tab-count"> {{ statusCount.NOT_STARTED }} </span>
 
-            <button
-                type="button"
-                :class="{ active: activeTab === 'AVAILABLE' }"
-                @click="activeTab = 'AVAILABLE'">
+			</button>
 
-                可使用
+			<button type="button" :class="{ active: activeTab === 'USED' }"
+				@click="activeTab = 'USED'">
 
-                <span class="tab-count">
-                    {{ statusCount.AVAILABLE }}
-                </span>
+				已使用 <span class="tab-count"> {{ statusCount.USED }} </span>
 
-            </button>
+			</button>
 
-            <button
-                type="button"
-                :class="{ active: activeTab === 'NOT_STARTED' }"
-                @click="activeTab = 'NOT_STARTED'">
+			<button type="button" :class="{ active: activeTab === 'EXPIRED' }"
+				@click="activeTab = 'EXPIRED'">
 
-                尚未開始
+				已過期 <span class="tab-count"> {{ statusCount.EXPIRED }} </span>
 
-                <span class="tab-count">
-                    {{ statusCount.NOT_STARTED }}
-                </span>
+			</button>
 
-            </button>
+		</section>
 
-            <button
-                type="button"
-                :class="{ active: activeTab === 'USED' }"
-                @click="activeTab = 'USED'">
+		<section v-if="loading" class="message-box">優惠券資料讀取中</section>
 
-                已使用
+		<section v-else-if="errorMessage" class="message-box error-message">
 
-                <span class="tab-count">
-                    {{ statusCount.USED }}
-                </span>
+			{{ errorMessage }}
 
-            </button>
+			<button type="button" class="retry-button" @click="loadCoupons">
 
-            <button
-                type="button"
-                :class="{ active: activeTab === 'EXPIRED' }"
-                @click="activeTab = 'EXPIRED'">
+				重新讀取</button>
 
-                已過期
+		</section>
 
-                <span class="tab-count">
-                    {{ statusCount.EXPIRED }}
-                </span>
+		<section v-else-if="filteredCoupons.length === 0" class="message-box">
 
-            </button>
+			目前沒有符合此分類的優惠券。</section>
 
-        </section>
+		<section v-else class="coupon-grid">
 
-        <section v-if="loading"
-                 class="message-box">
+			<article v-for="coupon in filteredCoupons"
+				:key="coupon.memberCouponId" class="coupon-card"
+				:class="statusClass(coupon.displayStatus)">
 
-            優惠券資料讀取中
+				<div class="coupon-value-section">
 
-        </section>
+					<span class="coupon-status-badge"> {{
+						statusText(coupon.displayStatus) }} </span>
 
-        <section v-else-if="errorMessage"
-                 class="message-box error-message">
+					<div class="coupon-discount">{{ discountText(coupon) }}</div>
 
-            {{ errorMessage }}
+					<div class="coupon-code">{{ coupon.couponCode }}</div>
 
-            <button type="button"
-                    class="retry-button"
-                    @click="loadCoupons">
+				</div>
 
-                重新讀取
+				<div class="coupon-content">
 
-            </button>
+					<div class="coupon-title-row">
 
-        </section>
+						<div>
+							<h2>{{ coupon.couponName }}</h2>
 
-        <section v-else-if="filteredCoupons.length === 0"
-                 class="message-box">
+							<p class="coupon-description">{{ coupon.description }}</p>
+						</div>
 
-            目前沒有符合此分類的優惠券。
+					</div>
 
-        </section>
+					<div class="coupon-information">
 
-        <section v-else
-                 class="coupon-grid">
+						<div v-if="Number(coupon.discountType) === 1"
+							class="information-row threshold-row">
 
-            <article
-                v-for="coupon in filteredCoupons"
-                :key="coupon.memberCouponId"
-                class="coupon-card"
-                :class="statusClass(coupon.displayStatus)">
+							<span class="information-label"> 消費門檻 </span> <span
+								class="information-value threshold-value"> {{
+								thresholdText(coupon) }} </span>
 
-                <div class="coupon-value-section">
+						</div>
+						<div class="information-row">
 
-                    <span class="coupon-status-badge">
-                        {{ statusText(coupon.displayStatus) }}
-                    </span>
+							<span class="information-label"> 取得日期 </span> <span
+								class="information-value"> {{
+								formatDateTime(coupon.claimedTime) }} </span>
 
-                    <div class="coupon-discount">
-                        {{ discountText(coupon) }}
-                    </div>
+						</div>
 
-                    <div class="coupon-code">
-                        {{ coupon.couponCode }}
-                    </div>
+						<div class="information-row">
 
-                </div>
+							<span class="information-label"> 開始使用 </span> <span
+								class="information-value"> {{
+								formatDateTime(coupon.usageStartTime) }} </span>
 
-                <div class="coupon-content">
+						</div>
 
-                    <div class="coupon-title-row">
+						<div class="information-row">
 
-                        <div>
-                            <h2>{{ coupon.couponName }}</h2>
+							<span class="information-label"> 使用期限 </span> <span
+								class="information-value"> {{
+								formatDateTime(coupon.usageEndTime) }} </span>
 
-                            <p class="coupon-description">
-                                {{ coupon.description }}
-                            </p>
-                        </div>
+						</div>
 
-                    </div>
+						<div class="information-row">
 
-                    <div class="coupon-information">
+							<span class="information-label"> 發放期別 </span> <span
+								class="information-value"> {{
+								issuePeriodText(coupon.issuePeriod) }} </span>
 
-                        <div class="information-row">
+						</div>
 
-                            <span class="information-label">
-                                取得日期
-                            </span>
+						<div v-if="coupon.usedTime" class="information-row">
 
-                            <span class="information-value">
-                                {{ formatDateTime(coupon.claimedTime) }}
-                            </span>
+							<span class="information-label"> 使用日期 </span> <span
+								class="information-value"> {{
+								formatDateTime(coupon.usedTime) }} </span>
 
-                        </div>
+						</div>
 
-                        <div class="information-row">
+					</div>
 
-                            <span class="information-label">
-                                開始使用
-                            </span>
+					<div class="coupon-footer">
 
-                            <span class="information-value">
-                                {{ formatDateTime(coupon.usageStartTime) }}
-                            </span>
+						<span> 優惠券編號 {{ coupon.memberCouponId }} </span> <span> {{
+							usageHint(coupon.displayStatus) }} </span>
 
-                        </div>
+					</div>
 
-                        <div class="information-row">
+				</div>
 
-                            <span class="information-label">
-                                使用期限
-                            </span>
+			</article>
 
-                            <span class="information-value">
-                                {{ formatDateTime(coupon.usageEndTime) }}
-                            </span>
+		</section>
 
-                        </div>
+	</main>
 
-                        <div class="information-row">
+	</div>
 
-                            <span class="information-label">
-                                發放期別
-                            </span>
-
-                            <span class="information-value">
-                                {{ issuePeriodText(coupon.issuePeriod) }}
-                            </span>
-
-                        </div>
-
-                        <div v-if="coupon.usedTime"
-                             class="information-row">
-
-                            <span class="information-label">
-                                使用日期
-                            </span>
-
-                            <span class="information-value">
-                                {{ formatDateTime(coupon.usedTime) }}
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                    <div class="coupon-footer">
-
-                        <span>
-                            優惠券編號
-                            {{ coupon.memberCouponId }}
-                        </span>
-
-                        <span>
-                            {{ usageHint(coupon.displayStatus) }}
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </article>
-
-        </section>
-
-    </main>
-
-</div>
-
-<script src="/js/coupons.js"></script>
-<script src="/js/header-auth.js"></script>
+	<script src="/js/coupons.js"></script>
+	<script src="/js/header-auth.js"></script>
 
 </body>
 

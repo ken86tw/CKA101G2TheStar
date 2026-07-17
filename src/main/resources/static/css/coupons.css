@@ -816,3 +816,8 @@ input {
     box-shadow: none;
     filter: none;
 }
+
+.threshold-value {
+    color: #8b633e;
+    font-weight: 600;
+}

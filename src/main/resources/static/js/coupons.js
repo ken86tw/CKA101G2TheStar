@@ -144,6 +144,21 @@ createApp({
             return "專屬優惠";
         },
 
+		thresholdText(coupon) {
+
+		    if (Number(coupon.discountType) !== 1) {
+		        return "";
+		    }
+
+		    const discountAmount =
+		        Number(coupon.discountAmount || 0);
+
+		    const minimumSpend =
+		        discountAmount + 1;
+
+		    return `消費滿 NT$ ${minimumSpend.toLocaleString("zh-TW")} 可使用`;
+		},
+
         statusText(status) {
 
             const statusMap = {

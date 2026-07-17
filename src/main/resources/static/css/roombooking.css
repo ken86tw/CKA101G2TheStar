@@ -127,6 +127,18 @@ a {
     width: 100%
 }
 
+select option:disabled {
+    color: #aaa;
+    background-color: #f1f1f1;
+}
+
+.coupon-threshold-note {
+    margin: 8px 0 0;
+    color: #9a7250;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
 input, select {
     width: 100%;
     border: 0;
