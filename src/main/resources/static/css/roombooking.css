@@ -59,6 +59,10 @@ a {
     justify-content: center;
     gap: 8px;
     border: 0;
+    /* 頁面現在同時載入 common.css(共用導覽列需要),它的 .btn 有
+       border-radius:4px 和 font-weight:700,這裡明寫回原本的值把它蓋掉 */
+    border-radius: 0;
+    font-weight: 400;
     cursor: pointer;
     background: var(--gold);
     color: #fff;
@@ -1462,3 +1466,44 @@ summary {
 
 .invcell.full       { background: #f6e7e4 }
 .invcell.full .n b  { color: #a85b50 }
+
+/* ===== 共用導覽列:本頁專屬配色(room-navbar) =====
+   共用導覽列 fragment 的第三個參數帶 'site-navbar-dark room-navbar':
+   site-navbar-dark(common.css)提供尺寸與排版,room-navbar(這裡)把顏色蓋成本頁的奶油色調。
+   為什麼蓋得掉:這支檔案比 common.css 晚載入,選擇器比重相同時「後載入的贏」。
+   規則放自己的檔案、不動 common.css,才不會影響組員的頁面 */
+.room-navbar {
+    background: rgba(251, 249, 244, .92);   /* 跟本頁員工功能列同款的奶油半透明底 */
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+}
+
+/* 連結文字:site-navbar-dark 原本是深底配淺灰藍字,奶油底要換深色字 */
+.room-navbar .navbar-links > a,
+.room-navbar .restaurant-nav-trigger {
+    color: var(--soft);
+}
+
+.room-navbar .navbar-links > a:hover,
+.room-navbar .restaurant-nav-trigger:hover {
+    color: var(--ink);
+}
+
+/* 目前所在頁(訂房)的高亮與 hover 底線:改用本頁的金色 */
+.room-navbar .nav-links a:hover,
+.room-navbar .nav-links .active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+}
+
+/* 餐廳下拉選單打開時的觸發器:原本的淺金色在奶油底上會看不清楚 */
+.room-navbar .restaurant-nav-menu:hover .restaurant-nav-trigger,
+.room-navbar .restaurant-nav-menu:focus-within .restaurant-nav-trigger,
+.room-navbar .restaurant-nav-menu.active-menu .restaurant-nav-trigger {
+    color: var(--gold);
+}
+
+/* 品牌字「東方之星」:原本是白字,奶油底上改墨色(英文 The Star 本來就是金色,不用動) */
+.room-navbar .navbar-brand .brand-zh {
+    color: var(--ink);
+}

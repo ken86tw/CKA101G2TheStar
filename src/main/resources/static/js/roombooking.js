@@ -138,6 +138,12 @@ createApp({
             }
         } catch { /* 沒登入就停在登入頁 */
         }
+        // 共用導覽列會員選單的「我的訂房預訂」會連到 /roombooking.html?tab=orders:
+        // 登入會員帶這個參數進來就直接切到「我的預訂」分頁(員工在下面會被改成 admin,不受影響)
+        if (this.member.on && new URLSearchParams(location.search).get('tab') === 'orders') {
+            this.nav = 'orders';
+            this.loadOrders();
+        }
         // 員工從後台登入頁(Spring Security 的 /thestar/admin/login)登入後進來:共用同一個 session,
         // /thestar/admin/me 登入回員工資料、未登入回 401。認得員工就直接進後台
         try {
