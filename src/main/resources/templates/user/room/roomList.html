@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>精選房型 - THE STAR</title>
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" th:href="@{/css/roomList.css}">
+</head>
+<body>
+    <div class="room-container">
+        <div class="room-grid">
+            <div th:each="room : ${activeRoomList}" class="room-card">
+                <div class="card-image">
+                    <img th:if="${room.firstPhoto != null}" 
+                         th:src="@{/roomtypephoto/display/photo/{id}(id=${room.firstPhoto.roomTypePhotoId})}" 
+                         th:alt="${room.roomTypeName}">
+                    <img th:unless="${room.firstPhoto != null}" 
+                         th:src="@{/images/default-room.jpg}" 
+                         alt="暫無圖片">
+                </div>
+                <div class="card-content">
+                    <h3 th:text="${room.roomTypeName}">房型名稱</h3>
+                    <p class="room-desc" th:text="${room.roomTypeContent}">房型簡介...</p>
+                    <div class="price-section">
+                         <strong>TWD <span th:text="${room.roomTypePrice}">0</span></strong>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <a href="/roombooking.html" class="btn-book">預訂</a>
+                    <!-- 添加了 data-id 屬性以便 JS 抓取該房型 ID -->
+                    <a href="#" th:attr="data-id=${room.roomTypeId}" class="btn-more">SEE MORE</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 燈箱浮動視窗 -->
+    <div id="roomModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <!-- Swiper 容器 -->
+            <div class="swiper mySwiper">
+                <div class="swiper-wrapper" id="modalSwiperWrapper">
+                    <!-- JS 將會動態載入圖片於此 -->
+                </div>
+                <!-- 導航按鈕 -->
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+                <!-- 分頁器 (選用) -->
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <!-- 你的邏輯 JS -->
+    <script th:src="@{/js/roomList.js}"></script>
+</body>
+</html>

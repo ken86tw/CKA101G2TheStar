@@ -6,6 +6,7 @@
 <link rel="stylesheet" th:href="@{/css/roomTypeManage.css}">
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
 :root {
 	--serif: 'Cormorant Garamond', 'Noto Serif TC', serif;
@@ -24,6 +25,17 @@
 
 * {
 	box-sizing: border-box
+}
+
+header {
+	position: relative; /* 或 sticky */
+	z-index: 1000; /* 設定一個夠大的數值，確保它在最上層 */
+}
+
+/* 2. 確保 .admin-header 的 z-index 低於 header */
+.admin-header {
+	position: relative;
+	z-index: 1; /* 讓它的層級小於 header */
 }
 
 html, body {
@@ -72,16 +84,9 @@ a {
 					Residences</small>
 			</div>
 			<nav class="menu">
-				<button>後台訂單</button>
-				<button>房務管理</button>
-				<button>房型管理</button>
+				<a th:href="@{/room/manage}">房間管理</a> <a
+					th:href="@{/roomtype/manage}">房型管理</a>
 			</nav>
-			<div class="hright">
-				<div class="ident">
-					<div>員工</div>
-				</div>
-				<button class="btn line">登出</button>
-			</div>
 		</div>
 	</header>
 	<div class="container">
@@ -92,10 +97,22 @@ a {
 		</header>
 
 		<main class="admin-content">
+
+			<!--   新增後顯示成功訊息 -->
+			<div th:if="${successMessage}"
+				style="margin-bottom: 20px; padding: 15px; background-color: #f6f2ea; border: 1px solid #9c7c4f; color: #9c7c4f; text-align: center; border-radius: 4px;">
+				<i class="fa-solid fa-check-circle"></i> <span
+					th:text="${successMessage}"></span>
+			</div>
+
+
 			<div class="toolbar">
 				<div class="admin-stats">
-					目前共有 <span th:text="${totalCount}">0</span> 種房型，總庫存 <span
-						th:text="${totalAmount}">0</span> 間
+					目前共有 <span th:text="${totalCount}">0</span> 種房型， 總庫存 <span
+						th:text="${totalAmount}">0</span> 間，
+					<!-- 加入剩餘庫存顯示 -->
+					<span style="color: #9c7c4f; font-weight: bold;"> (剩餘可用額度:
+						[[${remaining}]] 間) </span>
 				</div>
 				<a th:href="@{/roomtype/add}" class="btn btn-primary"> <i
 					class="fa-solid fa-plus"></i> 新增房型
@@ -116,10 +133,16 @@ a {
 				<tbody>
 					<tr th:each="room : ${rooms}">
 						<td><img
-							th:src="@{/roomtypephoto/display/{id}(id=${room.roomTypeId})}"
+							th:src="@{/roomtypephoto/display/room/{id}(id=${room.roomTypeId})}"
 							class="table-img" alt="房型圖片"></td>
 						<td th:text="${room.roomTypeName}"></td>
-						<td th:text="${room.roomTypeAmount} + ' 間'"></td>
+
+						<td style="text-align: center; font-weight: bold; color: #9c7c4f;">
+							<i class="fa-solid fa-bed" style="margin-right: 5px;"></i> <span
+							th:text="${roomService.countRoomsByTypeId(room.roomTypeId)}">0</span>
+							間
+						</td>
+
 						<td th:text="'NT$ ' + ${room.roomTypePrice}"></td>
 						<td><span class="status-badge"
 							th:text="${room.roomTypeStatus} ? '已啟用' : '未啟用'"></span></td>

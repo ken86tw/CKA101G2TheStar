@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -36,15 +37,17 @@ public class RoomTypeVO {
 	@Column(name = "ROOM_TYPE_CONTENT")
 	private String roomTypeContent;
 
-	@Column(name = "ROOM_TYPE_STATUS", columnDefinition = "BIT(1)") //房型狀態設定
+	@Column(name = "ROOM_TYPE_STATUS", columnDefinition = "BIT(1)") // 房型狀態設定
 	private Boolean roomTypeStatus = false; // 預設為未啟用;
 
 	@NotNull(message = "價格不能為空")
 	@Min(value = 0, message = "價格不能為負數")
 	@Column(name = "ROOM_TYPE_PRICE")
 	private Integer roomTypePrice;
-	
-	
+
+	// 給roomList.html使用的不存在欄位，用於前台抓取該房型第一張圖
+	@Transient
+	private RoomTypePhotoVO firstPhoto;
 
 	public RoomTypeVO() {
 		super();
@@ -96,6 +99,15 @@ public class RoomTypeVO {
 
 	public void setRoomTypePrice(Integer roomTypePrice) {
 		this.roomTypePrice = roomTypePrice;
+	}
+
+	// 給firstPhoto不存在的欄位使用
+	public RoomTypePhotoVO getFirstPhoto() {
+		return firstPhoto;
+	}
+
+	public void setFirstPhoto(RoomTypePhotoVO firstPhoto) {
+		this.firstPhoto = firstPhoto;
 	}
 
 }

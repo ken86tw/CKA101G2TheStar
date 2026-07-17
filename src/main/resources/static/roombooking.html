@@ -31,6 +31,9 @@
                     <button v-if="employee.on" :class="{on:nav==='refund'}" @click="nav='refund';loadRefunds()">
                         退款管理
                     </button>
+                    <button v-if="employee.on" :class="{on:nav==='inv'}" @click="nav='inv';loadInventory()">
+                        庫存查詢
+                    </button>
                 </nav>
                 <div class="hright">
                     <div class="ident">
@@ -39,8 +42,10 @@
                         <div v-if="employee.on">員工，
                             <b>{{ employee.name ? employee.name + '（#' + employee.on + '）' : '#' + employee.on }}</b></div>
                     </div>
-                    <button class="btn line" v-if="member.on || employee.on" @click="logout">登出</button>
-                    <template v-else>
+                    <!-- 員工登出在後台做,這頁只給「回後台」;登出按鈕只屬於會員 -->
+                    <a class="btn line" v-if="employee.on" href="/thestar/admin/home">回後台</a>
+                    <button class="btn line" v-if="member.on" @click="logout">登出</button>
+                    <template v-if="!member.on && !employee.on">
                         <a class="btn line" href="/login.html?redirect=/roombooking.html">登入</a>
                         <a class="btn line" href="/thestar/admin/login">員工登入</a>
                     </template>
@@ -721,6 +726,65 @@
                         </tbody>
                     </table>
                     <p v-else class="hint">目前沒有待處理的退款</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 員工庫存查詢:自查詢日起 31 天,每房型每日的 剩餘/總數 -->
+        <section v-if="employee.on && nav==='inv'">
+            <div class="wrap">
+                <div class="sechead">
+                    <div class="up">Inventory</div>
+                    <h2>庫存查詢</h2>
+                    <p>各房型未來 31 天的剩餘房量</p></div>
+                <div class="panel">
+                    <div class="row" style="margin-bottom:14px;display:flex;gap:10px;align-items:center">
+                        <label>查詢起日</label>
+                        <input type="date" v-model="inv.date">
+                        <button class="btn sm" @click="loadInventory()">查詢</button>
+                    </div>
+
+                    <!-- 圖例:告訴使用者三種顏色代表什麼,跟下面 invLevel() 回傳的三個 class 一一對應 -->
+                    <div v-if="invRows.length" class="invlegend">
+                        <span><i class="sw ok"></i>充足</span>
+                        <span><i class="sw low"></i>緊張（剩 1/3 以下）</span>
+                        <span><i class="sw full"></i>滿房</span>
+                    </div>
+
+                    <!-- 外面包一層 .invscroll:31 列太長,讓表格在框內捲動,
+                         表頭跟日期欄用 CSS sticky 釘住,捲到哪都看得到欄位名稱 -->
+                    <div v-if="invRows.length" class="invscroll">
+                        <table class="invtable">
+                            <thead>
+                            <tr>
+                                <th class="invdate">日期</th>
+                                <th v-for="t in invTypes" :key="t">{{ t }}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="row in invRows" :key="row.date">
+                                <!-- 日期欄:大字月/日 + 小字星期,今天多一顆金色小標 -->
+                                <td class="invdate" :class="{wkend: invIsWeekend(row.date)}">
+                                    <b>{{ invMD(row.date) }}</b>
+                                    <small>{{ invWD(row.date) }}</small>
+                                    <em v-if="invIsToday(row.date)">今天</em>
+                                </td>
+                                <!-- 每一格:invLevel(c) 回傳 ok/low/full 決定底色,
+                                     滿房直接顯示「滿」字比 0/10 更好認;
+                                     底下的細長條是剩餘比例(70% 剩就畫 70% 寬) -->
+                                <td v-for="(c, i) in row.cells" :key="i"
+                                    class="invcell" :class="invLevel(c)">
+                                    <div class="n">
+                                        <b>{{ c.remain === 0 ? '滿' : c.remain }}</b><small
+                                            v-if="c.remain !== 0">/{{ c.total }}</small>
+                                    </div>
+                                    <div class="bar"><i :style="{width: invPct(c)}"></i></div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p v-else class="hint">選擇日期後按查詢</p>
                 </div>
             </div>
         </section>
