@@ -1,14 +1,23 @@
 document.addEventListener("DOMContentLoaded", function() {
     
-    // --- 1. 初始化 DOM 元素 ---
+    // --- 1. 成功提示訊息自動消失功能 ---
+    const successMessageDiv = document.getElementById('successMessageDiv');
+    if (successMessageDiv) {
+        setTimeout(function() {
+            successMessageDiv.style.transition = "opacity 0.5s ease";
+            successMessageDiv.style.opacity = "0";
+            setTimeout(function() {
+                successMessageDiv.style.display = 'none';
+            }, 500);
+        }, 3000); // 3秒後開始淡出
+    }
+
+    // --- 2. 圖片處理邏輯 (累加) ---
     const imageInput = document.getElementById('imageFilesInput'); 
     const uploadBtn = document.getElementById('uploadBtn');
     const previewContainer = document.getElementById('previewContainer');
-    
-    // 建立一個 DataTransfer 物件來存放「累積」的所有檔案
     let dataTransfer = new DataTransfer();
 
-    // 綁定按鈕觸發 input
     if (uploadBtn && imageInput) {
         uploadBtn.addEventListener('click', function() {
             imageInput.click();
@@ -17,25 +26,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (imageInput && previewContainer) {
         imageInput.addEventListener('change', function(event) {
-            // 修正：移除 previewContainer.innerHTML = ''; 這樣舊預覽才不會消失
             const files = event.target.files;
-            
-            // 限制檔案大小 (例如 5MB)
-            const MAX_SIZE = 5 * 1024 * 1024; 
+            const MAX_SIZE = 5 * 1024 * 1024; // 5MB
             
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
-                
-                // 檢查檔案類型
                 if (!file.type.startsWith('image/')) continue;
-
-                // 檢查大小
                 if (file.size > MAX_SIZE) {
                     alert(`檔案 ${file.name} 太大，請選擇 5MB 以下的圖片`);
                     continue;
                 }
 
-                // 【累加關鍵】將新選擇的檔案加入到 dataTransfer 清單中
                 dataTransfer.items.add(file);
 
                 const reader = new FileReader();
@@ -47,26 +48,33 @@ document.addEventListener("DOMContentLoaded", function() {
                 };
                 reader.readAsDataURL(file);
             }
-            
-            // 【累加關鍵】將累積後的完整檔案清單塞回 input 元素
-            // 這樣表單送出時，Controller 才能拿到累加後的所有圖片
             imageInput.files = dataTransfer.files;
         });
     }
 
-    // --- 2. 表單驗證 ---
+    // --- 3. 核心驗證邏輯 (與後端防禦對齊) ---
     const form = document.querySelector('form');
     if (form) {
         form.addEventListener('submit', function(event) {
             const amountInput = document.getElementById('amountInput');
-            if (amountInput && (parseInt(amountInput.value) < 1 || parseInt(amountInput.value) > 99)) {
-                alert('庫存數量必須在 1 到 99 之間');
-                event.preventDefault(); 
+            
+            if (amountInput) {
+                const enteredValue = parseInt(amountInput.value);
+                // 獲取 HTML 中渲染出來的 min 值 (就是後端傳入的 minAllowedAmount)
+                const minAllowed = parseInt(amountInput.getAttribute('min')) || 1;
+                
+                // 【關鍵修正】：語意修改，對應後端邏輯
+                if (enteredValue < minAllowed) {
+                    event.preventDefault(); // 阻止提交
+                    alert(`修改失敗：庫存數量不可小於系統中已建立的房間總數 (${minAllowed} 間)。\n請先至房間管理刪除多餘的房間，再調整庫存。`);
+                    amountInput.focus();
+                    return;
+                }
             }
         });
     }
 
-    // --- 3. 刪除圖片按鈕確認 ---
+    // --- 4. 刪除圖片按鈕確認 ---
     const deleteButtons = document.querySelectorAll('.delete-btn');
     deleteButtons.forEach(btn => {
         btn.addEventListener('click', function(e) {

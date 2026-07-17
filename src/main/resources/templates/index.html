@@ -295,13 +295,39 @@
 				<section class="section shop-faq" id="faq">
 					<h2 class="section-title">FAQ</h2>
 					<div class="gold-line"></div>
+					<div class="simple-grid" id="faq-app">
+						<article class="simple-card">
+							<h3>常見問題</h3>
+							<p>整理訂房、入住、設施使用、購物與付款相關問題，方便旅客快速查看。</p>
+						</article>
+
+						<!-- FAQ 列表區塊 -->
+						<div class="faq-content" style="flex: 1; min-width: 300px;">
+							<div v-for="(item, index) in faqList" :key="index"
+								class="faq-item">
+								<button class="faq-question" @click="toggleFaq(index)"
+									:class="{ 'active': faqActiveIndex === index }">
+									{{ index + 1 }}. {{ item.question }} <span>{{
+										activeIndex === index ? '▲' : '▼' }}</span>
+								</button>
+								<div class="faq-answer" v-show="faqActiveIndex === index">
+									<p style="white-space: pre-line;">{{ item.answer }}</p>
+								</div>
+							</div>
+						</div>
+				</section>
+
+
+				<!--  <section class="section shop-faq" id="faq">
+					<h2 class="section-title">FAQ</h2>
+					<div class="gold-line"></div>
 					<div class="simple-grid">
 						<article class="simple-card">
 							<h3>常見問題</h3>
 							<p>整理訂房、入住、設施使用、購物與付款相關問題，方便旅客快速查看。</p>
 						</article>
 					</div>
-				</section>
+				</section> -->
 
 				<section class="cta">
 					<div>
@@ -514,7 +540,17 @@
           memberEmail: '',
           memberPassword: '',
           rememberMe: false
-        }
+        },
+      
+      faqActiveIndex: null,
+      faqList: [
+          { question: "什麼時候能辦理入住?", answer: "隨時都可以，線上辦理在此網頁上即可，現場入住可至飯店地點臨櫃辦理，依照當日住宿情況可能無空房，如有需要請先撥打電話向櫃台人員確認。" },
+          { question: "有供應毛巾、牙刷和牙膏嗎?", answer: "有的，每間房都備有毛巾、牙刷、牙膏、沐浴乳等基本盥洗用具，如房內缺少、或需要更多，請向房務人員詢問喔。" },
+          { question: "付款方式有哪些?", answer: "線上訂房僅限信用卡，現金付款只適用於臨櫃訂房。" },
+          { question: "房內設施有什麼?", answer: "備有液晶電視、冷暖氣、小冰箱、衛浴設備、充電器等等，住宿期間提供Wifi網路使用，依照房型不同設備也會有所差異。" },
+          { question: "飯店有停車場可用?需要付錢嗎?", answer: "住宿客免費使用，住宿期間可自由出入，到當日退房時間後的隔日下午13:00前為止，一般消費者請洽附近的公、私有停車場，目前飯店停車場僅供住宿客使用。" }
+      ],
+      
       };
     },
 
@@ -993,7 +1029,12 @@
     	},
       featureComingSoon(featureName) {
         alert(featureName + '尚未完成');
-      }
+      },
+    	
+        toggleFaq(index) {
+            this.faqActiveIndex = (this.faqActiveIndex === index) ? null : index;
+        }
+    	
     }
   }).mount('#app');
 </script>

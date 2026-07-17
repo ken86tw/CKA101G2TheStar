@@ -11,6 +11,8 @@ import org.springframework.web.server.ResponseStatusException;
 import com.thestar.room.entity.RoomTypeVO;
 import com.thestar.room.entity.RoomVO;
 import com.thestar.room.repository.RoomRepository;
+import com.thestar.stayrecord.entity.StayRecordVO;
+import com.thestar.stayrecord.repository.StayRecordRepository;
 
 @Service
 @Transactional
@@ -21,6 +23,9 @@ public class RoomService {
 
 	@Autowired
 	private RoomTypeService roomTypeService;
+
+	@Autowired
+	private StayRecordRepository stayRecordRepository;
 
 	// 查詢所有房間
 	public List<RoomVO> findAll() {
@@ -58,6 +63,15 @@ public class RoomService {
 
 	// 刪除房間
 	public void deleteById(Integer id) {
+		// 1. 查詢所有屬於該 roomId 的住宿紀錄
+		List<StayRecordVO> records = stayRecordRepository.findByRoomId(id);
+
+		// 2. 如果找得到的紀錄不為空 (長度大於 0)，代表該房間有歷史紀錄，禁止刪除
+		if (records != null && !records.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "刪除失敗：該房間已有相關住宿紀錄，為保留完整帳務資料，禁止刪除。");
+		}
+
+		// 3. 若無關聯紀錄，才執行刪除
 		repository.deleteById(id);
 	}
 
@@ -70,6 +84,11 @@ public class RoomService {
 	// 目前在 room 資料表中，有多少間房間屬於指定的房型 (由 roomTypeId 指定)
 	// 根據房型編號，統計資料庫中該房型目前已配置的房間總數。
 	public long countRoomsByTypeId(Integer roomTypeId) {
-		return repository.countByRoomTypeId(roomTypeId);
+		return (int) repository.countByRoomTypeId(roomTypeId);
+	}
+
+	public int countBookedRoomsByTypeId(Integer roomTypeId) {
+		// 呼叫剛剛新增的 Repository 方法
+		return stayRecordRepository.countActiveByRoomTypeId(roomTypeId);
 	}
 }

@@ -6,12 +6,12 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.thestar.room.entity.RoomVO;
@@ -109,9 +109,23 @@ public class RoomController {
 
 	// 執行刪除
 	@PostMapping("/delete")
-	public String delete(@RequestParam("roomId") Integer roomId) {
-		roomService.deleteById(roomId);
-		return "redirect:/room/manage";
+	public String delete(@RequestParam("roomId") Integer roomId, RedirectAttributes redirectAttributes) {
+	    try {
+	        // 呼叫 Service 執行刪除 (記得 Service 裡面要有我們剛剛討論的邏輯檢查)
+	        roomService.deleteById(roomId);
+	        redirectAttributes.addFlashAttribute("successMessage", "房間編號 " + roomId + " 已成功刪除！");
+	        
+	    } catch (ResponseStatusException e) {
+	        // 這是我們在 Service 拋出的自定義錯誤 (例如：已有住宿紀錄)
+	        redirectAttributes.addFlashAttribute("errorMessage", e.getReason());
+	        
+	    } catch (Exception e) {
+	        // 捕捉其他未預期的系統錯誤 (例如資料庫連線中斷)
+	        redirectAttributes.addFlashAttribute("errorMessage", "刪除失敗：該房間可能已有相關關聯資料，無法刪除。");
+	    }
+	    
+	    // 一律轉回列表頁
+	    return "redirect:/room/manage";
 	}
 
 }

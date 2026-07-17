@@ -89,11 +89,10 @@
 
 	<div class="container">
 
-		<!-- 1. 新增：成功提示訊息區塊 -->
-		<div id="successMessageDiv" th:if="${successMessage}"
-			style="max-width: 600px; margin: 20px auto 0 auto; padding: 15px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px; text-align: center; font-weight: bold;">
-			<span th:text="${successMessage}"></span>
-		</div>
+		<div th:if="${successMessage}" class="alert alert-success"
+			th:text="${successMessage}"></div>
+		<div th:if="${errorMessage}" class="alert alert-danger"
+			th:text="${errorMessage}"></div>
 
 		<!-- 圖片管理區塊 -->
 		<div class="photo-container" th:if="${roomTypeVO.roomTypeId != null}">
@@ -149,17 +148,36 @@
 					style="margin-top: 15px;"></div>
 			</div>
 
+
 			<div class="form-group">
-				<label>庫存數量</label> <input type="number"
-					th:field="*{roomTypeAmount}" id="amountInput" min="1" max="99"
-					required />
+				<label>庫存數量 (系統自動統計)</label>
+
+				<!-- 1. 給使用者看的唯讀欄位 (顯示最新統計值) -->
+				<!-- 注意：這裡判斷一下，如果是新增頁面顯示0，編輯頁面顯示 minAllowedAmount -->
+				<input type="number"
+					th:value="${minAllowedAmount != null ? minAllowedAmount : 0}"
+					readonly
+					style="background-color: #f8f9fa; border: 1px solid #dee2e6; color: #6c757d; cursor: not-allowed; padding: 12px; box-sizing: border-box; width: 100%;" />
+
+				<!-- 2. 重要：隱藏欄位 (確保表單送出時，amount 欄位有值，對應 VO 屬性) -->
+				<!-- 如果是編輯頁，就把現有的 amount 帶進去；如果是新增頁，預設為 0 -->
+				<input type="hidden" th:field="*{roomTypeAmount}" />
+
+				<!-- 3. 提示訊息 -->
+				<small id="amountHint"
+					style="color: #9c7c4f; font-size: 12px; font-weight: bold;">
+					由系統自動統計 (目前系統中該房型已建立 [[${minAllowedAmount != null ?
+					minAllowedAmount : 0}]] 間房間) </small>
 			</div>
 
 			<div class="form-group">
 				<label>房型說明</label>
 				<textarea name="roomTypeContent" th:field="*{roomTypeContent}"
 					style="resize: none; width: 100%; height: 200px;">
-</textarea>
+				</textarea>
+				<span th:if="${#fields.hasErrors('roomTypeContent')}"
+					th:errors="*{roomTypeContent}"
+					style="color: #a85b50; font-size: 12px; margin-top: 5px; display: block;"></span>
 			</div>
 
 			<div class="form-group">

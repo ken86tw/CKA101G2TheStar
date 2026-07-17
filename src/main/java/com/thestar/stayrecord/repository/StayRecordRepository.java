@@ -12,37 +12,41 @@ import java.util.List;
 
 public interface StayRecordRepository extends JpaRepository<StayRecordVO, Integer> {
 
+	int countByOrderListvo(OrderListVO orderListVO);
 
-    int countByOrderListvo(OrderListVO orderListVO);
+	StayRecordVO findByRoomIdAndCheckOutTimeIsNull(Integer roomId);
 
+	// 找出屬於這張訂單的訂單明細的所有住宿紀錄不管有無退房
+	// COUNT * FROM STAY_RECORD s JOIN ROOM_ORDER_LIST ol ON s.ORDER_LIST_ID =
+	// ol.ORDER_LIST_ID
+	// WHERE ol.ORDER_ID = :orderId
+	int countByOrderListvoOrdervoOrderId(Integer orderId);
 
-    StayRecordVO findByRoomIdAndCheckOutTimeIsNull(Integer roomId);
+	// 找出屬於這張訂單有退房的住宿紀錄
+	int countByOrderListvoOrdervoOrderIdAndCheckOutTimeIsNull(Integer orderId);
 
-    //找出屬於這張訂單的訂單明細的所有住宿紀錄不管有無退房
-    //COUNT * FROM STAY_RECORD s JOIN ROOM_ORDER_LIST ol ON s.ORDER_LIST_ID = ol.ORDER_LIST_ID
-    //WHERE ol.ORDER_ID = :orderId
-    int countByOrderListvoOrdervoOrderId(Integer orderId);
+	// 複合查詢住宿紀錄
+	@Query("FROM StayRecordVO s WHERE (:roomId IS NULL OR  s.roomId = :roomId ) AND (:stayCustomer IS NULL OR s.stayCustomer LIKE CONCAT('%',:stayCustomer,'%') ) "
+			+ "AND (:checkInTime is null OR s.checkInTime >= :checkInTime) AND (s.checkOutTime is null OR :checkOutTime is null OR s.checkOutTime < :checkOutTime) ORDER BY s.checkInTime DESC")
+	List<StayRecordVO> FrontSearchStayRecordVO(@Param("roomId") Integer roomId, // 確保未退房也查得到
+			@Param("stayCustomer") String stayCustomer, @Param("checkInTime") LocalDateTime checkInTime,
+			@Param("checkOutTime") LocalDateTime checkOutTime);
 
-    //找出屬於這張訂單有退房的住宿紀錄
-    int countByOrderListvoOrdervoOrderIdAndCheckOutTimeIsNull(Integer orderId);
+	// 退房時使用列出所有還沒退房的房間
+	List<StayRecordVO> findByCheckOutTimeIsNullOrderByOrderListvoOrdervoOrderIdDesc();
 
+	// 查詢詳情時查詢訂單
+	@Query("SELECT o FROM StayRecordVO s JOIN s.orderListvo ol JOIN ol.ordervo o WHERE s.stayId = :stayId")
+	OrderVO findOrderByStayId(@Param("stayId") Integer stayId);
 
-    //複合查詢住宿紀錄
-    @Query("FROM StayRecordVO s WHERE (:roomId IS NULL OR  s.roomId = :roomId ) AND (:stayCustomer IS NULL OR s.stayCustomer LIKE CONCAT('%',:stayCustomer,'%') ) " +
-            "AND (:checkInTime is null OR s.checkInTime >= :checkInTime) AND (s.checkOutTime is null OR :checkOutTime is null OR s.checkOutTime < :checkOutTime) ORDER BY s.checkInTime DESC")
-    List<StayRecordVO> FrontSearchStayRecordVO(@Param("roomId") Integer roomId,             //確保未退房也查得到
-                                               @Param("stayCustomer")String stayCustomer,
-                                               @Param("checkInTime") LocalDateTime checkInTime,
-                                               @Param("checkOutTime")LocalDateTime checkOutTime);
+	// 利用 findBy 查詢該房間的所有住宿紀錄
+	List<StayRecordVO> findByRoomId(Integer roomId);
 
-    //退房時使用列出所有還沒退房的房間
-    List<StayRecordVO> findByCheckOutTimeIsNullOrderByOrderListvoOrdervoOrderIdDesc();
-
-
-    //查詢詳情時查詢訂單
-    @Query("SELECT o FROM StayRecordVO s JOIN s.orderListvo ol JOIN ol.ordervo o WHERE s.stayId = :stayId")
-    OrderVO findOrderByStayId(@Param("stayId") Integer stayId);
+	// 使用原生 SQL (最直接，不依賴實體關聯)
+	@Query(value = "SELECT COUNT(s.STAY_ID) FROM STAY_RECORD s " +
+	       "JOIN ROOM r ON s.ROOM_ID = r.ROOM_ID " +
+	       "WHERE r.ROOM_TYPE_ID = :roomTypeId AND s.CHECK_OUT_TIME IS NULL", 
+	       nativeQuery = true)
+	int countActiveByRoomTypeId(@Param("roomTypeId") Integer roomTypeId);
 
 }
-
-

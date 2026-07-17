@@ -7,7 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -26,9 +25,6 @@ public class RoomTypeVO {
 	@Column(name = "ROOM_TYPE_NAME")
 	private String roomTypeName;
 
-	@NotNull(message = "數量不能為空")
-	@Min(value = 0, message = "數量不能小於 0") // 禁止負數
-	@Digits(integer = 2, fraction = 0, message = "數量必須是整數") // 限制只能是整數，且不超過設定的2位數
 	@Column(name = "ROOM_TYPE_AMOUNT")
 	private Integer roomTypeAmount;
 

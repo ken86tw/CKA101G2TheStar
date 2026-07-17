@@ -40,24 +40,22 @@ public class RoomTypeController {
 	// 所有房型總覽
 	@GetMapping("/manage")
 	public String showRoomTypesPage(Model model) {
-	    List<RoomTypeVO> list = service.getAllRoomTypes();
-	    
-	    // 1. 取得所有真實的實體房間總數 (這是「總庫存」)
-	    int actualTotalCount = roomService.findAll().size();
-	    
-	    // 2. 計算剩餘額度：使用總上限 50 - 實際房間總數
-	    // 這樣 總庫存(actualTotalCount) + 剩餘(remaining) 就會等於 50
-	    int remaining = 50 - actualTotalCount;
+        List<RoomTypeVO> list = service.getAllRoomTypes();
+        java.util.Map<Integer, Integer> roomCountsMap = new java.util.HashMap<>();
+        for (RoomTypeVO type : list) {
+            roomCountsMap.put(type.getRoomTypeId(), (int) roomService.countRoomsByTypeId(type.getRoomTypeId()));
+        }
 
-	    model.addAttribute("rooms", list);
-	    model.addAttribute("totalCount", list.size()); // 房型種類數
-	    model.addAttribute("totalAmount", actualTotalCount); // 顯示真實的總房間數
-	    model.addAttribute("remaining", remaining); // 顯示正確的剩餘額度
-	    
-	    // 必須傳入 roomService，讓 HTML 顯示各別房型的實體數量
-	    model.addAttribute("roomService", roomService); 
-	    
-	    return "admin/room/roomTypeManage";
+        int actualTotalCount = roomService.findAll().size();
+        int remaining = 30 - actualTotalCount;
+
+        model.addAttribute("rooms", list);
+        model.addAttribute("roomCountsMap", roomCountsMap);
+        model.addAttribute("totalCount", list.size());
+        model.addAttribute("totalAmount", actualTotalCount);
+        model.addAttribute("remaining", remaining);
+        
+        return "admin/room/roomTypeManage";
 	}
 
 	// 檢視房型詳細資料
@@ -78,110 +76,122 @@ public class RoomTypeController {
 	// 進入新增頁面
 	@GetMapping("/add")
 	public String addRoomTypePage(Model model) {
-		model.addAttribute("roomTypeVO", new RoomTypeVO());
-
-		// 計算剩餘：總容量 50 - 目前已使用量
-		int totalUsed = service.getSumOfAmounts();
-		int remaining = 50 - totalUsed;
-		model.addAttribute("remaining", remaining);
-
-		return "admin/room/roomTypeForm";
-	}
+	    // 1. 建立一個空的房型物件
+	    model.addAttribute("roomTypeVO", new RoomTypeVO());
+	    
+	    // 2. [補充] 明確傳入 0，因為新增房型時庫存絕對是 0
+	    // 這樣 HTML 的顯示邏輯會更穩定
+	    model.addAttribute("minAllowedAmount", 0);
+	    
+	    return "admin/room/roomTypeForm";
+    }
 
 	// 執行新增
 	@PostMapping("/insert")
 	public String insert(@Valid RoomTypeVO roomTypeVO, BindingResult result,
-			@RequestParam(value = "imageFiles", required = false) MultipartFile[] imageFiles, Model model,
-			RedirectAttributes redirectAttributes) { // 記得加入 Model
+            @RequestParam(value = "imageFiles", required = false) MultipartFile[] imageFiles, 
+            Model model, RedirectAttributes redirectAttributes) {
 
-		if (result.hasErrors()) {
-			model.addAttribute("remaining", 50 - service.getSumOfAmounts());
-			return "admin/room/roomTypeForm";
-		}
+        if (result.hasErrors()) {
+            // 【重要】確保物件還在 Model 裡，否則欄位值會消失，錯誤也不會顯示
+            model.addAttribute("roomTypeVO", roomTypeVO); 
+            model.addAttribute("minAllowedAmount", 0);
+            System.out.println("發生驗證錯誤: " + result.getAllErrors());
+            return "admin/room/roomTypeForm";
+	    }
 
-		try {
-			service.addRoomType(roomTypeVO);
-
-			// 使用迴圈處理多張圖片
-			if (imageFiles != null) {
-				for (MultipartFile file : imageFiles) {
-					if (file != null && !file.isEmpty()) {
-						RoomTypePhotoDTO photoDTO = new RoomTypePhotoDTO();
-						photoDTO.setRoomTypeId(roomTypeVO.getRoomTypeId());
-						photoDTO.setRoomTypePic(file);
-						photoService.addRoomTypePhoto(photoDTO);
-					}
-				}
-			}
-			redirectAttributes.addFlashAttribute("successMessage", "房型新增成功！");
-		} catch (ResponseStatusException e) {
-			model.addAttribute("errorMessage", e.getReason());
-			model.addAttribute("remaining", 50 - service.getSumOfAmounts());
-			return "admin/room/roomTypeForm";
-		}
-
-		return "redirect:/roomtype/manage";
+	    try {
+	        service.addRoomType(roomTypeVO);
+	        
+	        // 2. 圖片處理邏輯
+	        if (imageFiles != null) {
+	            for (MultipartFile file : imageFiles) {
+	                if (file != null && !file.isEmpty()) {
+	                    RoomTypePhotoDTO photoDTO = new RoomTypePhotoDTO();
+	                    photoDTO.setRoomTypeId(roomTypeVO.getRoomTypeId());
+	                    photoDTO.setRoomTypePic(file);
+	                    photoService.addRoomTypePhoto(photoDTO);
+	                }
+	            }
+	        }
+	        
+	        redirectAttributes.addFlashAttribute("successMessage", "房型新增成功！");
+	    } catch (Exception e) {
+	        model.addAttribute("errorMessage", "新增失敗：" + e.getMessage());
+	        model.addAttribute("minAllowedAmount", 0);
+	        return "admin/room/roomTypeForm";
+	    }
+	    
+	    return "redirect:/roomtype/manage";
 	}
 
 	// 進入修改頁面 (帶入特定 ID)
 	@GetMapping("/edit/{id}")
 	public String editRoomTypePage(@PathVariable("id") Integer id, Model model) {
-		RoomTypeVO roomTypeVO = service.getOneRoomType(id);
-		model.addAttribute("roomTypeVO", roomTypeVO);
+	    // 1. 取得房型資料
+	    RoomTypeVO roomTypeVO = service.getOneRoomType(id);
+	    model.addAttribute("roomTypeVO", roomTypeVO);
+	    
+	    // 2. 取得該房型所有照片
+	    model.addAttribute("photoList", photoService.getPhotosByRoomTypeId(id));
+	    
+	    // 3. 計算並傳入真實庫存數量 (給唯讀欄位與隱藏欄位使用)
+	    int actualCount = (int) roomService.countRoomsByTypeId(id);
+	    model.addAttribute("minAllowedAmount", actualCount);
 
-		// 【關鍵補強】：載入該房型所有的照片列表
-		List<RoomTypePhotoVO> photos = photoService.getPhotosByRoomTypeId(id);
-		model.addAttribute("photoList", photos);
-
-		int totalUsed = service.getSumOfAmounts();
-		int remaining = 50 - (totalUsed - roomTypeVO.getRoomTypeAmount());
-		model.addAttribute("remaining", remaining);
-
-		return "admin/room/roomTypeForm";
+	    return "admin/room/roomTypeForm";
 	}
 
 	// 執行修改
 	@PostMapping("/update")
 	public String update(@Valid RoomTypeVO roomTypeVO, BindingResult result,
-			@RequestParam(value = "imageFiles", required = false) MultipartFile[] imageFiles, Model model,
-			RedirectAttributes redirectAttributes) {
+	        @RequestParam(value = "imageFiles", required = false) MultipartFile[] imageFiles, 
+	        Model model, RedirectAttributes redirectAttributes) {
 
-		if (result.hasErrors()) {
-			model.addAttribute("photoList", photoService.getPhotosByRoomTypeId(roomTypeVO.getRoomTypeId()));
-			return "admin/room/roomTypeForm";
-		}
+	    // 1. 錯誤處理
+	    if (result.hasErrors()) {
+            // 【補強】確保 VO 物件顯式放入 model，以防萬一
+            model.addAttribute("roomTypeVO", roomTypeVO);
+            // 確保頁面所需資訊回填
+	        model.addAttribute("photoList", photoService.getPhotosByRoomTypeId(roomTypeVO.getRoomTypeId()));
+	        model.addAttribute("minAllowedAmount", (int) roomService.countRoomsByTypeId(roomTypeVO.getRoomTypeId()));
+	        return "admin/room/roomTypeForm";
+	    }
 
-		try {
-			service.updateRoomType(roomTypeVO);
+	    try {
+	        service.updateRoomType(roomTypeVO);
 
-			// 【關鍵補強】：處理多張圖片上傳
-			if (imageFiles != null) {
-				for (MultipartFile file : imageFiles) {
-					if (file != null && !file.isEmpty()) {
-						RoomTypePhotoDTO photoDTO = new RoomTypePhotoDTO();
-						photoDTO.setRoomTypeId(roomTypeVO.getRoomTypeId());
-						photoDTO.setRoomTypePic(file);
-						photoService.addRoomTypePhoto(photoDTO); // 新增圖片到資料庫
-					}
-				}
-			}
-			redirectAttributes.addFlashAttribute("successMessage", "房型更新成功！");
-		} catch (ResponseStatusException e) {
-			model.addAttribute("errorMessage", e.getReason());
-			model.addAttribute("photoList", photoService.getPhotosByRoomTypeId(roomTypeVO.getRoomTypeId()));
-			return "admin/room/roomTypeForm";
-		}
+	        if (imageFiles != null) {
+	            for (MultipartFile file : imageFiles) {
+	                if (file != null && !file.isEmpty()) {
+	                    RoomTypePhotoDTO photoDTO = new RoomTypePhotoDTO();
+	                    photoDTO.setRoomTypeId(roomTypeVO.getRoomTypeId());
+	                    photoDTO.setRoomTypePic(file);
+	                    photoService.addRoomTypePhoto(photoDTO);
+	                }
+	            }
+	        }
+	        redirectAttributes.addFlashAttribute("successMessage", "房型更新成功！");
+	    } catch (Exception e) {
+            // 異常處理時也要確保 VO 回填，讓使用者看到剛才輸入的內容，不用重打
+            model.addAttribute("roomTypeVO", roomTypeVO); 
+	        model.addAttribute("errorMessage", "更新失敗：" + e.getMessage());
+	        model.addAttribute("photoList", photoService.getPhotosByRoomTypeId(roomTypeVO.getRoomTypeId()));
+	        return "admin/room/roomTypeForm";
+	    }
 
-		return "redirect:/roomtype/edit/" + roomTypeVO.getRoomTypeId();
+	    return "redirect:/roomtype/manage";
 	}
 
 	// 執行刪除指定房型
 	@PostMapping("/delete/{id}")
-	public String delete(@PathVariable("id") Integer id) {
-		// 刪除房型 (根據你的 Service 的方法)
-		service.deleteRoomType(id);
-
-		// 刪除後跳轉回房型管理列表頁面
-		return "redirect:/roomtype/manage";
+	public String delete(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            service.deleteRoomType(id);
+            redirectAttributes.addFlashAttribute("successMessage", "房型刪除成功！");
+        } catch (ResponseStatusException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getReason());
+        }
+        return "redirect:/roomtype/manage";
 	}
 }

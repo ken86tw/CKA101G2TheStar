@@ -98,6 +98,14 @@ a {
 
 		<main class="admin-content">
 
+			<!-- 錯誤訊息顯示區塊 (新增這一段) -->
+			<div th:if="${errorMessage}"
+				style="margin-bottom: 20px; padding: 15px; background-color: #fff0f0; border: 1px solid #d9534f; color: #d9534f; text-align: center; border-radius: 4px;">
+				<i class="fa-solid fa-circle-exclamation"></i> <span
+					th:text="${errorMessage}"></span>
+			</div>
+
+
 			<!--   新增後顯示成功訊息 -->
 			<div th:if="${successMessage}"
 				style="margin-bottom: 20px; padding: 15px; background-color: #f6f2ea; border: 1px solid #9c7c4f; color: #9c7c4f; text-align: center; border-radius: 4px;">
@@ -138,9 +146,8 @@ a {
 						<td th:text="${room.roomTypeName}"></td>
 
 						<td style="text-align: center; font-weight: bold; color: #9c7c4f;">
-							<i class="fa-solid fa-bed" style="margin-right: 5px;"></i> <span
-							th:text="${roomService.countRoomsByTypeId(room.roomTypeId)}">0</span>
-							間
+							<i class="fa-solid fa-bed" style="margin-right: 5px;"></i> <!-- 修改後的寫法：從 Controller 傳入的 roomCountsMap 取得對應 ID 的數量 -->
+							<span th:text="${roomCountsMap.get(room.roomTypeId)}">0</span> 間
 						</td>
 
 						<td th:text="'NT$ ' + ${room.roomTypePrice}"></td>
