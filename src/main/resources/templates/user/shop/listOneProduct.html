@@ -162,7 +162,7 @@ footer { background: #1e3a4a; color: #7a9aaa; text-align: center; padding: 40px 
 				<div class="stat-value stars">
 					<span th:if="${productsVO.productReviewNumber == 0}">—</span>
 					<span th:if="${productsVO.productReviewNumber > 0}"
-						th:text="${#numbers.formatDecimal(productsVO.productTotalStar / productsVO.productReviewNumber, 1, 1)} + ' ★'"></span>
+						th:text="${#numbers.formatDecimal(productsVO.productTotalStar *1.0 / productsVO.productReviewNumber, 1, 1)} + ' ★'"></span>
 				</div>
 			</div>
 		</div>

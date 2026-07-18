@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/shop_sidebar :: common-head('庫存查詢')}"></head>
+<body>
+	<style>
+.row-low-stock td {
+	background-color: #ffd5d5 !important;
+}
+</style>
+	<div th:replace="~{admin/shop_sidebar :: sidebar('stock')}"></div>
+	<div class="main-content">
+		<div th:replace="~{admin/shop_sidebar :: topbar('庫存查詢')}"></div>
+		<div class="page-body">
+			<div class="card p-4">
+				<h5 class="m-0 fw-bold mb-3">
+					<i class="fa-solid fa-boxes-stacking me-2"></i>庫存查詢
+				</h5>
+				<table class="table table-bordered table-hover align-middle">
+					<thead class="table-light">
+						<tr>
+							<th style="white-space: nowrap;">商品編號</th>
+							<th style="white-space: nowrap;">商品名稱</th>
+							<th style="white-space: nowrap;">類別</th>
+							<th style="white-space: nowrap;">單價</th>
+							<th style="white-space: nowrap;">已賣出</th>
+							<th style="white-space: nowrap;">剩餘庫存</th>
+							<th style="white-space: nowrap;">狀態</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="product : ${productsListData}"
+							th:classappend="${product.productQuantity <= 5} ? 'row-low-stock' : ''">
+							<td th:text="${product.productId}"></td>
+							<td class="fw-bold" th:text="${product.productName}"></td>
+							<td
+								th:text="${product.productCategory != null ? product.productCategory.productCategoryName : '-'}"></td>
+							<td th:text="'NT$ ' + ${product.productPrice}"></td>
+							<td><span th:text="${soldMap[product.productId]}"
+								style="color: #2d7a4a; font-weight: 600;"></span></td>
+							<td>
+								<form th:action="@{/admin/shop/stock/listStock/updateStock}"
+									method="post"
+									style="display: flex; align-items: center; gap: 8px;">
+									<input type="hidden" name="productId"
+										th:value="${product.productId}"> <input type="number"
+										name="productQuantity" th:value="${product.productQuantity}"
+										min="0" style="width: 80px;"
+										class="form-control form-control-sm">
+									<button type="submit" class="btn btn-gold btn-sm">更新</button>
+								</form>
+							</td>
+							<td><span th:if="${product.productStatus == 1}"
+								class="badge bg-success">上架</span> <span
+								th:if="${product.productStatus == 0}" class="badge bg-secondary">下架</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
