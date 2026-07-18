@@ -1,20 +1,23 @@
 package com.thestar.shop.controller.user;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import com.thestar.member.entity.MemberVO;
 import com.thestar.shop.entity.CartItemVO;
 import com.thestar.shop.service.CartItemService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
-
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 @Controller
 @RequestMapping("/shop/cart")
@@ -38,7 +41,15 @@ public class CartItemController {
 			if (item.getProduct() != null && item.getCartItemProdQty() != null) {
 				total += item.getProduct().getProductPrice() * item.getCartItemProdQty();
 			}
-		}
+		}	
+		
+		// 檢查是否有下架商品
+		boolean hasOffShelfInCart = list.stream()
+		        .anyMatch(item -> item.getProduct() == null 
+		                || item.getProduct().getProductStatus() == null
+		                || item.getProduct().getProductStatus() != 1);
+
+		model.addAttribute("hasOffShelfInCart", hasOffShelfInCart);
 
 		model.addAttribute("cartListData", list);
 		model.addAttribute("cartTotal", total);

@@ -83,6 +83,11 @@ public class UserProductsController {
 
 		ProductsVO productsVO = productsSvc.getOneProduct(productId);
 
+		 // 商品不存在或已下架，導回商品列表
+	    if (productsVO == null || productsVO.getProductStatus() == null || productsVO.getProductStatus() != 1) {
+	        return "redirect:/shop/listAllProducts";
+	    }
+	    
 		// 取得類別名稱
 		ProductCategoryVO categoryVO = productCategorySvc.getOneProductCategory(productsVO.getProductCategoryId());
 		String categoryName = (categoryVO != null) ? categoryVO.getProductCategoryName() : "飯店精選商品";

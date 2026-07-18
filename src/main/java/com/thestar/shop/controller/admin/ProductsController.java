@@ -1,6 +1,5 @@
 package com.thestar.shop.controller.admin;
 
-import com.thestar.shop.entity.ProductCategoryVO;
 import com.thestar.shop.entity.ProductsVO;
 import com.thestar.shop.service.ProductCategoryService;
 import com.thestar.shop.service.ProductsService;

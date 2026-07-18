@@ -95,6 +95,17 @@ public class ShopOrderController extends AdminShopBaseController {
 			shopOrderVO.setShopPaymentStatus(shopPaymentStatus);
 			shopOrderSvc.updateShopOrder(shopOrderVO);
 		}
+		
+		if (shopOrderStatus == 3) {
+		    shopOrderSvc.cancelShopOrderManually(shopOrderVO);
+		} else if (shopOrderStatus == 2) {
+		    shopOrderSvc.deliverShopOrder(shopOrderVO);
+		} else if (shopOrderStatus == 1) {
+		    shopOrderSvc.shipShopOrder(shopOrderVO);
+		} else {
+		    shopOrderSvc.updateShopOrder(shopOrderVO);
+		}
+		
 		return "redirect:/admin/shop/order/listAllOrders";
 	}
 }

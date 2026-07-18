@@ -39,4 +39,8 @@ public class ProductOrderItemService {
     public List<ProductOrderItemVO> getByShopOrderId(Integer shopOrderId) {
         return repository.findByShopOrderId(shopOrderId);
     }
+    
+    public List<ProductOrderItemVO> getByProductId(Integer productId) {
+        return repository.findByProductId(productId);
+    }
 }

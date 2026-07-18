@@ -274,6 +274,10 @@ body {
 	background-color: #2d6d5f;
 	color: #fff;
 }
+
+.table thead th {
+	white-space: nowrap;
+}
 </style>
 </head>
 <body>
@@ -298,6 +302,9 @@ body {
 			</a> <a href="/admin/shop/category/listAllCategories" class="nav-link"
 				th:classappend="${activePage == 'category'} ? 'active'"> <i
 				class="fa-solid fa-tags fa-fw"></i> 商品類別
+			</a> <a href="/admin/shop/stock/listStock" class="nav-link"
+				th:classappend="${activePage == 'stock'} ? 'active'"> <i
+				class="fa-solid fa-cubes fa-fw"></i> 庫存查詢
 			</a>
 
 			<div class="nav-section">訂單 &amp; 評論</div>
