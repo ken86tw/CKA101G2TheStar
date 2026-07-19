@@ -14,35 +14,7 @@
 .shop-navbar a[href*="cart"], .shop-navbar a[href*="Cart"], .shop-navbar .fa-cart-shopping,
 	.shop-navbar .fa-bag-shopping, .shop-navbar .cart-icon {
 	display: none !important;
-}
-
-.shop-navbar {
-	background: rgba(251, 249, 244, .92) !important;
-	backdrop-filter: blur(8px) !important;
-	border-bottom: 1px solid #e4ddd0 !important; /* 使用範本的 --line 顏色 */
-	position: relative !important;
-	z-index: 40 !important;
-}
-
-/* 調整連結文字顏色 */
-.shop-navbar .navbar-links>a {
-	color: #5b564c !important; /* 使用範本的 --soft 顏色 */
-}
-
-.shop-navbar .navbar-links>a:hover {
-	color: #23211c !important; /* 使用範本的 --ink 顏色 */
-}
-
-/* 調整「品牌字」顏色 */
-.shop-navbar .navbar-brand .brand-zh {
-	color: #23211c !important; /* 使用範本的 --ink 顏色 */
-}
-
-/* 調整當前頁面連結的高亮與底線 */
-.shop-navbar .nav-links .active {
-	color: #9c7c4f !important; /* 使用範本的 --gold 顏色 */
-	border-bottom-color: #9c7c4f !important;
-}
+	}
 </style>
 
 
@@ -82,7 +54,7 @@
 					<a href="/roombooking.html" class="btn-book">預訂</a>
 					<!-- 添加了 data-id 屬性以便 JS 抓取該房型 ID -->
 
-					<a th:href="@{/roomList/detail/{id}(id=${room.roomTypeId})}"
+					<a th:href="@{/roomlist/detail/{id}(id=${room.roomTypeId})}"
 						class="btn-more">詳細資訊</a>
 
 				</div>
@@ -92,6 +64,5 @@
 
 	<!-- 你的邏輯 JS -->
 	<script th:src="@{/js/header-auth.js}"></script>
-	<script th:src="@{/js/roomList.js}"></script>
 </body>
 </html>

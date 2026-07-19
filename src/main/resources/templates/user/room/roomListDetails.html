@@ -1,245 +1,80 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title th:text="${room.roomTypeName} + '｜東方之星 The Star'">房型詳情｜東方之星</title>
+<meta charset="UTF-8">
+<title>房型詳情 - THE STAR</title>
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<link rel="stylesheet" href="/css/common.css">
-<link rel="stylesheet" href="/css/roomList.css">
+<link rel="stylesheet" th:href="@{/css/common.css}">
+<link rel="stylesheet" th:href="@{/css/roomListDetails.css}">
 <style>
-/* 基礎設定 */
-* {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
-}
-
-body {
-	font-family: 'Noto Sans TC', sans-serif;
-	background: #f5f8fa;
-	color: #2c3e50;
-}
-
-/* 頁面容器 */
-.detail-container {
-	max-width: 1000px;
-	margin: 120px auto 60px;
-	padding: 0 32px;
-	display: grid;
-	grid-template-columns: 1.2fr 0.8fr;
-	gap: 48px;
-}
-
-/* 圖片區 */
-.img-gallery {
-	border-radius: 8px;
-	overflow: hidden;
-	border: 1px solid #dce8ed;
-}
-
-.img-main {
-	width: 100%;
-	height: 450px;
-	object-fit: cover;
-}
-
-/* 資訊區 */
-.product-info {
-	padding: 8px 0;
-}
-
-.room-name {
-	font-size: 2rem;
-	font-weight: 700;
-	color: #1e3a4a;
-	margin-bottom: 16px;
-}
-
-.gold-line {
-	width: 40px;
-	height: 2px;
-	background: #c9a84c;
-	margin-bottom: 24px;
-}
-
-.room-desc {
-	font-size: 15px;
-	color: #5a7a8a;
-	line-height: 1.9;
-	margin-bottom: 32px;
-}
-
-.price-area {
-	background: #fff;
-	border-radius: 8px;
-	padding: 24px;
-	border: 1px solid #dce8ed;
-	margin-bottom: 32px;
-}
-
-.price-label {
-	font-size: 12px;
-	color: #7a9aaa;
-	letter-spacing: 2px;
-}
-
-.price-value {
-	font-size: 2.2rem;
-	font-weight: 700;
-	color: #c9a84c;
-}
-
-.btn-book {
-    display: block;
-    width: 100%;
-    background: #9c8a77; 
-    color: #fff;
-    text-align: center;
-    padding: 16px;
-    border-radius: 4px;
-    text-decoration: none;
-    font-size: 16px;
-    transition: background 0.2s;
-}
-
-.btn-book:hover {
-background: #977;
-}
-
-.btn-back {
-	display: block;
-	text-align: center;
-	margin-top: 16px;
-	color: #7a9aaa;
-	text-decoration: none;
-	font-size: 14px;
-}
-
-@media ( max-width : 768px) {
-	.detail-container {
-		grid-template-columns: 1fr;
-		margin-top: 100px;
-	}
-}
 
 /* 強制隱藏導覽列中的購物車圖示與連結 */
 .shop-navbar a[href*="cart"], .shop-navbar a[href*="Cart"], .shop-navbar .fa-cart-shopping,
 	.shop-navbar .fa-bag-shopping, .shop-navbar .cart-icon {
 	display: none !important;
 }
-
-* 強制隱藏導覽列中的購物車圖示與連結 */
-.shop-navbar a[href*="cart"], .shop-navbar a[href*="Cart"], .shop-navbar .fa-cart-shopping,
-	.shop-navbar .fa-bag-shopping, .shop-navbar .cart-icon {
-	display: none !important;
-}
-
-.shop-navbar {
-	background: rgba(251, 249, 244, .92) !important;
-	backdrop-filter: blur(8px) !important;
-	border-bottom: 1px solid #e4ddd0 !important; /* 使用範本的 --line 顏色 */
-	position: relative !important;
-	z-index: 40 !important;
-}
-
-/* 調整連結文字顏色 */
-.shop-navbar .navbar-links>a {
-	color: #5b564c !important; /* 使用範本的 --soft 顏色 */
-}
-
-.shop-navbar .navbar-links>a:hover {
-	color: #23211c !important; /* 使用範本的 --ink 顏色 */
-}
-
-/* 調整「品牌字」顏色 */
-.shop-navbar .navbar-brand .brand-zh {
-	color: #23211c !important; /* 使用範本的 --ink 顏色 */
-}
-
-/* 調整當前頁面連結的高亮與底線 */
-.shop-navbar .nav-links .active {
-	color: #9c7c4f !important; /* 使用範本的 --gold 顏色 */
-	border-bottom-color: #9c7c4f !important;
-	:root { --gold: #9c7c4f; --ink: #23211c; --cream: #f6f2ea; }
-body { background: var(--cream); color: var(--ink); font-family: 'Jost', sans-serif; margin: 0; }
-.detail-container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
-.room-title { font-family: 'Cormorant Garamond', serif; color: var(--gold); text-align: center; font-size: 40px; margin-bottom: 40px; }
-.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
-.slider-wrapper { position: relative; }
-.slider img { width: 100%; height: 400px; object-fit: cover; }
-.btn-book { background: var(--gold); color: white; border: none; padding: 15px 30px; width: 100%; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
-.description { line-height: 1.8; margin-bottom: 20px; }
-.room-specs h3 { font-size: 14px; letter-spacing: 2px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
-.spec-item { margin: 10px 0; }
-.highlight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
-.highlights { margin-top: 50px; border-top: 1px solid #ccc; padding-top: 20px; }
-@media (max-width: 768px) { .detail-grid { grid-template-columns: 1fr; } }
-}
-
 </style>
 </head>
 <body>
-
-	<!-- 導覽列 (需保留您的共用設定) -->
 	<div
 		th:replace="~{user/common/frontNavbar :: navbar('room', true, 'shop-navbar site-navbar-dark', false)}"></div>
 
 	<div class="detail-container">
-    <h1 class="room-title">雙人房</h1>
-
-
+		<!-- Grid 佈局：僅包含圖片與右側詳細資訊 -->
 		<div class="detail-grid">
-        <!-- Image Slider Section -->
-        <div class="slider-wrapper">
-            <div class="slider">
-                <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=1000" alt="Room View">
-            </div>
-            <button class="nav-prev"><i class="fas fa-chevron-left"></i></button>
-            <button class="nav-next"><i class="fas fa-chevron-right"></i></button>
-            <div class="dots"><span></span><span></span><span></span><span></span></div>
-        </div>
+			<div class="slider-wrapper">
+				<div class="slider">
+					<img id="main-room-img"
+						th:if="${photoList != null && !photoList.isEmpty()}"
+						th:src="@{/roomtypephoto/display/photo/{id}(id=${photoList[0].roomTypePhotoId})}"
+						alt="Room Image"> <img id="main-room-img"
+						th:unless="${photoList != null && !photoList.isEmpty()}"
+						src="/images/noimage.jpg" alt="No Image">
+				</div>
+				<button type="button" class="nav-prev">
+					<i class="fas fa-chevron-left"></i>
+				</button>
+				<button type="button" class="nav-next">
+					<i class="fas fa-chevron-right"></i>
+				</button>
+			</div>
 
-        <!-- Right Description Section -->
-        <div class="info-wrapper">
-            <button class="btn-book">BOOK NOW</button>
-            <p class="description">
-                Superior Terrace Pool View rooms are defined by chic contemporary style, 
-                from a balcony to soft designer linens on your choice of double or twin beds, 
-                with access to modern amenities, as electronic safe, a Nespresso coffee machine, 
-                tea facilities and complementary WiFi.
-            </p>
-            
-            <div class="room-specs">
-                <h3>ROOM DETAILS</h3>
-                <div class="spec-item"><i class="fas fa-expand-arrows-alt"></i> 35 m²</div>
-                <div class="spec-item"><i class="fas fa-users"></i> Maximum 2 adults</div>
-                <div class="spec-item"><i class="fas fa-bed"></i> Double or Twin</div>
-                <div class="rating">
-                    <span>Tripadvisor Traveler Rating</span><br>
-                    <i class="fas fa-circle"></i><i class="fas fa-circle"></i><i class="fas fa-circle"></i><i class="fas fa-circle"></i><i class="fas fa-circle-notch"></i>
-                    <small>5,588 reviews</small>
-                </div>
-                <a href="#" class="read-reviews">Read Reviews</a>
-            </div>
-        </div>
-    </div>
+			<div class="info-wrapper">
+				<h1 class="room-title" th:text="${room.roomTypeName}">房型名稱</h1>
+				<div class="room-specs">
+					<h3>ROOM DETAILS</h3>
+					<p class="description" th:text="${room.roomTypeContent}">房型內容描述...</p>
+					<div class="spec-item">
+						<i class="fas fa-users"></i> 最多可容納 <span
+							th:text="${room.capacity}">6</span> 人
+					</div>
+					<div class="spec-item"
+						style="font-size: 1.2em; color: #b5894b; font-weight: bold; margin: 15px 0;">
+						<i class="fas fa-tag"></i> 價格：NT$ <span
+							th:text="${room.roomTypePrice}">0</span> / 晚
+					</div>
+					<a th:href="@{/roombooking.html}" class="btn-book">預訂</a> <a
+						th:href="@{/roomlist/list}" class="btn-back"
+						style="display: block; text-align: center; margin-top: 15px; color: #b5894b; text-decoration: underline;">«
+						返回房型列表</a>
+				</div>
+			</div>
+		</div>
 
-    <!-- Highlights Section -->
-    <div class="highlights">
-        <h3>HIGHLIGHTS</h3>
-        <div class="highlight-grid">
-            <div><i class="fas fa-swimmer"></i> Pool view</div>
-            <div><i class="fas fa-wifi"></i> Complimentary WiFi</div>
-            <div><i class="fas fa-lock"></i> In-room safe</div>
-            <div><i class="fas fa-tshirt"></i> Laundry service</div>
-            <div><i class="fas fa-coffee"></i> Nespresso machine</div>
-        </div>
-    </div>
-</div>
+		<!-- 移到 Grid 下方：內部設施 -->
+		<div class="highlights">
+			<h3>內部設施</h3>
+			<div class="highlight-grid">
+				<p th:text="${room.amenities}">設施資訊...</p>
+			</div>
+		</div>
 
-	<script th:src="@{/js/header-auth.js}"></script>
-	<script th:src="@{/js/roomList.js}"></script>
+		<div id="photo-ids" th:if="${photoList != null}"
+			th:data-ids="${#strings.listJoin(photoList.![roomTypePhotoId], ',')}"
+			style="display: none;"></div>
+	</div>
+
+	<script th:src="@{/js/roomListDetails.js}"></script>
 </body>
 </html>
