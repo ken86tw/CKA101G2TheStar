@@ -63,10 +63,13 @@ a {
     display: flex;
     flex-direction: column;
     padding: 36px 24px 28px;
-    color: #f6efe2;
-    background:
-        linear-gradient(rgba(28, 24, 18, .91), rgba(28, 24, 18, .96)),
-        url('https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=900&q=80') center/cover;
+    color: #23211c;
+    background: #f6f2ea;
+/*     background: linear-gradient(rgba(246, 242, 234, .91), rgba(246, 242, 234, .96)),url('https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=900&q=80') center/cover; */
+/*     color: #f6efe2;  */
+/*     background: */
+/*         linear-gradient(rgba(28, 24, 18, .91), rgba(28, 24, 18, .96)), */
+/*         url('https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=900&q=80') center/cover; */
 }
 
 .brand {
@@ -74,7 +77,9 @@ a {
     flex-direction: column;
     align-items: flex-start;
     padding: 0 10px 34px;
-    border-bottom: 1px solid rgba(255, 255, 255, .12);
+    border-bottom-color: #e4ddd0;
+    border-bottom: 1px solid;
+/*     border-bottom: 1px solid rgba(255, 255, 255, .12); */
 }
 
 .brand-star {
@@ -93,7 +98,8 @@ a {
 
 .brand small {
     margin-top: 2px;
-    color: rgba(255, 255, 255, .5);
+    color: #9b9486;
+/*     color: rgba(255, 255, 255, .5); */
     font-size: 9px;
     letter-spacing: 2.4px;
     text-transform: uppercase;
@@ -111,7 +117,8 @@ a {
     gap: 14px;
     padding: 13px 14px;
     border: 1px solid transparent;
-    color: rgba(255, 255, 255, .7);
+    color: #5b564c;
+/*     color: rgba(255, 255, 255, .7); */
     font-size: 13px;
     letter-spacing: 1px;
     transition: .22s ease;
@@ -127,13 +134,16 @@ a {
 .side-nav a.active {
     border-color: rgba(216, 183, 125, .32);
     background: rgba(216, 183, 125, .11);
-    color: #fff;
+    color: #23211c;
+/*     color: #fff; */
 }
 
 .sidebar-note {
     margin-top: auto;
     padding: 18px 14px;
-    border-top: 1px solid rgba(255, 255, 255, .12);
+    border-top-color: #e4ddd0;
+    border-top: 1px solid;
+/*     border-top: 1px solid rgba(255, 255, 255, .12); */
 }
 
 .sidebar-note span,
@@ -142,14 +152,16 @@ a {
 }
 
 .sidebar-note span {
-    color: rgba(255, 255, 255, .45);
+	color: #9b9486;
+/*     color: rgba(255, 255, 255, .45); */
     font-size: 10px;
     letter-spacing: 1.8px;
 }
 
 .sidebar-note strong {
     margin-top: 5px;
-    color: #fff;
+    color: #23211c;
+/*     color: #fff; */
     font-weight: 400;
 }
 
@@ -1275,3 +1287,4 @@ tbody tr:hover {
         padding: 11px 16px;
     }
 }
+

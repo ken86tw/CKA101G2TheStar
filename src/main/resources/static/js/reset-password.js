@@ -6,6 +6,7 @@ createApp({
       token: '',
       checking: true,
       tokenValid: false,
+      resetCompleted: false,
       submitting: false,
       errorMsg: '',
       successMsg: '',
@@ -68,7 +69,9 @@ createApp({
           return;
         }
         this.successMsg = data.message || '密碼重設成功';
-        this.tokenValid = false;
+        this.resetCompleted = true;
+        this.form.newPassword = '';
+        this.form.confirmPassword = '';
         setTimeout(() => {
           location.href = '/login.html';
         }, 1200);
