@@ -482,7 +482,31 @@
 
     loadNotifications(panel);
   }
+  function loadHeaderMemberAvatar(
+    avatarImage,
+    avatarFallback
+  ) {
+    if (!avatarImage || !avatarFallback) {
+      return;
+    }
 
+    avatarImage.hidden = true;
+    avatarFallback.hidden = false;
+
+    avatarImage.onload = function () {
+      avatarImage.hidden = false;
+      avatarFallback.hidden = true;
+    };
+
+    avatarImage.onerror = function () {
+      avatarImage.hidden = true;
+      avatarFallback.hidden = false;
+    };
+
+    avatarImage.src =
+      "/api/member/profile/picture?v="
+      + Date.now();
+  }
   async function initHeaderMemberState() {
 
     const loginLink =
@@ -493,6 +517,16 @@
 
     const memberAvatar =
       document.getElementById("memberAvatar");
+	  
+	  const memberAvatarImage =
+	    document.getElementById(
+	      "memberAvatarImage"
+	    );
+
+	  const memberAvatarFallback =
+	    document.getElementById(
+	      "memberAvatarFallback"
+	    );
 
     const memberDropdown =
       document.getElementById(
@@ -507,15 +541,17 @@
     const logoutBtn =
       document.getElementById("logoutBtn");
 
-    if (
-      !loginLink
-      || !memberMenu
-      || !memberAvatar
-      || !memberDropdown
-      || !logoutBtn
-    ) {
-      return;
-    }
+	  if (
+	    !loginLink
+	    || !memberMenu
+	    || !memberAvatar
+	    || !memberAvatarImage
+	    || !memberAvatarFallback
+	    || !memberDropdown
+	    || !logoutBtn
+	  ) {
+	    return;
+	  }
 
     const currentPage =
       location.pathname
@@ -539,12 +575,17 @@
       const memberName =
         status.memberName || "會員";
 
-      memberAvatar.title = memberName;
+		memberAvatar.title = memberName;
 
-      if (memberGreeting) {
-        memberGreeting.textContent =
-          `貴賓，${memberName}`;
-      }
+		loadHeaderMemberAvatar(
+		  memberAvatarImage,
+		  memberAvatarFallback
+		);
+
+		if (memberGreeting) {
+		  memberGreeting.textContent =
+		    `貴賓，${memberName}`;
+		}
 
     } else {
 

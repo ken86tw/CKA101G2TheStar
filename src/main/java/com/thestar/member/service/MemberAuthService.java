@@ -56,6 +56,7 @@ public class MemberAuthService {
         Byte memberGender = request.getMemberGender() == null ? 2 : request.getMemberGender();
         MultipartFile memberPictureFile = request.getMemberPicture();
 
+        // 這段保留你原本 Servlet insert() 的判斷：必填、手機格式、性別、圖片大小。
         validateRegisterData(
                 memberName,
                 memberEmail,
@@ -287,6 +288,53 @@ public class MemberAuthService {
     }
 
     @Transactional
+    public MemberVO changePassword(Integer memberId,
+                                   String currentPassword,
+                                   String newPassword,
+                                   String confirmPassword) {
+        if (memberId == null) {
+            throw new IllegalArgumentException("請先登入會員");
+        }
+
+        MemberVO member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("查無會員資料"));
+
+        String storedPassword = member.getMemberPassword();
+        String current = currentPassword == null ? "" : currentPassword;
+        String password = newPassword == null ? "" : newPassword;
+        String confirm = confirmPassword == null ? "" : confirmPassword;
+
+        boolean hasPassword =
+                storedPassword != null && !storedPassword.isBlank();
+
+        // 一般信箱會員必須驗證目前密碼
+        if (hasPassword) {
+            if (current.isBlank()) {
+                throw new IllegalArgumentException("請輸入目前密碼");
+            }
+
+            if (!passwordEncoder.matches(current, storedPassword)) {
+                throw new IllegalArgumentException("目前密碼錯誤");
+            }
+        }
+
+        validateNewPassword(password, confirm);
+
+        if (hasPassword
+                && passwordEncoder.matches(password, storedPassword)) {
+            throw new IllegalArgumentException("新密碼不可與目前密碼相同");
+        }
+
+        member.setMemberPassword(passwordEncoder.encode(password));
+
+        // 修改密碼後，清除先前可能存在的忘記密碼連結
+        member.setResetToken(null);
+        member.setResetExpireTime(null);
+
+        return memberRepository.save(member);
+    }
+    
+    @Transactional
     public MemberVO updateProfilePicture(Integer memberId, MultipartFile picture) throws IOException {
         if (memberId == null) {
             throw new IllegalArgumentException("請先登入會員");
@@ -351,6 +399,7 @@ public class MemberAuthService {
         if (!EMAIL_PATTERN.matcher(memberEmail).matches()) {
             throw new IllegalArgumentException("會員信箱格式不正確");
         }
+        // confirmPassword 是 Vue 版多加的前端保護，不會改掉你原本密碼必填判斷。
         validateNewPassword(memberPassword, confirmPassword);
         if (memberPhone.isEmpty()) {
             throw new IllegalArgumentException("會員手機請勿空白");

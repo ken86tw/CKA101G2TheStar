@@ -422,6 +422,7 @@
         memberName: '',
         memberEmail: '',
         memberDropdownOpen: false,
+        avatarLoadFailed: false,
         hasNotify: false,
 
         notificationPanelOpen: false,
@@ -560,6 +561,7 @@
     	    this.memberId = data.memberId || null;
     	    this.memberName = data.memberName || '';
     	    this.memberEmail = data.memberEmail || '';
+    	    this.avatarLoadFailed = false;
 
     	    if (this.loggedIn) {
     	      await this.loadNotifications();
@@ -581,6 +583,7 @@
         this.memberId = null;
         this.memberName = '';
         this.memberEmail = '';
+        this.avatarLoadFailed = false;
         this.memberDropdownOpen = false;
         this.stopNotificationPolling();
         this.clearNotificationState();
@@ -647,6 +650,7 @@
           this.memberId = data.memberId || null;
           this.memberName = data.memberName || '';
           this.memberEmail = data.memberEmail || '';
+          this.avatarLoadFailed = false;
           this.loginModalOpen = false;
           this.clearLoginMessages();
           this.keepRootUrl();

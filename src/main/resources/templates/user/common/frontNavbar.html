@@ -143,11 +143,19 @@
       <div v-else-if="authReady"
            class="member-menu">
         <button class="member-avatar"
-                type="button"
-                :title="displayName"
-                @click.stop="toggleMemberMenu">
-          <i class="fa-regular fa-user"></i>
-        </button>
+		        type="button"
+		        :title="displayName"
+		        @click.stop="toggleMemberMenu">
+		
+		  <img v-if="!avatarLoadFailed"
+		       class="member-avatar-image"
+		       src="/api/member/profile/picture"
+		       alt="會員頭像"
+		       @error="avatarLoadFailed = true">
+		
+		  <i v-else
+		     class="fa-regular fa-user member-avatar-fallback"></i>
+		</button>
 
         <!-- 會員選單 -->
         <div class="member-dropdown"
@@ -193,11 +201,18 @@
            id="memberMenu"
            style="display: none;">
         <button class="member-avatar"
-                id="memberAvatar"
-                type="button"
-                title="會員選單">
-          <i class="fa-regular fa-user"></i>
-        </button>
+		        id="memberAvatar"
+		        type="button"
+		        title="會員選單">
+		
+		  <img id="memberAvatarImage"
+		       class="member-avatar-image"
+		       alt="會員頭像"
+		       hidden>
+		
+		  <i id="memberAvatarFallback"
+		     class="fa-regular fa-user member-avatar-fallback"></i>
+		</button>
 
         <div class="member-dropdown"
              id="memberDropdown">

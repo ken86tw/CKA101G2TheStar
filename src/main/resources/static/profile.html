@@ -178,12 +178,65 @@
 			</div>
 		</section>
 
+		<section class="security-section" v-if="!loading">
+			<div class="section-heading">
+				<div>
+					<h2>帳號安全</h2>
+					<p>{{ profile.hasPassword ? '定期更新密碼，有助於保護會員帳號。' : '目前為 Google 登入帳號，可設定密碼後使用信箱與密碼登入。' }}</p>
+				</div>
+				<button type="button" class="btn secondary"
+					v-if="!passwordEditing" @click="enterPasswordMode"
+					:disabled="editing">{{ profile.hasPassword ? '修改密碼' : '設定登入密碼' }}</button>
+			</div>
+
+			<form v-if="passwordEditing" class="password-form"
+				@submit.prevent="changePassword">
+				<div class="profile-table">
+					<div class="profile-row" v-if="profile.hasPassword">
+						<div class="label">目前密碼</div>
+						<div class="value">
+							<input type="password" v-model="passwordForm.currentPassword"
+								autocomplete="current-password" maxlength="100"
+								placeholder="請輸入目前使用的密碼">
+						</div>
+					</div>
+
+					<div class="profile-row">
+						<div class="label">新密碼</div>
+						<div class="value password-value">
+							<input type="password" v-model="passwordForm.newPassword"
+								autocomplete="new-password" maxlength="100"
+								placeholder="至少 6 個字元">
+							<span class="hint">密碼至少需要 6 個字元。</span>
+						</div>
+					</div>
+
+					<div class="profile-row">
+						<div class="label">確認新密碼</div>
+						<div class="value">
+							<input type="password" v-model="passwordForm.confirmPassword"
+								autocomplete="new-password" maxlength="100"
+								placeholder="請再次輸入新密碼">
+						</div>
+					</div>
+				</div>
+
+				<div class="password-actions">
+					<button type="submit" class="btn" :disabled="passwordSaving">
+						{{ passwordSaving ? '更新中...' : (profile.hasPassword ? '確認修改密碼' : '確認設定密碼') }}
+					</button>
+					<button type="button" class="btn secondary"
+						@click="exitPasswordMode" :disabled="passwordSaving">取消</button>
+				</div>
+			</form>
+		</section>
+
 		<div class="error">{{ errorMsg }}</div>
 		<div class="success">{{ successMsg }}</div>
 
 		<div class="actions" v-if="!loading">
 			<button type="button" class="btn" v-if="!editing"
-				@click="enterEditMode">修改資料</button>
+				@click="enterEditMode" :disabled="passwordEditing">修改資料</button>
 			<button type="button" class="btn" v-if="editing" @click="saveProfile"
 				:disabled="saving">{{ saving ? '儲存中...' : '儲存修改' }}</button>
 			<button type="button" class="btn secondary" v-if="editing"

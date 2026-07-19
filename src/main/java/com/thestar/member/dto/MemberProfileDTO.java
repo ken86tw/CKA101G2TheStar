@@ -14,6 +14,7 @@ public class MemberProfileDTO {
     private LocalDate memberBirthday;
     private Byte memberGender;
     private Byte memberStatus;
+    private boolean hasPassword;
 
     public static MemberProfileDTO from(MemberVO member) {
         MemberProfileDTO dto = new MemberProfileDTO();
@@ -25,6 +26,7 @@ public class MemberProfileDTO {
         dto.memberBirthday = member.getMemberBirthday();
         dto.memberGender = member.getMemberGender();
         dto.memberStatus = member.getMemberStatus();
+        dto.hasPassword = member.getMemberPassword() != null && !member.getMemberPassword().isBlank();
         return dto;
     }
 
@@ -58,5 +60,9 @@ public class MemberProfileDTO {
 
     public Byte getMemberStatus() {
         return memberStatus;
+    }
+
+    public boolean isHasPassword() {
+        return hasPassword;
     }
 }

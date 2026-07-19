@@ -1,6 +1,7 @@
 package com.thestar.member.controller;
 
 import com.thestar.member.dto.GoogleCompleteProfileRequest;
+import com.thestar.member.dto.MemberChangePasswordRequest;
 import com.thestar.member.dto.MemberForgotPasswordRequest;
 import com.thestar.member.dto.MemberLoginRequest;
 import com.thestar.member.dto.MemberProfileDTO;
@@ -269,6 +270,32 @@ public class MemberAuthController {
             MemberVO updatedMember = memberAuthService.updateProfile(loginMember.getMemberId(), request);
             session.setAttribute("loginMember", updatedMember);
             return ResponseEntity.ok(MemberProfileDTO.from(updatedMember));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/profile/password")
+    public ResponseEntity<?> changePassword(@RequestBody MemberChangePasswordRequest request,
+                                            HttpSession session) {
+        MemberVO loginMember = (MemberVO) session.getAttribute("loginMember");
+        if (loginMember == null || loginMember.getMemberId() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "請先登入會員"));
+        }
+
+        try {
+            MemberVO updatedMember = memberAuthService.changePassword(
+                    loginMember.getMemberId(),
+                    request.getCurrentPassword(),
+                    request.getNewPassword(),
+                    request.getConfirmPassword()
+            );
+            session.setAttribute("loginMember", updatedMember);
+            return ResponseEntity.ok(Map.of(
+                    "ok", true,
+                    "message", "密碼修改成功"
+            ));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }

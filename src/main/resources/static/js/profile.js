@@ -6,12 +6,19 @@ createApp({
       loading: true,
       saving: false,
       editing: false,
+      passwordEditing: false,
+      passwordSaving: false,
       profile: {},
       form: {
         memberName: '',
         memberPhone: '',
         memberAddress: '',
         memberGender: 2
+      },
+      passwordForm: {
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
       },
       pictureVersion: Date.now(),
       pictureVisible: true,
@@ -139,6 +146,98 @@ createApp({
       }
 
       return '';
+    },
+
+    enterPasswordMode() {
+      this.clearMessage();
+      this.passwordForm = {
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      };
+      this.passwordEditing = true;
+    },
+
+    exitPasswordMode() {
+      this.clearMessage();
+      this.passwordForm = {
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      };
+      this.passwordEditing = false;
+    },
+
+    validatePassword() {
+      if (this.profile.hasPassword && !this.passwordForm.currentPassword) {
+        return '請輸入目前密碼';
+      }
+
+      if (!this.passwordForm.newPassword) {
+        return '請輸入新密碼';
+      }
+
+      if (this.passwordForm.newPassword.length < 6) {
+        return '新密碼至少需要 6 個字元';
+      }
+
+      if (!this.passwordForm.confirmPassword) {
+        return '請再次輸入新密碼';
+      }
+
+      if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) {
+        return '兩次輸入的新密碼不一致';
+      }
+
+      return '';
+    },
+
+    async changePassword() {
+      this.clearMessage();
+
+      const error = this.validatePassword();
+      if (error) {
+        this.errorMsg = error;
+        return;
+      }
+
+      this.passwordSaving = true;
+
+      try {
+        const res = await fetch('/api/member/profile/password', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'same-origin',
+          body: JSON.stringify(this.passwordForm)
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (res.status === 401) {
+          location.href = '/login.html?redirect=/profile.html';
+          return;
+        }
+
+        if (!res.ok) {
+          this.errorMsg = data.error || '密碼修改失敗';
+          return;
+        }
+
+        this.profile.hasPassword = true;
+        this.passwordForm = {
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        };
+        this.passwordEditing = false;
+        this.successMsg = data.message || '密碼修改成功';
+      } catch (e) {
+        this.errorMsg = '無法連線到伺服器';
+      } finally {
+        this.passwordSaving = false;
+      }
     },
 
     validatePicture(file) {
