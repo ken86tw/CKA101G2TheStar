@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!-- 「退款管理」區塊(員工):被 roombooking.html 用 th:replace 引入。
+     對應 JS:js/roombooking/refund.js;樣式全用 css/roombooking/base.css 的共用件 -->
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- ===== 退款管理 ===== -->
+<section th:fragment="section" v-if="employee.on && nav==='refund'">
+    <div class="wrap">
+        <div class="sechead">
+            <div class="up">Refund</div>
+            <h2>退款管理</h2>
+            <p>未退款訂單查詢 ， 退款</p></div>
+        <div class="panel">
+            <table v-if="refund.list.length">
+                <thead>
+                <tr>
+                    <th>退款單號</th>
+                    <th>訂單</th>
+                    <th>會員</th>
+                    <th>金額</th>
+                    <th>原因</th>
+                    <th>申請時間</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="r in refund.list" :key="r.refundId">
+                    <td>{{ r.refundId }}</td>
+                    <td>{{ r.orderId }}</td>
+                    <td>{{ r.memberId }}</td>
+                    <td>${{r.amount.toLocaleString()}}</td>
+                    <td>{{r.reason}}</td>
+                    <td>{{fmt(r.createdTime)}}</td>
+                    <td>
+                        <button class="btn danger sm" @click="doRefund(r)">執行退款</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <p v-else class="hint">目前沒有待處理的退款</p>
+        </div>
+    </div>
+</section>
+</body>
+</html>

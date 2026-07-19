@@ -1,0 +1,27 @@
+/* ============================================================
+   roombooking/admin-orders.js — 「後台訂單」(員工全站訂單列表)
+   內容:全站訂單分頁查詢
+   (明細展開 toggleDetail 和統計 refreshCounts 跟會員版共用,放 common.js)
+   對應畫面:templates/roombooking/admin-orders.html
+   ============================================================ */
+window.RB = window.RB || {};
+
+RB.adminOrders = {
+    methods: {
+        async loadAdmin() {
+            if (!this.employee.on) {
+                this.toast('warn', '請先員工登入', '登出後改用員工身分');
+                return;
+            }
+            try {
+                const r = await this.api(`/thestar/admin/order?orderStatus=${this.admin.status}&page=${this.admin.page}&size=${this.admin.size}`);
+                this.admin.list = r.content || [];
+                this.admin.totalPages = r.totalPages || 0;
+                this.admin.open = {};
+                this.refreshCounts(this.admin, '/thestar/admin/order');
+            } catch {
+                this.admin.list = [];
+            }
+        },
+    },
+};

@@ -66,7 +66,7 @@ public class OrderController {
         return ResponseEntity.ok("訂單" + orderId + "取消訂單成功");
     }
 
-    @GetMapping("/member/order")
+    @GetMapping("/member")
     public ResponseEntity<Page<OrderVO>> memberFindOrder(@RequestParam Byte orderStatus,
                                                          @RequestParam(defaultValue = "0") int page,
                                                          @RequestParam(defaultValue = "10") int size,
@@ -83,7 +83,7 @@ public class OrderController {
         return ResponseEntity.ok(orderQueryService.findMemberOrder(memberId, orderStatus, page, size));
     }
 
-    @GetMapping("/member/order/detail/{orderId}")
+    @GetMapping("/member/detail/{orderId}")
     public ResponseEntity<List<OrderDetailDTO>> memberFindOrderList(@PathVariable Integer orderId,
                                                                     HttpSession session) {
         MemberVO member = (MemberVO) session.getAttribute("loginMember");

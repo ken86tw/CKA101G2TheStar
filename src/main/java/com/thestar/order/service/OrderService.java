@@ -2,9 +2,7 @@ package com.thestar.order.service;
 
 import com.thestar.member.service.MemberCouponService;
 import com.thestar.member.service.MemberNotifyService;
-import com.thestar.order.repository.OrderListRepository;
 import com.thestar.room.service.RedisRoomStock;
-
 import com.thestar.order.dto.CreateRoomOrderDTO;
 import com.thestar.order.entity.OrderListVO;
 import com.thestar.order.entity.OrderVO;
@@ -19,7 +17,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -34,14 +31,13 @@ public class OrderService {
     private final RedisRoomStock redisRoomStock;
     private final MemberCouponService memberCouponService;
     private final MemberNotifyService memberNotifyService;
-    private final OrderListRepository orderListRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;
 
 
     @Autowired
     public OrderService(OrderRepository orderRepository, RoomInventoryRepository roomInventoryRepository
             , RoomTypeRepository roomTypeRepository, RefundListRepository refundListRepository
-            , RedisRoomStock redisRoomStock, MemberCouponService memberCouponService, MemberNotifyService memberNotifyService, OrderListRepository orderListRepository, SimpMessagingTemplate simpMessagingTemplate) {
+            , RedisRoomStock redisRoomStock, MemberCouponService memberCouponService, MemberNotifyService memberNotifyService, SimpMessagingTemplate simpMessagingTemplate) {
         this.orderRepository = orderRepository;
         this.roomInventoryRepository = roomInventoryRepository;
         this.roomTypeRepository = roomTypeRepository;
@@ -49,7 +45,7 @@ public class OrderService {
         this.redisRoomStock = redisRoomStock;
         this.memberCouponService = memberCouponService;
         this.memberNotifyService = memberNotifyService;
-        this.orderListRepository = orderListRepository;
+
         this.simpMessagingTemplate = simpMessagingTemplate;
     }
 

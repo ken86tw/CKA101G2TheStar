@@ -60,7 +60,7 @@ createApp({
       this.loading = true;
       try {
         // 查「已付款」清單，看這張訂單在不在裡面
-        const res = await fetch('/thestar/order/member/order?orderStatus=1&page=0&size=100',
+        const res = await fetch('/thestar/order/member?orderStatus=1&page=0&size=100',
                                 { credentials: 'same-origin' });
         const data = await res.json();
         const list = data.content || [];

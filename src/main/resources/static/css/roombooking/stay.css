@@ -1,0 +1,104 @@
+/* ============================================================
+   roombooking/stay.css — 「房務管理」頁
+   內容:入住/退房兩大入口按鈕、配房房間格、彈窗遮罩與面板
+   (「我的預訂」「後台訂單」「退款管理」只用 base.css 的共用樣式,
+    所以沒有自己的檔案)
+   ============================================================ */
+
+/* ===== 房務兩大入口按鈕 ===== */
+.bigact {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    padding: 46px 20px;
+    cursor: pointer;
+    font-family: var(--serif);
+    font-size: 26px;
+    letter-spacing: 6px;
+    color: var(--ink);
+    transition: .3s
+}
+
+.bigact:hover {
+    border-color: var(--gold);
+    color: var(--gold)
+}
+
+/* ===== 配房的房間格(綠點=可選 紅點=入住中/停用) ===== */
+.roomgrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 20px
+}
+
+.rchip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    padding: 12px 18px;
+    cursor: pointer;
+    transition: .25s
+}
+
+.rchip:hover {
+    border-color: var(--gold)
+}
+
+.rchip .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%
+}
+
+.rchip .free {
+    background: #5b8a5f
+}
+
+.rchip .busy {
+    background: #a85b50
+}
+
+.rchip .no {
+    font-family: var(--serif);
+    font-size: 18px
+}
+
+.rchip small {
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase
+}
+
+/* ===== 配房彈窗:遮罩貼滿整個視窗,面板置中 ===== */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 18, 14, .5);
+    z-index: 50;
+    display: grid;
+    place-items: center
+}
+
+.modal {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    width: min(860px, 92vw);
+    max-height: 86vh;
+    overflow: auto;
+    padding: 34px 38px;
+    position: relative
+}
+
+.modal .close {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    background: 0;
+    border: 0;
+    font-size: 22px;
+    cursor: pointer;
+    color: var(--muted)
+}

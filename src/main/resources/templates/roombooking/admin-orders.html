@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<!-- 「後台訂單」區塊(員工全站訂單):被 roombooking.html 用 th:replace 引入。
+     對應 JS:js/roombooking/admin-orders.js;樣式全用 css/roombooking/base.css 的共用件 -->
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- ===== 後台訂單 ===== -->
+<section th:fragment="section" v-if="employee.on && nav==='admin'">
+    <div class="wrap">
+        <div class="sechead">
+            <div class="up">Back Office</div>
+            <h2>全站訂單</h2>
+            <p>需員工身分</p></div>
+        <div class="stab">
+            <div v-for="s in STATUS" :key="s.v" class="box" :class="{on:admin.status===s.v}"
+                 @click="admin.status=s.v;admin.page=0;loadAdmin()">
+                <div class="num">{{ admin.counts[s.v] || 0 }}</div>
+                <div class="lb">{{ s.label }}</div>
+            </div>
+        </div>
+        <div class="panel" style="border-top:0;padding:14px 30px 30px">
+            <table v-if="admin.list.length">
+                <thead>
+                <tr>
+                    <th>編號</th>
+                    <th>會員</th>
+                    <th>狀態</th>
+                    <th>入住</th>
+                    <th>退房</th>
+                    <th>金額</th>
+                    <th style="text-align:right">明細</th>
+                </tr>
+                </thead>
+                <tbody>
+                <template v-for="o in admin.list" :key="o.orderId">
+                    <tr>
+                        <td><span class="oid">No. {{ o.orderId }}</span></td>
+                        <td>#{{ o.memberId }}</td>
+                        <td><span class="badge" :class="'b'+o.orderStatus">{{ STATUS[o.orderStatus].label
+                            }}</span></td>
+                        <td>{{ o.checkInDate }}</td>
+                        <td>{{ o.checkOutDate }}</td>
+                        <td class="money">${{ (o.totalAmount - o.discountAmount).toLocaleString() }}</td>
+                        <td style="text-align:right">
+                            <button class="btn line sm" @click="toggleDetail(admin,o.orderId,'admin')">
+                                {{ admin.open[o.orderId] ? '收合' : '明細' }}
+                            </button>
+                        </td>
+                    </tr>
+                    <tr v-if="admin.open[o.orderId]" class="det">
+                        <td colspan="7">
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>房型</th>
+                                    <th>每晚</th>
+                                    <th>數量</th>
+                                    <th>小計</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="(d,k) in admin.detail[o.orderId]" :key="k">
+                                    <td>{{ d.roomTypeName }}</td>
+                                    <td>${{ d.roomPrice.toLocaleString() }}</td>
+                                    <td>×{{ d.QTY }}</td>
+                                    <td class="money">${{ d.subtotal.toLocaleString() }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </template>
+                </tbody>
+            </table>
+            <div v-else class="empty">
+                <div class="big">{{ employee.on ? '此分類無訂單' : '請以員工身分登入' }}</div>
+            </div>
+            <div class="pager" v-if="admin.totalPages>1">
+                <button class="reslink" :disabled="admin.page<=0" @click="admin.page--;loadAdmin()">‹ 上一頁
+                </button>
+                <span>{{ admin.page + 1 }} / {{ admin.totalPages }}</span>
+                <button class="reslink" :disabled="admin.page>=admin.totalPages-1"
+                        @click="admin.page++;loadAdmin()">下一頁 ›
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<!-- 「我的預訂」區塊(會員訂單列表):被 roombooking.html 用 th:replace 引入。
+     對應 JS:js/roombooking/orders.js;樣式全用 css/roombooking/base.css 的共用件(stab/table/badge) -->
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- ===== 我的預訂 ===== -->
+<section th:fragment="section" v-if="member.on && nav==='orders'">
+    <div class="wrap">
+        <div class="sechead">
+            <div class="up">My Stay</div>
+            <h2>我的預訂</h2>
+            <p>檢視並管理您的訂房</p></div>
+        <div class="stab">
+            <div v-for="s in STATUS" :key="s.v" class="box" :class="{on:orders.status===s.v}"
+                 @click="orders.status=s.v;orders.page=0;loadOrders()">
+                <div class="num">{{ orders.counts[s.v] || 0 }}</div>
+                <div class="lb">{{ s.label }}</div>
+            </div>
+        </div>
+        <div class="panel" style="border-top:0;padding:14px 30px 30px">
+            <table v-if="orders.list.length">
+                <thead>
+                <tr>
+                    <th>預訂編號</th>
+                    <th>狀態</th>
+                    <th>退款</th>
+                    <th>入住</th>
+                    <th>退房</th>
+                    <th>應付</th>
+                    <th style="text-align:right">服務</th>
+                </tr>
+                </thead>
+                <tbody>
+                <template v-for="o in orders.list" :key="o.orderId">
+                    <tr>
+                        <td><span class="oid">No. {{ o.orderId }}</span></td>
+                        <td><span class="badge" :class="'b'+o.orderStatus">{{ STATUS[o.orderStatus].label
+                            }}</span>
+                            <!-- 待付款的單掛個小倒數 歸零後等後端排程取消+WS通知重查 狀態就會變已取消 -->
+                            <div v-if="o.orderStatus===0"
+                                 style="color:red;font-size:12px;margin-top:4px;font-variant-numeric:tabular-nums">
+                                {{ payLeftOf(o) > 0 ? '剩 ' + mmss(payLeftOf(o)) : '逾時，取消處理中' }}
+                            </div>
+                        </td>
+                        <td>
+                            <span v-if="o.orderStatus===3 && o.refundvo">
+                                {{o.refundvo.refundStatus === 1 ? '已退款' : '退款處理中'}}
+                            </span>
+                            <span v-else>-</span>
+                        </td>
+
+                        <td>{{ o.checkInDate }}</td>
+                        <td>{{ o.checkOutDate }}</td>
+                        <td><span class="money">${{ (o.totalAmount - o.discountAmount).toLocaleString()
+                            }}</span>
+                            <span v-if="o.discountAmount>0" class="strike">${{ o.totalAmount.toLocaleString()
+                                }}</span></td>
+                        <td>
+                            <div class="actions">
+                                <button class="btn line sm" @click="toggleDetail(orders,o.orderId,'member')">
+                                    {{ orders.open[o.orderId] ? '收合' : '明細' }}
+                                </button>
+                                <button v-if="o.orderStatus===0" class="btn ghost sm"
+                                        @click="devConfirm(o.orderId)" title="不經綠界直接標記已付款">略過金流付款
+                                </button>
+                                <button v-if="o.orderStatus===1" class="btn danger sm"
+                                        @click="cancel(o.orderId)">取消訂單（退款）
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr v-if="orders.open[o.orderId]" class="det">
+                        <td colspan="7">
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>房型</th>
+                                    <th>每晚</th>
+                                    <th>數量</th>
+                                    <th>小計</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="(d,k) in orders.detail[o.orderId]" :key="k">
+                                    <td>{{ d.roomTypeName }}</td>
+                                    <td>${{ d.roomPrice.toLocaleString() }}</td>
+                                    <td>×{{ d.QTY }}</td>
+                                    <td class="money">${{ d.subtotal.toLocaleString() }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </template>
+                </tbody>
+            </table>
+            <div v-else class="empty">
+                <div class="big">尚無此類預訂</div>
+                <p>切換上方分類，或前往「預訂客房」</p></div>
+            <div class="pager" v-if="orders.totalPages>1">
+                <button class="reslink" :disabled="orders.page<=0" @click="orders.page--;loadOrders()">‹
+                    上一頁
+                </button>
+                <span>{{ orders.page + 1 }} / {{ orders.totalPages }}</span>
+                <button class="reslink" :disabled="orders.page>=orders.totalPages-1"
+                        @click="orders.page++;loadOrders()">下一頁 ›
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
