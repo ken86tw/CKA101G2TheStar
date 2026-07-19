@@ -16,7 +16,7 @@
     <a href="/index.html"
        th:classappend="${activePage == 'home'} ? 'active' : ''">首頁</a>
 
-    <a href="/index.html#about-preview">關於我們</a>
+    <a href="/about.html" th:classappend="${activePage == 'about'} ? 'active' : ''">關於我們</a>
 
     <a href="/articles.html"
        th:classappend="${activePage == 'articles'} ? 'active' : ''">文章</a>
@@ -133,12 +133,12 @@
       </div>
 
       <!-- 登入按鈕 -->
-      <button v-if="authReady && !loggedIn"
-              type="button"
-              class="login-btn login-btn-as-button"
-              @click="openLoginModal">
-        登入
-      </button>
+      <!-- 登入按鈕 -->
+	  <a v-if="authReady && !loggedIn"
+	     href="/login.html"
+	     class="login-btn login-btn-as-button">
+	    登入
+	  </a>
 
       <div v-else-if="authReady"
            class="member-menu">
@@ -157,10 +157,10 @@
             貴賓，{{ displayName }}
           </div>
 
-          <a href="/profile.html">我的會員資料</a>
-          <a href="/roombooking.html?tab=orders">我的訂房預訂</a>
-          <a href="/restaurant/booking/list">我的餐廳預訂</a>
-          <a href="/shop/order/myOrders">我的購物訂單</a>
+          <a href="/profile.html">會員資料</a>
+          <a href="/roombooking.html?tab=orders">訂房紀錄</a>
+          <a href="/restaurant/booking/list">餐廳預訂紀錄</a>
+          <a href="/shop/order/myOrders">購物訂單</a>
           <a href="/coupons.html">我的優惠券</a>
 
           <button type="button"
@@ -206,10 +206,10 @@
             貴賓，會員
           </div>
 
-          <a href="/profile.html">我的會員資料</a>
-          <a href="/roombooking.html?tab=orders">我的訂房預訂</a>
-          <a href="/restaurant/booking/list">我的餐廳預訂</a>
-          <a href="/shop/order/myOrders">我的購物訂單</a>
+          <a href="/profile.html">會員資料</a>
+          <a href="/roombooking.html?tab=orders">訂房紀錄</a>
+          <a href="/restaurant/booking/list">餐廳預訂紀錄</a>
+          <a href="/shop/order/myOrders">購物訂單</a>
           <a href="/coupons.html">我的優惠券</a>
 
           <button type="button"
@@ -220,7 +220,7 @@
       </div>
     </div>
 
-    <a href="/thestar/admin/login"
+    <a href="/thestar/admin/home"
        class="navbar-staff-entry">
       員工入口
     </a>

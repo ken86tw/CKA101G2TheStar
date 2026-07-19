@@ -5,51 +5,114 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>會員登入｜東方之星 The Star</title>
 
-  <link rel="stylesheet" href="/css/common.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/login.css">
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 </head>
 <body>
-  <main id="app" class="login-page" v-cloak>
-    <section class="login-card">
-      <h1>會員登入</h1>
-      <p>東方之星 The Star</p>
-
-      <form @submit.prevent="submitLogin" autocomplete="on">
-        <div class="field">
-          <label for="email">會員信箱</label>
-          <input id="email" type="email" required v-model.trim="form.memberEmail" autocomplete="username">
+  <main id="app" class="member-login-page" v-cloak>
+    <section class="login-shell">
+      <div class="login-visual" aria-hidden="true">
+        <div class="visual-caption">
+          <div class="eyebrow">THE STAR · SINCE 2026</div>
+          <h1>Arrive as a guest,<br>leave as family.</h1>
         </div>
+      </div>
 
-        <div class="field">
-          <label for="password">會員密碼</label>
-          <input id="password" type="password" required v-model="form.memberPassword" autocomplete="current-password">
-        </div>
-
-        <label class="remember-row">
-          <input type="checkbox" v-model="form.rememberMe">
-          <span>記住我</span>
-        </label>
-
-        <button type="submit" :disabled="submitting">
-          {{ submitting ? '登入中...' : '登入' }}
-        </button>
-
-        <div class="msg error">{{ errorMsg }}</div>
-
-        <div v-if="showResendVerify" class="resend-box">
-          <p>這個帳號還沒完成信箱驗證。</p>
-          <button type="button" class="resend-btn" :disabled="resending" @click="resendVerification">
-            {{ resending ? '寄送中...' : '重送驗證信' }}
+      <div class="login-panel">
+        <nav class="page-actions" aria-label="頁面導覽">
+          <button type="button" class="page-action" @click="goBack">
+            <span aria-hidden="true">‹</span>
+            回上頁
           </button>
+          <a class="page-action" href="/index.html">回首頁</a>
+        </nav>
+
+        <div class="login-content">
+          <header class="hotel-mark">
+<!--             <div class="hotel-star">✦</div> -->
+            <h2>THE STAR</h2>
+            <p>Hotel &amp; Residences</p>
+          </header>
+
+          <div class="form-heading">
+            <span>MEMBER SIGN IN</span>
+            <h3>會員登入</h3>
+          </div>
+
+          <form @submit.prevent="submitLogin" autocomplete="on">
+            <div class="field">
+              <label for="email">Member Email</label>
+              <input
+                id="email"
+                type="email"
+                required
+                autofocus
+                v-model.trim="form.memberEmail"
+                autocomplete="username"
+                placeholder="請輸入會員信箱">
+            </div>
+
+            <div class="field">
+              <label for="password">Password</label>
+              <input
+                id="password"
+                type="password"
+                required
+                v-model="form.memberPassword"
+                autocomplete="current-password"
+                placeholder="請輸入會員密碼">
+            </div>
+
+            <div class="login-options">
+              <label class="remember-row">
+                <input type="checkbox" v-model="form.rememberMe">
+                <span>記住帳號</span>
+              </label>
+              <a class="forgot-link" href="/forgot-password.html">忘記密碼？</a>
+            </div>
+
+            <button class="login-submit" type="submit" :disabled="submitting">
+              {{ submitting ? '登入中...' : '登入會員' }}
+            </button>
+
+            <p v-if="errorMsg" class="message error-message" role="alert">
+              {{ errorMsg }}
+            </p>
+
+            <div v-if="showResendVerify" class="resend-box">
+              <p>這個帳號還沒完成信箱驗證。</p>
+              <button
+                type="button"
+                class="resend-btn"
+                :disabled="resending"
+                @click="resendVerification">
+                {{ resending ? '寄送中...' : '重送驗證信' }}
+              </button>
+            </div>
+
+            <p v-if="successMsg" class="message success-message" aria-live="polite">
+              {{ successMsg }}
+            </p>
+          </form>
+
+          <div v-if="googleEnabled" class="social-login">
+            <div class="social-divider"><span>OR</span></div>
+            <a class="google-login-btn" :href="googleLoginUrl">
+              <span class="google-mark">G</span>
+              使用 Google 登入
+            </a>
+          </div>
+
+          <div class="login-footer">
+            <p>還沒有會員帳號？</p>
+            <a href="/register.html">立即註冊會員</a>
+          </div>
+
+          <p class="service-hint">會員專區 · 訂房 · 餐飲 · 購物</p>
         </div>
-
-        <div class="msg success">{{ successMsg }}</div>
-      </form>
-
-      <div class="login-links">
-        <a href="/register.html">還沒有帳號，註冊會員</a>
-        <a href="/index.html">回首頁</a>
       </div>
     </section>
   </main>

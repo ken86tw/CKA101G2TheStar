@@ -16,4 +16,5 @@ public interface ProductOrderItemRepository extends JpaRepository<ProductOrderIt
     void deleteByProductOrderItemId(int productOrderItemId);
 
     List<ProductOrderItemVO> findByShopOrderId(Integer shopOrderId);
+    List<ProductOrderItemVO> findByProductId(Integer productId);
 }

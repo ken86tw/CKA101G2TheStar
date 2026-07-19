@@ -45,6 +45,43 @@ public class MemberVerificationMailService {
         return baseUrl + "/verify.html?token=" + encodedToken;
     }
 
+
+    public String buildResetPasswordUrl(String token) {
+        String baseUrl = appBaseUrl == null || appBaseUrl.isBlank()
+                ? "http://localhost:8080"
+                : appBaseUrl.trim();
+
+        while (baseUrl.endsWith("/")) {
+            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+        }
+
+        String encodedToken = URLEncoder.encode(token, StandardCharsets.UTF_8);
+        return baseUrl + "/reset-password.html?token=" + encodedToken;
+    }
+
+    public boolean sendPasswordResetMail(MemberVO member, String resetUrl, long expireMinutes) {
+        String safeName = member.getMemberName() == null || member.getMemberName().isBlank()
+                ? "會員"
+                : member.getMemberName();
+
+        String subject = "The Star Hotel 會員密碼重設";
+        String messageText = safeName + " 您好：\n\n"
+                + "我們收到您的會員密碼重設申請。\n"
+                + "請點選以下連結設定新密碼：\n"
+                + resetUrl + "\n\n"
+                + "此連結將於 " + expireMinutes + " 分鐘後失效。\n"
+                + "若您沒有提出申請，請忽略此信。\n\n"
+                + "The Star Hotel";
+
+        try {
+            sendMail(member.getMemberEmail(), subject, messageText);
+            return true;
+        } catch (Exception e) {
+            System.err.println("會員密碼重設信寄送失敗：" + e.getMessage());
+            return false;
+        }
+    }
+
     public boolean sendVerifyMail(MemberVO member, String verifyUrl) {
         try {
             sendVerificationMail(member.getMemberEmail(), member.getMemberName(), verifyUrl);

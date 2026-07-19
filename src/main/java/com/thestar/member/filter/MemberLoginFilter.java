@@ -1,5 +1,6 @@
 package com.thestar.member.filter;
 
+import com.thestar.member.security.MemberSecurityContextSupport;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,19 +16,33 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class MemberLoginFilter extends OncePerRequestFilter {
 
+    private final MemberSecurityContextSupport memberSecurityContextSupport;
+
+    public MemberLoginFilter(MemberSecurityContextSupport memberSecurityContextSupport) {
+        this.memberSecurityContextSupport = memberSecurityContextSupport;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
         String path = getPath(request);
+        HttpSession session = request.getSession(false);
+
+        // 員工登入成功後的第一個請求就清掉會員身分，避免訂房頁同時看到兩種身分。
+        if (session != null
+                && session.getAttribute("loginEmployee") != null
+                && session.getAttribute("loginMember") != null) {
+            session.removeAttribute("loginMember");
+            memberSecurityContextSupport.clear(session);
+        }
 
         if (!needsMemberLogin(path)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        HttpSession session = request.getSession(false);
         Object loginMember = session == null ? null : session.getAttribute("loginMember");
 
         if (loginMember != null) {

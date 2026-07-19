@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.thestar.member.entity.MemberVO;
-import com.thestar.member.service.MemberNotifyService;
 import com.thestar.shop.entity.CartItemVO;
 import com.thestar.shop.entity.ProductOrderItemVO;
 import com.thestar.shop.entity.ProductsVO;
@@ -48,9 +47,6 @@ public class UserShopOrderController {
 	
 	@Autowired
 	ProductsService productsSvc;
-
-	@Autowired
-	MemberNotifyService memberNotifySvc;
 
 	// ===== 綠界設定（從 application.properties 讀取）=====
 	@Value("${ecpay.merchant-id}")
@@ -96,6 +92,14 @@ public class UserShopOrderController {
 		boolean hasOverStock = cartList.stream()
 				.anyMatch(item -> item.getProduct() != null
 						&& item.getCartItemProdQty() > item.getProduct().getProductQuantity());
+		
+		// 檢查是否有下架商品
+		boolean hasOffShelf = cartList.stream()
+		        .anyMatch(item -> item.getProduct() != null
+		                && item.getProduct().getProductStatus() != null
+		                && item.getProduct().getProductStatus() != 1);
+
+		model.addAttribute("hasOffShelf", hasOffShelf);
 
 		model.addAttribute("cartListData", cartList);
 		model.addAttribute("cartTotal", total);
@@ -123,6 +127,15 @@ public class UserShopOrderController {
 		if (cartList == null || cartList.isEmpty())
 			return "<script>location.href='/shop/cart'</script>";
 
+		// 檢查是否有下架商品
+		boolean hasOffShelf = cartList.stream()
+		        .anyMatch(item -> item.getProduct() != null
+		                && item.getProduct().getProductStatus() != null
+		                && item.getProduct().getProductStatus() != 1);
+		if (hasOffShelf) {
+		    return "<script>alert('購物車中有已下架商品，請移除後再結帳！');location.href='/shop/cart'</script>";
+		}
+		
 		// 計算總金額
 		int total = 0;
 		for (CartItemVO item : cartList) {
@@ -149,10 +162,6 @@ public class UserShopOrderController {
 		}
 
 		shopOrderSvc.addShopOrder(order);
-
-		// 發送訂單建立通知
-		memberNotifySvc.createNotification(loginMember.getMemberId(),
-				"您的購物訂單已成立，訂單編號：" + order.getShopOrderId() + "，請盡快完成付款！");
 
 		// 建立訂單明細
 		StringBuilder itemNames = new StringBuilder();
@@ -243,11 +252,7 @@ public class UserShopOrderController {
 				ShopOrderVO order = shopOrderSvc.getOneShopOrder(orderId);
 				if (order != null) {
 					order.setShopPaymentStatus((byte) 1); // 已付款
-					order.setShopOrderStatus((byte) 1); // 處理中
-					shopOrderSvc.updateShopOrder(order);
-
-					// 發送付款成功通知
-					memberNotifySvc.createNotification(order.getMemberId(), "購物訂單編號 " + orderId + " 付款成功，感謝您的購買！");
+					shopOrderSvc.updateShopOrderWithPayment(order, orderId);
 				}
 			} catch (Exception e) {
 				// 解析失敗不影響回傳
@@ -261,7 +266,7 @@ public class UserShopOrderController {
 	@org.springframework.web.bind.annotation.RequestMapping(value = "ecpay/result", method = {
 			org.springframework.web.bind.annotation.RequestMethod.GET,
 			org.springframework.web.bind.annotation.RequestMethod.POST })
-	public String ecpayResult(@RequestParam("orderId") Integer orderId, HttpSession session, ModelMap model) {
+	public String ecpayResult(@RequestParam("orderId") Integer orderId, ModelMap model) {
 
 		ShopOrderVO order = shopOrderSvc.getOneShopOrder(orderId);
 		List<ProductOrderItemVO> itemList = productOrderItemSvc.getByShopOrderId(orderId);

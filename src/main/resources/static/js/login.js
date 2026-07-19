@@ -9,6 +9,7 @@ createApp({
       errorMsg: '',
       successMsg: '',
       showResendVerify: false,
+      googleEnabled: false,
       form: {
         memberEmail: '',
         memberPassword: '',
@@ -22,17 +23,61 @@ createApp({
 	this.redirect = this.normalizeRedirect(params.get('redirect'));
 
     const rememberedEmail = localStorage.getItem('theStarRememberEmail') || '';
-    const rememberedPassword = localStorage.getItem('theStarRememberPassword') || '';
+    localStorage.removeItem('theStarRememberPassword');
     this.form.memberEmail = rememberedEmail;
-    this.form.memberPassword = rememberedPassword;
-    this.form.rememberMe = rememberedEmail !== '' || rememberedPassword !== '';
+    this.form.memberPassword = '';
+    this.form.rememberMe = rememberedEmail !== '';
 
     if (params.get('verified') === '1') {
       this.successMsg = '信箱驗證成功，請登入會員';
     }
+
+    if (params.get('googleError') === '1') {
+      this.errorMsg = 'Google 登入失敗，請重新操作或使用會員密碼登入';
+    }
+
+    if (params.get('googleDisabled') === '1') {
+      this.errorMsg = 'Google 登入尚未啟用';
+    }
+
+    this.loadGoogleLoginStatus();
+  },
+
+  computed: {
+    googleLoginUrl() {
+      return '/member/google/login?redirect=' + encodeURIComponent(this.redirect);
+    }
   },
 
   methods: {
+    async loadGoogleLoginStatus() {
+      try {
+        const res = await fetch('/api/member/google/enabled', { credentials: 'same-origin' });
+        const data = await res.json().catch(() => ({}));
+        this.googleEnabled = Boolean(data.enabled);
+      } catch (e) {
+        this.googleEnabled = false;
+      }
+    },
+
+    goBack() {
+      try {
+        const previousUrl = document.referrer ? new URL(document.referrer) : null;
+
+        if (
+          previousUrl
+          && previousUrl.origin === location.origin
+          && previousUrl.pathname !== location.pathname
+        ) {
+          history.back();
+          return;
+        }
+      } catch (e) {
+      }
+
+      location.href = '/index.html';
+    },
+
     normalizeRedirect(value) {
       if (!value || !value.startsWith('/') || value.startsWith('//')) {
         return '/index.html';
@@ -101,7 +146,7 @@ createApp({
 
         if (this.form.rememberMe) {
           localStorage.setItem('theStarRememberEmail', this.form.memberEmail);
-          localStorage.setItem('theStarRememberPassword', this.form.memberPassword);
+          localStorage.removeItem('theStarRememberPassword');
         } else {
           localStorage.removeItem('theStarRememberEmail');
           localStorage.removeItem('theStarRememberPassword');

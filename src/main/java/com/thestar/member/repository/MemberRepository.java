@@ -47,6 +47,12 @@ public interface MemberRepository extends JpaRepository<MemberVO, Integer> {
      */
     Optional<MemberVO> findByVerifyToken(String verifyToken);
 
+    /** 透過忘記密碼 Token 查詢會員。 */
+    Optional<MemberVO> findByResetToken(String resetToken);
+
+    /** Google OpenID Connect 的穩定唯一識別碼。 */
+    Optional<MemberVO> findByGoogleSub(String googleSub);
+
     /**
      * 查詢指定生日月份且帳號啟用中的會員
      * 用於生日優惠、生日通知等功能

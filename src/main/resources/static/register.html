@@ -34,7 +34,7 @@
 
 					<div class="field">
 						<label for="memberPassword">會員密碼 <span>*</span></label> <input
-							id="memberPassword" type="password" maxlength="50"
+							id="memberPassword" type="password" minlength="6" maxlength="50"
 							v-model="form.memberPassword" autocomplete="new-password">
 					</div>
 
@@ -46,6 +46,7 @@
 					  <input
 					    id="confirmPassword"
 					    type="password"
+					    minlength="6"
 					    maxlength="50"
 					    v-model="form.confirmPassword"
 					    autocomplete="new-password"

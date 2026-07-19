@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>完成會員資料｜東方之星 The Star</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&family=Noto+Serif+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/login.css">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+</head>
+<body>
+  <main id="app" v-cloak>
+    <section class="auth-single-panel">
+      <header class="hotel-mark">
+        <h2>THE STAR</h2>
+        <p>Hotel &amp; Residences</p>
+      </header>
+
+      <div class="form-heading">
+        <span>GOOGLE MEMBER</span>
+        <h3>{{ isLinkMode ? '綁定既有會員' : '完成會員資料' }}</h3>
+      </div>
+
+      <p v-if="loading" class="auth-help">正在讀取 Google 登入資料...</p>
+      <p v-else-if="loadError" class="message error-message">{{ loadError }}</p>
+
+      <form v-else @submit.prevent="submitProfile">
+        <div class="field">
+          <label for="email">Member Email</label>
+          <input id="email" class="readonly-field" type="email" :value="pending.memberEmail" readonly>
+        </div>
+
+        <template v-if="isLinkMode">
+          <p class="auth-help">這個 Email 已有會員帳號。請輸入原會員密碼完成 Google 帳號綁定。</p>
+          <div class="field">
+            <label for="existingPassword">Existing Password</label>
+            <input id="existingPassword" type="password" required
+                   v-model="form.existingPassword" autocomplete="current-password"
+                   placeholder="請輸入原會員密碼">
+          </div>
+        </template>
+
+        <template v-else>
+          <p class="auth-help">Google 已完成信箱驗證，請補齊飯店會員需要的基本資料。</p>
+
+          <div class="field">
+            <label for="memberName">Member Name</label>
+            <input id="memberName" type="text" required maxlength="50"
+                   v-model.trim="form.memberName" autocomplete="name"
+                   placeholder="請輸入會員姓名">
+          </div>
+
+          <div class="field">
+            <label for="memberPhone">Phone</label>
+            <input id="memberPhone" type="tel" required pattern="09[0-9]{8}"
+                   v-model.trim="form.memberPhone" autocomplete="tel"
+                   placeholder="09 開頭共 10 碼">
+          </div>
+
+          <div class="field">
+            <label for="memberAddress">Address</label>
+            <input id="memberAddress" type="text" required maxlength="100"
+                   v-model.trim="form.memberAddress" autocomplete="street-address"
+                   placeholder="請輸入會員地址">
+          </div>
+
+          <div class="field">
+            <label for="memberBirthday">Birthday</label>
+            <input id="memberBirthday" type="date" required v-model="form.memberBirthday">
+          </div>
+
+          <div class="field">
+            <label for="memberGender">Gender</label>
+            <select id="memberGender" required v-model.number="form.memberGender">
+              <option :value="0">女性</option>
+              <option :value="1">男性</option>
+              <option :value="2">不透露</option>
+            </select>
+          </div>
+        </template>
+
+        <button class="login-submit" type="submit" :disabled="submitting">
+          {{ submitting ? '處理中...' : (isLinkMode ? '確認綁定並登入' : '完成資料並登入') }}
+        </button>
+
+        <p v-if="errorMsg" class="message error-message" role="alert">{{ errorMsg }}</p>
+      </form>
+
+      <a class="auth-back-link" href="/login.html">取消並返回登入</a>
+    </section>
+  </main>
+  <script src="/js/google-complete-profile.js"></script>
+</body>
+</html>

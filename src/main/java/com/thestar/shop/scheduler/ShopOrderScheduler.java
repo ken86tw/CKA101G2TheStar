@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.thestar.member.service.MemberNotifyService;
 import com.thestar.shop.entity.ProductOrderItemVO;
 import com.thestar.shop.entity.ProductsVO;
 import com.thestar.shop.entity.ShopOrderVO;
@@ -26,9 +25,6 @@ public class ShopOrderScheduler {
 
     @Autowired
     ProductsService productsSvc;
-
-    @Autowired
-    MemberNotifyService memberNotifySvc;
 
     // 每分鐘執行一次
     @Scheduled(fixedRate = 60000)
@@ -58,11 +54,6 @@ public class ShopOrderScheduler {
                     }
                 }
 
-                // 發送通知
-                memberNotifySvc.createNotification(
-                    order.getMemberId(),
-                    "購物訂單編號 " + order.getShopOrderId() + " 因逾時未付款已自動取消。"
-                );
             }
         }
     }

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="認識東方之星 The Star 的品牌故事、墾丁周邊景點與飯店交通資訊。">
+  <title>東方之星 The Star｜關於我們</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/about.css">
+</head>
+<body>
+  <header class="about-hero" id="top">
+    <div th:replace="~{user/common/frontNavbar :: navbar('about', false, '', false)}"></div>
+
+    <div class="about-hero-content">
+      <p class="eyebrow">SINCE 1996 · KENTING</p>
+      <h1><span class="title-line">把一片海，</span><span class="title-line">變成旅人的記憶</span></h1>
+      <p class="about-hero-copy">
+        三十年來，我們沒有停止想像一間飯店可以帶來什麼。
+        從海岸旅店到全方位度假品牌，東方之星始終為每一次抵達保留溫度。
+      </p>
+    </div>
+
+    <div class="hero-index" aria-hidden="true">
+      <span>22.00° N</span>
+      <span>120.74° E</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="brand-intro" aria-labelledby="brand-intro-title">
+      <div class="brand-intro-number reveal" aria-label="東方之星三十年品牌歷程">
+        <div><strong>30</strong><span>年</span></div>
+        <p>30 年如一日，把旅人放在心上</p>
+      </div>
+      <div class="brand-intro-copy reveal">
+        <p class="section-kicker">OUR PHILOSOPHY</p>
+        <h2 id="brand-intro-title">
+          <span class="title-line">旅行不只是離開日常，</span>
+          <span class="title-line">也是重新靠近自己</span>
+        </h2>
+        <p>
+          東方之星以海岸、光線與人情為設計原點。客房留給旅人安靜，餐桌連結在地風味，
+          服務則藏在每一個不被打擾、卻剛好出現的時刻。
+        </p>
+        <p class="project-note">以下品牌沿革與飯店位置為本專題的情境設定。</p>
+      </div>
+    </section>
+
+    <section class="story-section" id="brand-story" aria-labelledby="story-title">
+      <div class="story-heading reveal">
+        <p class="section-kicker">THE JOURNEY</p>
+        <h2 id="story-title">品牌故事</h2>
+        <p>沿著年份，看見東方之星如何一步一步走到今天。</p>
+      </div>
+
+      <div class="story-layout">
+        <aside class="year-wheel" aria-label="品牌年份導覽">
+          <div class="year-wheel-shell">
+            <div class="year-window">
+              <div class="year-track" id="yearTrack">
+                <button type="button" class="year-button active" data-story-index="0" aria-current="step">
+                  <span>1996</span>
+                </button>
+                <button type="button" class="year-button" data-story-index="1">
+                  <span>2006</span>
+                </button>
+                <button type="button" class="year-button" data-story-index="2">
+                  <span>2016</span>
+                </button>
+                <button type="button" class="year-button" data-story-index="3">
+                  <span>2020</span>
+                </button>
+                <button type="button" class="year-button" data-story-index="4">
+                  <span>2026</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <p class="year-wheel-note">沿著年份閱讀品牌故事</p>
+        </aside>
+
+        <div class="story-list">
+          <article class="story-card active" data-story-index="0" id="story-1996">
+            <div class="story-image story-image-1996" role="img" aria-label="海岸邊的小型旅店與陽光沙灘"></div>
+            <div class="story-content">
+              <span class="story-year">1996</span>
+              <p class="story-chapter">CHAPTER 01 · THE BEGINNING</p>
+              <h3><span class="title-line">從十二間房開始</span></h3>
+              <p>
+                第一代經營者在墾丁海岸開啟一間只有十二間客房的小旅店。
+                沒有華麗大廳，只有每天親手準備的早餐、記得住客名字的櫃檯，
+                以及一扇打開就能聽見海的窗。
+              </p>
+            </div>
+          </article>
+
+          <article class="story-card" data-story-index="1" id="story-2006">
+            <div class="story-image story-image-2006" role="img" aria-label="現代海景度假飯店建築"></div>
+            <div class="story-content">
+              <span class="story-year">2006</span>
+              <p class="story-chapter">CHAPTER 02 · TRANSFORMATION</p>
+              <h3><span class="title-line">從旅店走向</span><span class="title-line">度假飯店</span></h3>
+              <p>
+                我們重新整理空間，加入泳池、餐廳與完整休閒服務，
+                正式以「東方之星」之名出發。規模變大了，最初那份親切仍然被保留下來。
+              </p>
+            </div>
+          </article>
+
+          <article class="story-card" data-story-index="2" id="story-2016">
+            <div class="story-image story-image-2016" role="img" aria-label="飯店餐桌與精緻在地料理"></div>
+            <div class="story-content">
+              <span class="story-year">2016</span>
+              <p class="story-chapter">CHAPTER 03 · LOCAL CONNECTION</p>
+              <h3><span class="title-line">讓風景也走進餐桌</span></h3>
+              <p>
+                東方之星開始與恆春半島的農漁生產者合作，將季節、海洋與土地的味道放進菜單。
+                住宿不再只是停留，而是一場認識地方的旅程。
+              </p>
+            </div>
+          </article>
+
+          <article class="story-card" data-story-index="3" id="story-2020">
+            <div class="story-image story-image-2020" role="img" aria-label="自然植栽與永續旅宿空間"></div>
+            <div class="story-content">
+              <span class="story-year">2020</span>
+              <p class="story-chapter">CHAPTER 04 · SUSTAINABLE STAY</p>
+              <h3>把舒適留給旅人，也留給環境</h3>
+              <p>
+                我們逐步減少一次性用品、導入節能設備並支持在地採購，
+                讓度假的美好不以消耗風景為代價，讓下一次回來仍能看見同一片海。
+              </p>
+            </div>
+          </article>
+
+          <article class="story-card" data-story-index="4" id="story-2026">
+            <div class="story-image story-image-2026" role="img" aria-label="筆記型電腦顯示飯店數位服務平台"></div>
+            <div class="story-content">
+              <span class="story-year">2026</span>
+              <p class="story-chapter">CHAPTER 05 · A NEW EXPERIENCE</p>
+              <h3><span class="title-line">一個平台，</span><span class="title-line">串起完整旅程</span></h3>
+              <p>
+                全新數位服務上線，整合會員、訂房、餐飲、購物、優惠券與即時通知。
+                科技不取代服務，而是把等待變少，讓旅人把更多時間留給真正重要的風景。
+              </p>
+              <a href="/roombooking.html" class="story-link">
+                體驗全新訂房服務
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="brand-values" aria-labelledby="values-title">
+      <div class="values-heading reveal">
+        <p class="section-kicker">WHAT WE STAND FOR</p>
+        <h2 id="values-title">我們堅持</h2>
+      </div>
+
+      <div class="values-grid">
+        <article class="value-card reveal">
+          <i class="fa-regular fa-compass"></i>
+          <h3>真實的地方感</h3>
+          <p>讓建築、餐飲與體驗回應墾丁的海風、陽光與生活方式。</p>
+        </article>
+        <article class="value-card reveal">
+          <i class="fa-regular fa-heart"></i>
+          <h3>剛剛好的照顧</h3>
+          <p>不過度打擾，也不錯過需求，在旅人需要時準確出現。</p>
+        </article>
+        <article class="value-card reveal">
+          <i class="fa-solid fa-seedling"></i>
+          <h3>可以延續的旅行</h3>
+          <p>從日常營運開始減少負擔，珍惜每一片讓旅人停留的風景。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="access-section" id="access" aria-labelledby="access-title">
+      <div class="access-copy reveal">
+        <p class="section-kicker">LOCATION & ACCESS</p>
+        <h2 id="access-title">飯店交通資訊</h2>
+        <p class="access-lead">
+          本專題暫以墾丁大街海岸區作為東方之星的示意位置，方便呈現交通與周邊旅遊功能。
+        </p>
+
+        <div class="address-block">
+          <span>PROJECT LOCATION</span>
+          <strong>屏東縣恆春鎮墾丁大街海岸區</strong>
+          <small>專題示意位置，非實際營業地址</small>
+        </div>
+
+        <div class="transport-list">
+          <article>
+            <i class="fa-solid fa-car"></i>
+            <div>
+              <h3>自行開車</h3>
+              <p>沿國道 3 號南下，轉台 1 線與台 26 線往墾丁方向。住宿旅客可使用飯店停車空間。</p>
+            </div>
+          </article>
+          <article>
+            <i class="fa-solid fa-train-subway"></i>
+            <div>
+              <h3>高鐵轉乘</h3>
+              <p>抵達高鐵左營站後，可轉乘往墾丁方向的客運，或事先預約接駁服務。</p>
+            </div>
+          </article>
+          <article>
+            <i class="fa-solid fa-van-shuttle"></i>
+            <div>
+              <h3>飯店接駁</h3>
+              <p>團體旅客與特殊需求可於入住前聯繫櫃檯，由服務人員協助安排接駁資訊。</p>
+            </div>
+          </article>
+        </div>
+
+        <a class="map-action" href="https://www.google.com/maps/search/?api=1&query=%E5%A2%BE%E4%B8%81%E5%A4%A7%E8%A1%97" target="_blank" rel="noopener noreferrer">
+          在 Google 地圖開啟
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        </a>
+      </div>
+
+      <div class="map-panel reveal">
+        <iframe
+          title="東方之星專題示意位置 Google 地圖"
+          src="https://www.google.com/maps?q=%E5%A2%BE%E4%B8%81%E5%A4%A7%E8%A1%97&output=embed"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen>
+        </iframe>
+        <div class="map-marker-card">
+          <span class="marker-pulse"><i class="fa-solid fa-location-dot"></i></span>
+          <div>
+            <strong>THE STAR</strong>
+            <small>KENTING · PROJECT LOCATION</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="local-guide" aria-labelledby="guide-title">
+      <div class="guide-heading reveal">
+        <div>
+          <p class="section-kicker">AROUND THE STAR</p>
+          <h2 id="guide-title">附近景點</h2>
+        </div>
+        <p>住進東方之星，也住進墾丁的日常。從海灘、街區到遼闊草原，安排半天就能看見不同風景。</p>
+      </div>
+
+      <div class="attraction-grid">
+        <article class="attraction-card reveal">
+          <div class="attraction-image attraction-street" role="img" aria-label="墾丁海岸與街區景色"></div>
+          <div class="attraction-copy">
+            <p class="attraction-distance"><i class="fa-solid fa-person-walking"></i> 飯店周邊散步</p>
+            <h3>墾丁大街</h3>
+            <p>傍晚開始熱鬧的街區，適合安排晚餐、採買伴手禮，再慢慢散步回飯店。</p>
+          </div>
+        </article>
+
+        <article class="attraction-card reveal">
+          <div class="attraction-image attraction-bay" role="img" aria-label="小灣沙灘海景"></div>
+          <div class="attraction-copy">
+            <p class="attraction-distance"><i class="fa-solid fa-umbrella-beach"></i> 短程即可抵達</p>
+            <h3>小灣沙灘</h3>
+            <p>清晨看海、午後踏浪都很適合，以輕鬆步調感受南國海岸。</p>
+          </div>
+        </article>
+
+        <article class="attraction-card reveal">
+          <div class="attraction-image attraction-longpan" role="img" aria-label="龍磐公園草原與海岸景色"></div>
+          <div class="attraction-copy">
+            <p class="attraction-distance"><i class="fa-solid fa-car-side"></i> 建議開車前往</p>
+            <h3>龍磐公園</h3>
+            <p>遼闊草原與太平洋交會的經典景色，適合看日出、吹風與感受開闊地景。</p>
+          </div>
+        </article>
+      </div>
+      <p class="photo-credit">
+	    照片採CC授權，來源：
+	    <a href="https://commons.wikimedia.org/wiki/File:Kenting_Night_Market_10.jpg"
+	       target="_blank" rel="noopener noreferrer">
+	        墾丁夜市
+	    </a>、
+	    <a href="https://commons.wikimedia.org/wiki/File:Panorama_at_Longpan_Park.jpg"
+	       target="_blank" rel="noopener noreferrer">
+	        龍磐公園
+	    </a>
+	    ／攝影：Tbatb
+	    ／<a href="https://creativecommons.org/licenses/by-sa/4.0/"
+	         target="_blank" rel="noopener noreferrer">
+	        CC BY-SA 4.0
+	    </a>
+	    ／圖片經裁切
+	</p>
+    </section>
+
+    <section class="about-cta">
+      <div class="about-cta-copy reveal">
+        <p>YOUR STORY STARTS HERE</p>
+        <h2><span class="title-line">下一段品牌故事，</span><span class="title-line">由您的旅程開始</span></h2>
+        <a href="/roombooking.html" class="cta-button">立即訂房</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="about-footer">
+    <a href="#top" class="back-to-top" aria-label="回到頁面頂端">
+      <i class="fa-solid fa-arrow-up"></i>
+    </a>
+    <div>
+      <strong>東方之星 The Star</strong>
+      <p>© 2026 The Star Hotel. Project showcase.</p>
+    </div>
+    <a href="/thestar/admin/home" class="footer-staff-entry">員工入口</a>
+  </footer>
+
+  <script src="/js/header-auth.js"></script>
+  <script src="/js/about.js"></script>
+</body>
+</html>

@@ -51,6 +51,10 @@ createApp({
       if (!this.form.memberPassword) {
         return '會員密碼請勿空白';
       }
+
+      if (this.form.memberPassword.length < 6) {
+        return '會員密碼至少需要 6 個字元';
+      }
 	  
 	  if (!this.form.confirmPassword) {
 	    return '確認密碼請勿空白';

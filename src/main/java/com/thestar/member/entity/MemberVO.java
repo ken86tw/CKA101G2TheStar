@@ -31,7 +31,7 @@ public class MemberVO implements Serializable {
     private String memberEmail;
 
     @JsonIgnore
-    @Column(name = "MEMBER_PASSWORD", nullable = false, length = 255)
+    @Column(name = "MEMBER_PASSWORD", length = 255)
     private String memberPassword;
 
     @Column(name = "MEMBER_PHONE", nullable = false, length = 20)
@@ -53,6 +53,10 @@ public class MemberVO implements Serializable {
 
     @Column(name = "MEMBER_STATUS", nullable = false)
     private Byte memberStatus = 0;
+
+    @JsonIgnore
+    @Column(name = "GOOGLE_SUB", unique = true, length = 255)
+    private String googleSub;
 
     @Column(name = "CREATED_TIME", insertable = false, updatable = false)
     private LocalDateTime createdTime;
@@ -157,6 +161,14 @@ public class MemberVO implements Serializable {
 
     public void setMemberStatus(Byte memberStatus) {
         this.memberStatus = memberStatus;
+    }
+
+    public String getGoogleSub() {
+        return googleSub;
+    }
+
+    public void setGoogleSub(String googleSub) {
+        this.googleSub = googleSub;
     }
 
     public LocalDateTime getCreatedTime() {

@@ -1,6 +1,5 @@
 package com.thestar.shop.controller.admin;
 
-import com.thestar.shop.entity.ProductCategoryVO;
 import com.thestar.shop.entity.ProductsVO;
 import com.thestar.shop.service.ProductCategoryService;
 import com.thestar.shop.service.ProductsService;
@@ -15,7 +14,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/admin/shop")
-public class ProductsController {
+public class ProductsController extends AdminShopBaseController {
 
     @Autowired
     ProductsService productsSvc;

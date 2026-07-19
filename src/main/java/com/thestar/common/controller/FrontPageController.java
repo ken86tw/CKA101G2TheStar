@@ -20,6 +20,11 @@ public class FrontPageController {
         model.addAttribute("latestNews", contentAdminService.findLatestNews());
         return "index";
     }
+    
+    @GetMapping("/about.html")
+    public String about() {
+        return "about";
+    }
 
     @GetMapping("/facilities.html")
     public String facilities() {

@@ -1,4 +1,5 @@
 package com.thestar.member.filter;
+import com.thestar.member.security.MemberSecurityContextSupport;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -11,7 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class MemberLoginFilterTest {
 
-    private final MemberLoginFilter filter = new MemberLoginFilter();
+	private final MemberLoginFilter filter =
+	        new MemberLoginFilter(new MemberSecurityContextSupport());
 
     @Test
     void nestedApiPathReturnsJsonInsteadOfCreatingLoginRedirect() throws Exception {

@@ -1,0 +1,61 @@
+package com.thestar.member.dto;
+
+import java.time.LocalDate;
+
+public class GoogleCompleteProfileRequest {
+
+    private String memberName;
+    private String memberPhone;
+    private String memberAddress;
+    private LocalDate memberBirthday;
+    private Byte memberGender;
+    private String existingPassword;
+
+    public String getMemberName() {
+        return memberName;
+    }
+
+    public void setMemberName(String memberName) {
+        this.memberName = memberName;
+    }
+
+    public String getMemberPhone() {
+        return memberPhone;
+    }
+
+    public void setMemberPhone(String memberPhone) {
+        this.memberPhone = memberPhone;
+    }
+
+    public String getMemberAddress() {
+        return memberAddress;
+    }
+
+    public void setMemberAddress(String memberAddress) {
+        this.memberAddress = memberAddress;
+    }
+
+    public LocalDate getMemberBirthday() {
+        return memberBirthday;
+    }
+
+    public void setMemberBirthday(LocalDate memberBirthday) {
+        this.memberBirthday = memberBirthday;
+    }
+
+    public Byte getMemberGender() {
+        return memberGender;
+    }
+
+    public void setMemberGender(Byte memberGender) {
+        this.memberGender = memberGender;
+    }
+
+    public String getExistingPassword() {
+        return existingPassword;
+    }
+
+    public void setExistingPassword(String existingPassword) {
+        this.existingPassword = existingPassword;
+    }
+}
