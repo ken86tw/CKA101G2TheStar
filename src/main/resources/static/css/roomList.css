@@ -27,3 +27,66 @@
 }
 .close-btn:hover { color: #ddd; transform: scale(1.1); }
 
+/* Hero Banner 區域設定 */
+.hero-banner {
+    position: relative;
+    width: 100%;
+    height: 350px; /* 可根據需求調整高度 */
+    background-image: url('/images/noimage.jpg'); /* 替換成你的圖片路徑 */
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px; /* 與下方房型列表的間距 */
+}
+
+/* 黑色半透明遮罩 */
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4); /* 調大數值可讓背景更暗 */
+}
+
+.hero-content {
+    position: relative;
+    text-align: center;
+    color: #ffffff;
+    z-index: 1;
+}
+
+/* 小標題樣式 */
+.hero-subtitle {
+    font-size: 14px;
+    letter-spacing: 0.3em;
+    color: #c5a059; /* 金色系 */
+    margin-bottom: 10px;
+    display: block;
+}
+
+/* 大標題樣式 (襯線體) */
+.hero-title {
+    font-family: 'Times New Roman', serif;
+    font-size: 3rem;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    margin: 10px 0;
+}
+
+/* 金色分隔線 */
+.hero-divider {
+    width: 50px;
+    height: 2px;
+    background-color: #c5a059;
+    margin: 15px auto;
+}
+
+.hero-desc {
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+}
+
+

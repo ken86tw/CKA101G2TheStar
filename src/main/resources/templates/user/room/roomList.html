@@ -26,6 +26,17 @@
 	<div
 		th:replace="~{user/common/frontNavbar :: navbar('room', true, 'shop-navbar site-navbar-dark', false)}"></div>
 
+<div class="hero-banner">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <span class="hero-subtitle">ROOM TYPE LIST</span>
+        <h1 class="hero-title">房型瀏覽</h1>
+        <div class="hero-divider"></div>
+        <p class="hero-desc">選擇想要的房型</p>
+    </div>
+</div>
+
+
 	<div class="room-container">
 		<div class="room-grid">
 			<div th:each="room : ${activeRoomList}" class="room-card">
@@ -51,7 +62,7 @@
 					</div>
 				</div>
 				<div class="card-actions">
-					<a href="/roombooking.html" class="btn-book">預訂</a>
+					<a href="/roombooking.html" class="btn-book">搜尋空房</a>
 					<!-- 添加了 data-id 屬性以便 JS 抓取該房型 ID -->
 
 					<a th:href="@{/roomlist/detail/{id}(id=${room.roomTypeId})}"
