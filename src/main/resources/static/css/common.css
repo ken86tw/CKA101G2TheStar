@@ -74,7 +74,7 @@ a {
 
 /* 導覽列左上角飯店品牌 */
 .navbar-brand {
-  min-width: 110px;
+  min-width: 145px;/*原110*/
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -84,16 +84,16 @@ a {
 
 .navbar-brand .brand-zh {
   font-family: 'Noto Serif TC', serif;
-  font-size: 16px;
+  font-size: 22px;/*原16*/
   font-weight: 700;
   color: #ffffff;
-  letter-spacing: 2px;
+  letter-spacing: 2.5px;/*原2*/
 }
 
 .navbar-brand .brand-en {
-  margin-top: 3px;
+  margin-top: 4px;/*原3*/
   font-family: 'Cormorant Garamond', serif;
-  font-size: 13px;
+  font-size: 16px;/*原13*/
   font-style: italic;
   font-weight: 400;
   color: #c9a84c;

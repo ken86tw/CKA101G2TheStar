@@ -16,6 +16,7 @@ import com.thestar.member.security.MemberSecurityContextSupport;
 import com.thestar.member.security.MemberUserDetails;
 import com.thestar.member.service.MemberAuthService;
 import com.thestar.member.service.MemberGoogleAuthService;
+import com.thestar.member.service.MemberLoginAttemptService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -51,6 +52,7 @@ public class MemberAuthController {
     private final MemberGoogleAuthService memberGoogleAuthService;
     private final AuthenticationManager memberAuthenticationManager;
     private final MemberSecurityContextSupport memberSecurityContextSupport;
+    private final MemberLoginAttemptService memberLoginAttemptService;
 
     @Value("${app.google-login.enabled:false}")
     private boolean googleLoginEnabled;
@@ -59,11 +61,13 @@ public class MemberAuthController {
                                 MemberGoogleAuthService memberGoogleAuthService,
                                 @Qualifier("memberAuthenticationManager")
                                 AuthenticationManager memberAuthenticationManager,
-                                MemberSecurityContextSupport memberSecurityContextSupport) {
+                                MemberSecurityContextSupport memberSecurityContextSupport,
+                                MemberLoginAttemptService memberLoginAttemptService) {
         this.memberAuthService = memberAuthService;
         this.memberGoogleAuthService = memberGoogleAuthService;
         this.memberAuthenticationManager = memberAuthenticationManager;
         this.memberSecurityContextSupport = memberSecurityContextSupport;
+        this.memberLoginAttemptService = memberLoginAttemptService;
     }
 
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -115,9 +119,17 @@ public class MemberAuthController {
                     .body(Map.of("error", "請輸入信箱與密碼"));
         }
 
+        long remainingLockSeconds = memberLoginAttemptService.getRemainingLockSeconds(email);
+        if (remainingLockSeconds > 0) {
+            return lockedLoginResponse(remainingLockSeconds);
+        }
+
         try {
             Authentication authentication = memberAuthenticationManager.authenticate(
                     UsernamePasswordAuthenticationToken.unauthenticated(email, password));
+
+            // 帳密正確就清除先前錯誤次數，未驗證或停用不算密碼輸入錯誤。
+            memberLoginAttemptService.clear(email);
 
             MemberUserDetails principal = (MemberUserDetails) authentication.getPrincipal();
             MemberVO member = memberAuthService.getMemberForAuthenticatedLogin(principal.getMemberId());
@@ -132,13 +144,51 @@ public class MemberAuthController {
             memberSecurityContextSupport.login(authentication, httpRequest, httpResponse);
 
             return ResponseEntity.ok(MemberSessionDTO.from(member));
-        } catch (AuthenticationException | IllegalArgumentException e) {
+        } catch (AuthenticationException e) {
+            MemberLoginAttemptService.LoginFailureResult result =
+                    memberLoginAttemptService.recordFailure(email);
+            
+            if (!result.trackingAvailable()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "信箱或密碼錯誤"));
+            }
+
+            if (result.locked()) {
+                return lockedLoginResponse(result.lockSeconds());
+            }
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of(
+                            "error", "信箱或密碼錯誤，還可嘗試 "
+                                    + result.remainingAttempts()
+                                    + " 次",
+                            "remainingAttempts", result.remainingAttempts()
+                    ));
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "信箱或密碼錯誤"));
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("error", e.getMessage()));
         }
+    }
+
+    private ResponseEntity<Map<String, Object>> lockedLoginResponse(long remainingSeconds) {
+        long safeSeconds = Math.max(1L, remainingSeconds);
+        long minutes = safeSeconds / 60L;
+        long seconds = safeSeconds % 60L;
+
+        String remainingText = minutes > 0
+                ? minutes + " 分 " + seconds + " 秒"
+                : seconds + " 秒";
+
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .header(HttpHeaders.RETRY_AFTER, String.valueOf(safeSeconds))
+                .body(Map.of(
+                        "error", "登入失敗次數過多，請於 " + remainingText + " 後再試",
+                        "locked", true,
+                        "retryAfterSeconds", safeSeconds
+                ));
     }
 
     @GetMapping("/status")

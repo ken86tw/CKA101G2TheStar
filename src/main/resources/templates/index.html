@@ -352,6 +352,39 @@
 
 		</main>
 
+
+		<div class="offer-popup-mask" v-if="offerPopupOpen"
+			@click.self="closeOfferPopup">
+			<section class="offer-popup" role="dialog" aria-modal="true"
+				aria-labelledby="offerPopupTitle">
+				<button class="offer-popup-close" type="button"
+					aria-label="關閉限時優惠" @click="closeOfferPopup">×</button>
+
+				<div class="offer-popup-visual" aria-hidden="true">
+					<span class="offer-popup-badge">LIMITED OFFER</span>
+					<i class="fa-solid fa-umbrella-beach"></i>
+				</div>
+
+				<div class="offer-popup-content">
+					<p class="offer-popup-eyebrow">東方之星夏日限定</p>
+					<h2 id="offerPopupTitle">限時住房優惠</h2>
+					<p style="color: red;">(以後可以跟其他商家或廣告商結合)</p>
+					<p class="offer-popup-description">
+						立即規劃墾丁海岸假期，登入會員即可查看可使用的專屬優惠券。
+					</p>
+					<p class="offer-popup-period">
+						<i class="fa-regular fa-clock"></i>
+						活動期間至 2026 / 08 / 31
+					</p>
+					<a class="offer-popup-action" href="/roombooking.html">
+						立即查看空房
+						<i class="fa-solid fa-arrow-right"></i>
+					</a>
+					<p class="offer-popup-note">實際優惠內容與使用資格以會員優惠券頁面顯示為準</p>
+				</div>
+			</section>
+		</div>
+
 		<div class="login-modal-mask" v-if="loginModalOpen"
 			@click.self="closeLoginModal">
 			<section class="login-modal" role="dialog" aria-modal="true"
@@ -431,6 +464,9 @@
         notificationLoading: false,
         notificationTimer: null,
 
+        offerPopupOpen: false,
+        offerPopupTimer: null,
+
         loginModalOpen: false,
         loginLoading: false,
         resending: false,
@@ -467,6 +503,7 @@
       this.cleanIndexUrl();
       this.loadRememberedLogin();
       this.checkMemberStatus();
+      this.scheduleOfferPopup();
 
       document.addEventListener('click', () => {
         this.memberDropdownOpen = false;
@@ -479,6 +516,9 @@
     },
     beforeUnmount() {
     	  this.stopNotificationPolling();
+      if (this.offerPopupTimer !== null) {
+        window.clearTimeout(this.offerPopupTimer);
+      }
     },
 
     methods: {
@@ -522,6 +562,22 @@
             });
           }
         });
+      },
+
+      scheduleOfferPopup() {
+        if (sessionStorage.getItem('theStarLimitedOfferClosed') === 'true') {
+          return;
+        }
+
+        this.offerPopupTimer = window.setTimeout(() => {
+          this.offerPopupOpen = true;
+          this.offerPopupTimer = null;
+        }, 700);
+      },
+
+      closeOfferPopup() {
+        this.offerPopupOpen = false;
+        sessionStorage.setItem('theStarLimitedOfferClosed', 'true');
       },
 
       loadRememberedLogin() {
