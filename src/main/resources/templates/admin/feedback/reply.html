@@ -2,70 +2,262 @@
 <html lang="zh-TW" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>問題回報後台管理</title>
-<link rel="stylesheet" th:href="@{/css/reply.css}">
+<title>問題回報管理 | THE STAR</title>
 <link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<link rel="stylesheet" href="/css/common.css">
-
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" th:href="@{/css/roomManage.css}">
 <style>
-
-/* 強制隱藏導覽列中的購物車圖示與連結 */
-.shop-navbar a[href*="cart"], .shop-navbar a[href*="Cart"], .shop-navbar .fa-cart-shopping,
-	.shop-navbar .fa-bag-shopping, .shop-navbar .cart-icon {
-	display: none !important;
-	
+:root {
+	--serif: 'Cormorant Garamond', 'Noto Serif TC', serif;
+	--sans: 'Jost', 'Noto Serif TC', system-ui, sans-serif;
+	--cream: #f6f2ea;
+	--paper: #fbf9f4;
+	--ink: #23211c;
+	--soft: #5b564c;
+	--muted: #9b9486;
+	--gold: #9c7c4f;
+	--gold-d: #80623a;
+	--line: #e4ddd0;
+	--hero:
+		url('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=2000&q=80');
 }
 
-</style>
+* {
+	box-sizing: border-box
+}
 
+header {
+	position: relative; /* 或 sticky */
+	z-index: 1000; /* 設定一個夠大的數值，確保它在最上層 */
+}
+
+/* 2. 確保 .admin-header 的 z-index 低於 header */
+.admin-header {
+	position: relative;
+	z-index: 1; /* 讓它的層級小於 header */
+}
+
+html, body {
+	margin: 0
+}
+
+body {
+	font-family: var(--sans);
+	background: var(--cream);
+	color: var(--ink);
+	font-weight: 300;
+	font-size: 15px;
+	line-height: 1.7
+}
+
+h1, h2, h3 {
+	font-family: var(--serif);
+	font-weight: 500;
+	margin: 0;
+	letter-spacing: .5px
+}
+
+.ser {
+	font-family: var(--serif)
+}
+
+.up {
+	text-transform: uppercase;
+	letter-spacing: 3px;
+	font-size: 11px;
+	font-weight: 400
+}
+
+a {
+	color: inherit;
+	text-decoration: none
+}
+
+.msg-box {
+	margin-bottom: 20px;
+	padding: 15px;
+	text-align: center;
+	border-radius: 4px;
+	border: 1px solid;
+}
+
+.msg-box.success {
+	background-color: #f6f2ea;
+	border-color: #9c7c4f;
+	color: #9c7c4f;
+}
+
+.msg-box.error {
+	background-color: #fff0f0;
+	border-color: #d9534f;
+	color: #d9534f;
+}
+
+.menu {
+	display: flex;
+	gap: 20px; /* 增加按鈕之間的間距 */
+	align-items: center;
+}
+
+/* 針對新按鈕的專屬樣式 */
+.btn-home {
+	padding: 8px 16px;
+	background-color: #f6f2ea; /* 與背景色一致，或改用 var(--ink) */
+	border: 1px solid #9c7c4f; /* 金色邊框，呼應你的設計 */
+	color: #9c7c4f;
+	font-size: 13px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	transition: all 0.3s ease;
+}
+
+.btn-home:hover {
+	background-color: #9c7c4f; /* 滑鼠移上去變成金色底 */
+	color: #ffffff; /* 文字變白色 */
+}
+
+/* 彈窗按鈕通用樣式 */
+.btn-action {
+	padding: 10px 24px;
+	background-color: white; /* 預設底色為白 */
+	border: 1px solid var(--gold); /* 使用品牌金色的邊框 */
+	color: var(--gold); /* 文字顏色為金色 */
+	font-size: 13px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	cursor: pointer;
+	transition: all 0.3s ease; /* 平滑的過渡效果 */
+	font-family: var(--sans);
+}
+
+/* 按鈕懸停效果 */
+.btn-action:hover {
+	background-color: var(--gold); /* 滑鼠移上去變金色底 */
+	color: white; /* 文字變白色 */
+}
+
+/* 取消按鈕的特殊色 (使用淺灰色調) */
+.btn-cancel {
+	background-color: #f6f2ea;
+	border-color: #d1cbc0;
+	color: #5b564c;
+}
+
+.btn-cancel:hover {
+	background-color: #d1cbc0;
+	color: white;
+}
+
+.status-badge {
+	padding: 8px 16px;
+	background-color: #f6f2ea; /* 與背景色一致，或改用 var(--ink) */
+	border: 1px solid #9c7c4f; /* 金色邊框，呼應你的設計 */
+	color: #9c7c4f;
+	font-size: 13px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	transition: all 0.3s ease;
+}
+
+
+
+.hbar {
+	display: flex;
+	justify-content: space-between; /* LOGO 在左，右側區塊在右 */
+	align-items: center;
+	padding: 20px 40px; /* 根據你的實際頁面間距調整 */
+}
+
+/* 右側容器，包含選單與按鈕 */
+.header-right {
+	display: flex;
+	align-items: center;
+	gap: 30px; /* 控制選單與按鈕之間的間距 */
+}
+</style>
 </head>
+
 <body>
 
-	<div
-		th:replace="~{user/common/frontNavbar :: navbar('room', true, 'shop-navbar site-navbar-dark', false)}"></div>
+	<!-- 頁面標題區 -->
+	<header>
+		<div class="hbar">
+			<a th:href="@{/thestar/admin/home}" class="logo"> <span
+				class="star">✦</span><b>THE STAR</b><small>Hotel &amp;
+					Residences</small>
+			</a>
+			<nav class="menu"></nav>
 
-	<div class="detail-container">
+			<a th:href="@{/thestar/admin/home}" class="btn-home">後台首頁</a>
+		</div>
+	</header>
+
+	<div class="container">
 
 		<header class="admin-header">
-			<p class="section-label">FEEDBACK MANAGEMENT</p>
-			<h1>問題回報列表</h1>
+			<p class="section-label">CUSTOMER SUPPORT</p>
+			<h1>問題回報管理</h1>
+			<p class="section-desc">處理會員反饋 · 郵件回覆管理</p>
 		</header>
 
-		<div class="form-container">
-			<table class="feedback-table">
+		<main class="admin-content">
+			<!-- 工具列 -->
+			<div class="toolbar">
+				<div class="admin-stats">
+					目前共有 <span id="totalCount">0</span> 筆待處理回報
+				</div>
+			</div>
+
+			<!-- 表格區 -->
+			<table class="room-table">
 				<thead>
 					<tr>
-						<th>ID</th>
-						<th>會員ID</th>
+						<th>問題編號</th>
+						<th>會員姓名</th>
 						<th>信箱</th>
 						<th>主旨</th>
-						<th>狀態</th>
+						<th>建立時間</th>
+						<th>回覆時間</th>
 						<th>操作</th>
 					</tr>
 				</thead>
 				<tbody id="feedbackTableBody">
-					<!-- JS 動態填入資料 -->
+					<!-- 由 JS 動態注入 -->
 				</tbody>
 			</table>
-		</div>
+		</main>
 	</div>
 
-	<!-- 回覆彈窗 -->
-	<div id="replyModal" class="modal" style="display: none;">
-		<div class="modal-content">
+	<!-- 彈窗內容：已移動至 body 內部最後方，確保 JS 能正確抓取 ID -->
+	<div id="replyModal" class="modal"
+		style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999; align-items: center; justify-content: center;">
+		<div class="modal-content"
+			style="background: white; padding: 40px; width: 500px; border: 1px solid #e0dcd5;">
+			<header class="modal-header"
+				style="margin-bottom: 20px; background: #f6f2ea; padding: 15px 30px; display: flex; align-items: center; justify-content: flex-start;">
+				<h3
+					style="margin: 0; font-family: var(--serif); color: #23211c; font-size: 24px; font-weight: 500;">回覆問題</h3>
+			</header>
+
 			<input type="hidden" id="modalTicketId"> <input type="hidden"
 				id="modalEmail">
-			<h3>回覆問題</h3>
-			<p id="modalContent"></p>
-			<textarea id="replyContent" placeholder="輸入回覆內容..."
-				style="width: 100%; height: 100px; margin: 10px 0;"></textarea>
-			<button onclick="submitReply()" class="btn">送出回覆</button>
-			<button onclick="closeModal()" class="btn ghost">取消</button>
+
+			<div class="modal-body">
+				<div id="modalContent"
+					style="margin-bottom: 20px; color: #5b564c; font-size: 14px;"></div>
+				<textarea id="replyContent" placeholder="請在此輸入回覆內容..."
+					style="width: 100%; height: 120px; border: 1px solid #e0dcd5; padding: 10px;"></textarea>
+			</div>
+
+			<footer class="modal-footer"
+				style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+				<button onclick="submitReply(event)" class="btn-action">送出回覆</button>
+				<button onclick="closeModal()" class="btn-action"
+					style="background: #eee;">取消</button>
+			</footer>
 		</div>
 	</div>
 
-	<!-- 請確認路徑是否正確指向剛剛更新的 reply.js -->
 	<script th:src="@{/js/reply.js}"></script>
 	<script th:src="@{/js/header-auth.js}"></script>
 </body>

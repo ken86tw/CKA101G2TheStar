@@ -1,61 +1,152 @@
 <!DOCTYPE html>
 <html lang="zh-TW" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>問題回報系統</title>
-    <link rel="stylesheet" th:href="@{/css/report.css}">
+<meta charset="UTF-8">
+<title>問題回報 | THE STAR</title>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" th:href="@{/css/common.css}">
 
 <style>
 
-.form-container {
-    max-width: 600px;
-    margin: 20px auto 50px auto;
-    background: white;
-    padding: 40px;
-    border: 1px solid #e0dcd5;
+/* 強制隱藏導覽列中的購物車圖示與連結 */
+.shop-navbar a[href*="cart"], .shop-navbar a[href*="Cart"], .shop-navbar .fa-cart-shopping,
+	.shop-navbar .fa-bag-shopping, .shop-navbar .cart-icon {
+	display: none !important;
 }
-.form-group { margin-bottom: 25px; }
-.form-group label { display: block; margin-bottom: 8px; color: #888; font-size: 13px; font-weight: bold; }
-.form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #e0dcd5; box-sizing: border-box; }
-.btn { background: #23211c; color: white; padding: 12px 30px; border: none; cursor: pointer; }
-.admin-header { max-width: 600px; margin: 40px auto; text-align: center; }
-.section-label { color: #9c7c4f; font-size: 11px; letter-spacing: 4px; }
 
+/* 統一 THE STAR 品牌風格設定 */
+:root {
+	--serif: 'Cormorant Garamond', 'Noto Serif TC', serif;
+	--sans: 'Jost', 'Noto Serif TC', system-ui, sans-serif;
+	--cream: #f6f2ea;
+	--ink: #23211c;
+	--gold: #9c7c4f;
+	--line: #e4ddd0;
+}
+
+body {
+	font-family: var(--sans);
+	background: var(--cream);
+	color: var(--ink);
+	margin: 0;
+	font-weight: 300;
+	font-size: 15px;
+	line-height: 1.7;
+}
+
+.container {
+	max-width: 800px; /* 調整寬度以保持優雅的閱讀間距 */
+	margin: 50px auto;
+	padding: 20px;
+}
+
+/* 標題風格統一 */
+.admin-header {
+	text-align: center;
+	margin-bottom: 60px;
+	position: static;
+}
+
+.section-label {
+	color: var(--gold);
+	letter-spacing: 4px;
+	font-size: 11px;
+	margin-bottom: 10px;
+	text-transform: uppercase;
+}
+
+h1 {
+	font-family: var(--serif);
+	font-size: 32px;
+	font-weight: 500;
+	margin: 0;
+}
+
+/* 表單區塊統一風格 */
+.form-container {
+	background: white;
+	padding: 40px;
+	border: 1px solid var(--line);
+}
+
+.form-group {
+	margin-bottom: 25px;
+}
+
+.form-group label {
+	display: block;
+	margin-bottom: 8px;
+	color: #999;
+	font-size: 12px;
+}
+
+.form-group input, .form-group textarea {
+	width: 100%;
+	padding: 12px;
+	border: 1px solid var(--line);
+	box-sizing: border-box;
+	font-family: inherit;
+}
+
+.btn {
+	padding: 12px 24px;
+	background-color: white; /* 預設底色為白 */
+	border: 1px solid var(--gold); /* 使用品牌金色的邊框 */
+	color: var(--gold); /* 文字顏色為金色 */
+	font-size: 15px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	cursor: pointer;
+	transition: all 0.3s ease; /* 平滑的過渡效果 */
+	font-family: var(--sans);
+}
+
+.btn:hover {
+	background-color: var(--gold); /* 滑鼠移上去變金色底 */
+	color: white; /* 文字變白色 */
+}
 </style>
-
 </head>
 
 <body>
-<div class="container">
-    <header class="admin-header">
-        <p class="section-label">SUPPORT CENTER</p>
-        <h1>問題回報</h1>
-    </header>
 
-    <form id="feedbackForm" class="form-container">
-        <!-- 假設 memberId 已透過 Session 或 Spring Security 取得，此處示範靜態值 -->
-        <input type="hidden" id="memberId" value="1" />
+	<div
+		th:replace="~{user/common/frontNavbar :: navbar('room', true, 'shop-navbar site-navbar-dark', false)}"></div>
 
-        <div class="form-group">
-            <label>聯絡信箱</label>
-            <input type="email" id="email" required placeholder="請輸入您的電子郵件" />
-        </div>
+	<div class="container">
+		<header class="admin-header">
+			<p class="section-label">SUPPORT CENTER</p>
+			<h1>問題回報</h1>
+			<p class="section-desc">會員反饋 · 郵件回報</p>
+		</header>
 
-        <div class="form-group">
-            <label>主旨</label>
-            <input type="text" id="subject" required maxlength="100" />
-        </div>
+		<form id="feedbackForm" class="form-container">
+			<input type="hidden" id="memberId" name="memberId"
+				th:value="${memberId}" />
+			<div class="form-group">
+				<label>聯絡信箱</label>
+				<!-- 使用 th:value 綁定 userEmail，並加上 readonly 讓會員無法亂改 -->
+				<input type="email" id="email" th:value="${userEmail}" required
+					placeholder="請輸入您的電子郵件" />
+			</div>
 
-        <div class="form-group">
-            <label>問題內容</label>
-            <textarea id="content" required style="height: 200px;"></textarea>
-        </div>
+			<div class="form-group">
+				<label>主旨</label> <input type="text" id="subject" required
+					maxlength="100" />
+			</div>
 
-        <div class="btn-row" style="text-align: center;">
-            <button type="submit" class="btn">送出問題</button>
-        </div>
-    </form>
-</div>
-<script th:src="@{/js/report.js}"></script>
+			<div class="form-group">
+				<label>問題內容</label>
+				<textarea id="content" required style="height: 200px;"></textarea>
+			</div>
+
+			<div style="text-align: center; margin-top: 30px;">
+				<button type="submit" class="btn">送出</button>
+			</div>
+		</form>
+	</div>
+	<script th:src="@{/js/report.js}"></script>
+	<script th:src="@{/js/header-auth.js}"></script>
 </body>
 </html>

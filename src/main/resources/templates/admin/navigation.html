@@ -47,6 +47,12 @@
         <a class="side-link" th:classappend="${!canUseRestaurant ? ' locked' : ''}"
            th:href="${canUseRestaurant ? '/admin/restaurant' : null}"
            th:attr="aria-disabled=${!canUseRestaurant},tabindex=${canUseRestaurant ? null : '-1'},title=${canUseRestaurant ? null : '沒有餐廳管理權限'}"><span class="side-icon">♢</span>餐廳管理</a>
+        <a class="side-link" 
+     	   th:classappend="${(active == 'feedback' ? ' active' : '') + (!canUseFrontDesk ? ' locked' : '')}"
+     	   th:href="${canUseFrontDesk ? '/feedback/manage' : null}"
+      	   th:attr="aria-disabled=${!canUseFrontDesk},tabindex=${canUseFrontDesk ? null : '-1'},title=${canUseFrontDesk ? null : '沒有客服管理權限'}">
+       		<span class="side-icon">✉</span>回報管理
+    </a>
     </div>
 </aside>
 </body>

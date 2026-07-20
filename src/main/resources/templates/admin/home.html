@@ -76,6 +76,13 @@
                     <p>管理訂位、菜單、桌型、營業時間與評論。</p>
                     <span class="dashboard-enter">進入管理 <b>→</b></span>
                 </a>
+                <a class="dashboard-tile module-feedback" th:if="${canUseFrontDesk}" th:href="@{/feedback/manage}">
+       				<span class="dashboard-icon">✉</span>
+        				<span class="dashboard-tag">SUPPORT</span>
+       				<h2>回報管理</h2>
+        				<p>處理會員反饋與郵件回覆管理。</p>
+        				<span class="dashboard-enter">進入管理 <b>→</b></span>
+   				 </a>
             </div>
         </section>
 
