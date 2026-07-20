@@ -52,28 +52,31 @@
 }
 
 .hero-content {
+	font-family: ''Helvetica Neue', Arial, sans-serif';
     position: relative;
     text-align: center;
     color: #ffffff;
     z-index: 1;
+    transform: translateY(20px);
 }
 
 /* 小標題樣式 */
 .hero-subtitle {
+	font-family: ''Helvetica Neue', Arial, sans-serif';
     font-size: 14px;
     letter-spacing: 0.3em;
     color: #c5a059; /* 金色系 */
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     display: block;
 }
 
 /* 大標題樣式 (襯線體) */
 .hero-title {
-    font-family: 'Times New Roman', serif;
+    font-family: ''Helvetica Neue', Arial, sans-serif';
     font-size: 3rem;
     font-weight: 300;
     letter-spacing: 0.1em;
-    margin: 10px 0;
+    margin: 20px 0;
 }
 
 /* 金色分隔線 */
@@ -85,6 +88,7 @@
 }
 
 .hero-desc {
+	font-family: ''Helvetica Neue', Arial, sans-serif';
     font-size: 1.1rem;
     letter-spacing: 0.05em;
 }
