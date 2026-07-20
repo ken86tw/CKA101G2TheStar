@@ -23,6 +23,19 @@ createApp({
       }
     };
   },
+  
+  computed: {
+      maxBirthday() {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        const year = yesterday.getFullYear();
+        const month = String(yesterday.getMonth() + 1).padStart(2, '0');
+        const day = String(yesterday.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+      }
+    },
 
   beforeUnmount() {
     this.revokePreviewUrl();
@@ -74,6 +87,14 @@ createApp({
 	  
 	  if (!this.form.memberBirthday) {
 	    return '會員生日請勿空白';
+	  }
+	  
+	  const birthday = new Date(`${this.form.memberBirthday}T00:00:00`);
+	  const today = new Date();
+	  today.setHours(0, 0, 0, 0);
+
+	  if (birthday >= today) {
+	    return '會員生日必須早於今天';
 	  }
 
       if (!this.form.memberAddress) {

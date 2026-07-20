@@ -98,7 +98,7 @@ public class MemberAuthController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                     .body(Map.of("error", e.getMessage()));
         }
     }
@@ -163,12 +163,27 @@ public class MemberAuthController {
     }
 
     @PostMapping("/forgot-password")
-    public Map<String, Object> forgotPassword(@RequestBody MemberForgotPasswordRequest request) {
-        memberAuthService.requestPasswordReset(request.getMemberEmail());
-        return Map.of(
-                "ok", true,
-                "message", "若此信箱已註冊，我們將寄送密碼重設信"
-        );
+    public ResponseEntity<?> forgotPassword(
+            @RequestBody MemberForgotPasswordRequest request) {
+
+        try {
+            memberAuthService.requestPasswordReset(
+                    request.getMemberEmail()
+            );
+
+            return ResponseEntity.ok(Map.of(
+                    "ok", true,
+                    "message", "若此信箱已註冊，我們將寄送密碼重設信"
+            ));
+
+        } catch (IllegalStateException e) {
+            return ResponseEntity
+                    .status(HttpStatus.TOO_MANY_REQUESTS)
+                    .body(Map.of(
+                            "error",
+                            e.getMessage()
+                    ));
+        }
     }
 
     @GetMapping("/reset-password/validate")

@@ -62,7 +62,7 @@
 
 					<div class="field">
 						<label for="memberBirthday">會員生日 <span>*</span></label> 
-						<input id="memberBirthday" type="date" v-model="form.memberBirthday" required> 
+						<input id="memberBirthday" type="date" v-model="form.memberBirthday" :max="maxBirthday" required> 
 						<small>生日註冊後不可更改，並會影響生日優惠券發放。</small>
 					</div>
 

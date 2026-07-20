@@ -31,6 +31,7 @@ public class MemberAuthService {
     private final MemberVerificationMailService verificationMailService;
     private final MemberCouponService memberCouponService;
     private final PasswordEncoder passwordEncoder;
+    private final MailCooldownService mailCooldownService;
 
     @Value("${app.member.password-reset-expire-minutes:30}")
     private long passwordResetExpireMinutes;
@@ -38,11 +39,13 @@ public class MemberAuthService {
     public MemberAuthService(MemberRepository memberRepository,
                              MemberVerificationMailService verificationMailService,
                              MemberCouponService memberCouponService,
-                             PasswordEncoder passwordEncoder) {
+                             PasswordEncoder passwordEncoder,
+                             MailCooldownService mailCooldownService) {
         this.memberRepository = memberRepository;
         this.verificationMailService = verificationMailService;
         this.memberCouponService = memberCouponService;
         this.passwordEncoder = passwordEncoder;
+        this.mailCooldownService = mailCooldownService;
     }
 
     @Transactional
@@ -160,6 +163,16 @@ public class MemberAuthService {
         if (member.getMemberStatus() != null && member.getMemberStatus() == 2) {
             throw new IllegalArgumentException("帳號已停用，請聯絡客服");
         }
+        long remainingSeconds =
+                mailCooldownService.acquire(cleanEmail, "VERIFY");
+
+        if (remainingSeconds > 0) {
+            throw new IllegalStateException(
+                    "操作過於頻繁，請於 "
+                            + remainingSeconds
+                            + " 秒後再試"
+            );
+        }
 
         String verifyToken = createToken();
         member.setVerifyToken(verifyToken);
@@ -170,9 +183,17 @@ public class MemberAuthService {
         System.out.println("重新寄送會員驗證連結：");
         System.out.println(verifyUrl);
 
-        boolean mailSent = verificationMailService.sendVerifyMail(savedMember, verifyUrl);
-        String message = mailSent ? "驗證信已重新寄出，請到信箱收信" : "驗證信寄送失敗，請稍後再試";
+        boolean mailSent =
+                verificationMailService.sendVerifyMail(savedMember, verifyUrl);
 
+        if (!mailSent) {
+            mailCooldownService.release(cleanEmail, "VERIFY");
+        }
+
+        String message = mailSent
+                ? "驗證信已重新寄出，請到信箱收信"
+                : "驗證信寄送失敗，請稍後再試";
+        
         return new MemberRegisterResponse(true, message, mailSent, verifyUrl);
     }
 
@@ -197,6 +218,20 @@ public class MemberAuthService {
         if (member == null || (member.getMemberStatus() != null && member.getMemberStatus() == 2)) {
             return;
         }
+        
+        long remainingSeconds =
+                mailCooldownService.acquire(
+                        cleanEmail,
+                        "RESET_PASSWORD"
+                );
+
+        if (remainingSeconds > 0) {
+            throw new IllegalStateException(
+                    "操作過於頻繁，請於 "
+                            + remainingSeconds
+                            + " 秒後再試"
+            );
+        }
 
         member.setResetToken(createToken());
         member.setResetExpireTime(LocalDateTime.now().plusMinutes(passwordResetExpireMinutes));
@@ -205,8 +240,20 @@ public class MemberAuthService {
         String resetUrl = verificationMailService.buildResetPasswordUrl(member.getResetToken());
         System.out.println("會員密碼重設連結：");
         System.out.println(resetUrl);
-        verificationMailService.sendPasswordResetMail(member, resetUrl, passwordResetExpireMinutes);
-    }
+        boolean mailSent =
+                verificationMailService.sendPasswordResetMail(
+                        member,
+                        resetUrl,
+                        passwordResetExpireMinutes
+                );
+
+        if (!mailSent) {
+            mailCooldownService.release(
+                    cleanEmail,
+                    "RESET_PASSWORD"
+            );
+        }
+        }
 
     @Transactional(readOnly = true)
     public boolean isResetTokenValid(String token) {
