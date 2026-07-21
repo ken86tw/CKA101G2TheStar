@@ -178,11 +178,9 @@ a {
 
 			<div class="toolbar">
 				<div class="admin-stats">
-					目前共有 <span th:text="${totalCount}">0</span> 種房型， 房間總庫存 <span
+					目前共有 <span th:text="${totalCount}">0</span> 種房型。房間總庫存 <span
 						th:text="${totalAmount}">0</span> 間。
-					<!-- 加入剩餘庫存顯示 -->
-					<span style="color: #9c7c4f; font-weight: bold;"> (可新建房間剩:
-						[[${remaining}]] 間) </span>
+					
 				</div>
 				<a th:href="@{/roomtype/add}" class="btn btn-primary"> <i
 					class="fa-solid fa-plus"></i> 新增房型

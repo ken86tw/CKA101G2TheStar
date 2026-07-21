@@ -174,10 +174,15 @@ a {
 
 			<div class="toolbar">
 				<div class="admin-stats">
-					<!-- 使用獨立且不受搜尋條件影響的 totalRoomCount 變數 -->
-					查詢共有 <span th:text="${roomList.size()}">0</span> 間。 <span
-						style="color: #9c7c4f; font-weight: bold;"> (可新增房間剩: <span
-						th:text="${30 - totalRoomCount}">30</span> 間)
+					<!-- roomList.size() 是「目前搜尋條件下」篩選出的房間數 -->
+					查詢共有 <span th:text="${roomList.size()}">0</span> 間。
+
+					<!-- 總庫存請對應到 totalRoomCount -->
+					房間總庫存 <span th:text="${totalRoomCount}">0</span> 間。 <span
+						style="color: #9c7c4f; font-weight: bold;">
+						
+						 <!-- 直接帶入 Controller 已經算好的 remainingQuota -->
+						(可新增房間剩: <span th:text="${remainingQuota}">30</span> 間)
 					</span>
 				</div>
 				<!-- 新增按鈕 -->

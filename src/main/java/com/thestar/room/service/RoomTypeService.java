@@ -87,19 +87,29 @@ public class RoomTypeService {
 	// 更新房型
 	@Transactional
 	public void updateRoomType(RoomTypeVO roomType) {
-		// 這裡改為傳入完整的 roomType 物件，以便比對狀態
-		validateUpdate(roomType);
-
 		// 1. 取得資料庫原始資料
 		RoomTypeVO existingRoom = getOneRoomType(roomType.getRoomTypeId());
 
-		// 2. [重要] 強制重新統計該房型的「真實房間實體數量」
-		// 這樣就不需要再擔心前端傳過來的數量與資料庫不符，也不需要手動檢查數量上限了
+		// 2. 檢查文字/狀態欄位是否有被更動
+		boolean isTextFieldsChanged = !existingRoom.getRoomTypeName().equals(roomType.getRoomTypeName())
+				|| !objectsEqual(existingRoom.getRoomTypeContent(), roomType.getRoomTypeContent())
+				|| !existingRoom.getRoomTypePrice().equals(roomType.getRoomTypePrice())
+				|| !existingRoom.getRoomTypeStatus().equals(roomType.getRoomTypeStatus())
+				|| !existingRoom.getCapacity().equals(roomType.getCapacity())
+				|| !objectsEqual(existingRoom.getAmenities(), roomType.getAmenities());
+
+		// 3. 只有當「文字或狀態欄位」被修改時，才執行嚴格的 validateUpdate 檢查！
+		// 如果只是單純上傳圖片、刪除圖片，而文字沒變，就不會被嚴格檢查擋下
+		if (isTextFieldsChanged) {
+			validateUpdate(roomType);
+		}
+
+		// 4. 強制重新統計該房型的「真實房間實體數量」
 		int actualCount = (int) roomRepository.countByRoomTypeId(roomType.getRoomTypeId());
 
-		// 3. 更新屬性 (除了 amount 由系統自動維護外，其餘保持更新)
+		// 5. 更新屬性
 		existingRoom.setRoomTypeName(roomType.getRoomTypeName());
-		existingRoom.setRoomTypeAmount(actualCount); // 強制覆寫為真實統計數量
+		existingRoom.setRoomTypeAmount(actualCount);
 		existingRoom.setRoomTypePrice(roomType.getRoomTypePrice());
 		existingRoom.setRoomTypeStatus(roomType.getRoomTypeStatus());
 		existingRoom.setRoomTypeContent(roomType.getRoomTypeContent());
@@ -111,24 +121,28 @@ public class RoomTypeService {
 
 	// 刪除房型
 	public void deleteRoomType(Integer id) {
-		if (!repository.existsById(id)) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "刪除失敗：找不到該房型 (ID: " + id + ")");
+		// 先取得該房型物件，若找不到直接拋出 404，並將結果存入 roomType 變數
+		RoomTypeVO roomType = repository.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "刪除失敗：找不到該房型 (ID: " + id + ")"));
+
+		// 檢查：如果房型目前是「啟用」狀態，禁止刪除
+		if (Boolean.TRUE.equals(roomType.getRoomTypeStatus())) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "無法刪除：該房型目前為「啟用」狀態，請先將其變更為「未啟用」後再執行刪除！");
 		}
 
-		// --- 修正點：直接使用 roomInventoryRepository 檢查 ---
+		// 檢查訂單紀錄 (防止刪除有歷史紀錄的房型)
+		if (stayRecordRepository.countActiveByRoomTypeId(id) > 0) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "無法刪除：該房型已有相關訂單紀錄！");
+		}
+		
 		// 傳入 id 與當前日期，確保檢查的是未來庫存
 		if (roomInventoryRepository.existsByRoomTypeIdAndDate(id, java.time.LocalDate.now())) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "無法刪除：該房型已有未來庫存排程，請先清空庫存！");
 		}
 
-		// [強化檢查] 檢查房間實體
+		// 檢查房間實體
 		if (roomRepository.countByRoomTypeId(id) > 0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "無法刪除：該房型下尚有房間，請先處理關聯房間！");
-		}
-
-		// [強化檢查] 檢查訂單紀錄 (防止刪除有歷史紀錄的房型)
-		if (stayRecordRepository.countActiveByRoomTypeId(id) > 0) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "無法刪除：該房型已有相關訂單紀錄！");
 		}
 
 		// 刪除所有相關聯的照片
@@ -137,6 +151,11 @@ public class RoomTypeService {
 		// 刪除房型本身
 		repository.deleteById(id);
 
+	}
+
+	// 輔助方法：用來安全比對可能為 null 的字串
+	private boolean objectsEqual(String a, String b) {
+		return (a == null ? "" : a).equals(b == null ? "" : b);
 	}
 
 }
