@@ -33,10 +33,13 @@ public class AdminShopStockController extends AdminShopBaseController {
         // 計算每個商品已賣出數量
         Map<Integer, Integer> soldMap = new HashMap<>();
         for (ProductsVO product : allProducts) {
-            int sold = productOrderItemSvc.getByProductId(product.getProductId())
-                    .stream()
-                    .mapToInt(item -> item.getProdOrderItemQty())
-                    .sum();
+        	int sold = productOrderItemSvc.getByProductId(product.getProductId())
+        	        .stream()
+        	        .filter(i -> i.getShopOrder() != null
+        	                  && i.getShopOrder().getShopOrderStatus() != null
+        	                  && i.getShopOrder().getShopOrderStatus() != 3)   // 排除已取消
+        	        .mapToInt(item -> item.getProdOrderItemQty())
+        	        .sum();
             soldMap.put(product.getProductId(), sold);
         }
 

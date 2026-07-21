@@ -283,15 +283,15 @@ body {
 }
 
 .status-off {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: #fce8e8;
-    color: #c0392b;
-    font-size: 13px;
-    padding: 6px 16px;
-    border-radius: 20px;
-    margin-bottom: 24px;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	background: #fce8e8;
+	color: #c0392b;
+	font-size: 13px;
+	padding: 6px 16px;
+	border-radius: 20px;
+	margin-bottom: 24px;
 }
 
 /* ===== 庫存警告 ===== */
@@ -549,7 +549,8 @@ footer {
 			<div class="stats-row">
 				<div class="stat-item">
 					<div class="stat-label">剩餘數量</div>
-					<div class="stat-value" th:text="${productsVO.productQuantity}">0</div>
+					<div class="stat-value"
+						th:text="${productsVO.productQuantity > 0 ? productsVO.productQuantity : 0}">0</div>
 				</div>
 				<div class="stat-item">
 					<div class="stat-label">評價人數</div>
@@ -570,7 +571,7 @@ footer {
 				<i class="fa-solid fa-circle-check"></i> 現貨供應中
 			</div>
 			<div class="status-off"
-				th:if="${productsVO.productStatus == 1 and productsVO.productQuantity == 0}">
+				th:if="${productsVO.productStatus == 1 and productsVO.productQuantity <= 0}">
 				<i class="fa-solid fa-circle-xmark"></i> 已售完，如需購買僅供宅配且到貨時間較久
 			</div>
 
@@ -586,7 +587,7 @@ footer {
 				<div class="btn-row">
 					<input type="number" name="qty" id="qtyInput" value="1" min="1"
 						class="qty-input"
-						th:attr="data-stock=${productsVO.productQuantity}"
+						th:attr="data-stock=${productsVO.productQuantity > 0 ? productsVO.productQuantity : 0}"
 						oninput="checkStock(this)">
 					<button type="submit" class="btn-cart">
 						<i class="fa-solid fa-cart-plus"></i> 加入購物車

@@ -349,10 +349,14 @@ footer {
 				</thead>
 				<tbody>
 					<tr th:each="item : ${cartListData}">
-						<td><a th:href="@{/shop/{id}(id=${item.productId})}"
+						<td><a
+							th:if="${item.product != null and item.product.productStatus == 1}"
+							th:href="@{/shop/{id}(id=${item.productId})}"
+							class="product-name" th:text="${item.product.productName}"></a> <span
+							th:if="${item.product == null or item.product.productStatus != 1}"
 							class="product-name"
-							th:text="${item.product != null ? item.product.productName : '商品已下架'}"
-							style="text-decoration: none;"></a> <span
+							th:text="${item.product != null ? item.product.productName : '商品已下架'}"></span>
+							<span
 							th:if="${item.product != null and item.product.productStatus != 1}"
 							style="color: #c0392b; font-size: 12px; font-weight: 600; margin-left: 4px;">已下架</span>
 						</td>

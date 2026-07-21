@@ -1,15 +1,21 @@
 package com.thestar.shop.controller.admin;
 
-import com.thestar.shop.entity.ProductCategoryVO;
-import com.thestar.shop.service.ProductCategoryService;
-import jakarta.validation.Valid;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
+import com.thestar.shop.entity.ProductCategoryVO;
+import com.thestar.shop.service.ProductCategoryService;
+
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/admin/shop/category")
@@ -63,8 +69,14 @@ public class ProductCategoryController extends AdminShopBaseController{
 
     // 執行刪除
     @PostMapping("delete")
-    public String delete(@RequestParam("productCategoryId") Integer productCategoryId) {
-        productCategorySvc.deleteProductCategory(productCategoryId);
+    public String delete(@RequestParam("productCategoryId") Integer productCategoryId,
+                         RedirectAttributes ra) {                  // ← 加參數
+        try {
+            productCategorySvc.deleteProductCategory(productCategoryId);
+            ra.addFlashAttribute("successMsg", "類別已刪除");
+        } catch (IllegalStateException e) {
+            ra.addFlashAttribute("errorMsg", e.getMessage());
+        }
         return "redirect:/admin/shop/category/listAllCategories";
     }
 }

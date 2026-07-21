@@ -12,7 +12,7 @@ public interface ShopOrderRepository extends JpaRepository<ShopOrderVO, Integer>
 
     @Transactional
     @Modifying
-    @Query(value = "delete from shop_order where shop_order_id = ?1", nativeQuery = true)
+    @Query(value = "delete from SHOP_ORDER where shop_order_id = ?1", nativeQuery = true)
     void deleteByShopOrderId(int shopOrderId);
 
     List<ShopOrderVO> findByMemberId(Integer memberId);
