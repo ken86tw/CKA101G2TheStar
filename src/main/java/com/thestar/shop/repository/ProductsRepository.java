@@ -13,7 +13,7 @@ public interface ProductsRepository extends JpaRepository<ProductsVO, Integer> {
 
 	@Transactional
 	@Modifying
-	@Query(value = "delete from products where product_id = ?1", nativeQuery = true)
+	@Query(value = "delete from PRODUCTS where product_id = ?1", nativeQuery = true)
 	void deleteByProductId(int productId);
 
 	List<ProductsVO> findByProductStatus(Byte productStatus);
@@ -23,4 +23,6 @@ public interface ProductsRepository extends JpaRepository<ProductsVO, Integer> {
 	// 關鍵字搜尋（商品名稱或介紹包含關鍵字，且為上架狀態）
 	List<ProductsVO> findByProductStatusAndProductNameContainingIgnoreCaseOrProductStatusAndProductDescContainingIgnoreCase(
 			Byte status1, String keyword1, Byte status2, String keyword2);
+	
+	long countByProductCategoryId(Integer productCategoryId);
 }

@@ -56,7 +56,7 @@
                         <td>
                             <span th:if="${productsVO.productReviewNumber == 0}">尚無評價</span>
                             <span th:if="${productsVO.productReviewNumber > 0}"
-                                  th:text="${#numbers.formatDecimal(productsVO.productTotalStar / productsVO.productReviewNumber, 1, 1)}">
+                                  th:text="${#numbers.formatDecimal(productsVO.productTotalStar * 1.0 / productsVO.productReviewNumber, 1, 1)}">
                             </span>
                         </td>
                     </tr>

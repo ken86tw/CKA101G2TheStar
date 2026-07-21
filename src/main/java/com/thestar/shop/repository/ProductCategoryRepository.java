@@ -10,6 +10,6 @@ public interface ProductCategoryRepository extends JpaRepository<ProductCategory
 
     @Transactional
     @Modifying
-    @Query(value = "delete from product_category where product_category_id = ?1", nativeQuery = true)
+    @Query(value = "delete from PRODUCT_CATEGORY where product_category_id = ?1", nativeQuery = true)
     void deleteByProductCategoryId(int productCategoryId);
 }

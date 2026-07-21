@@ -12,7 +12,7 @@ public interface ProductOrderItemRepository extends JpaRepository<ProductOrderIt
 
     @Transactional
     @Modifying
-    @Query(value = "delete from product_order_item where product_order_item_id = ?1", nativeQuery = true)
+    @Query(value = "delete from PRODUCT_ORDER_ITEM where product_order_item_id = ?1", nativeQuery = true)
     void deleteByProductOrderItemId(int productOrderItemId);
 
     List<ProductOrderItemVO> findByShopOrderId(Integer shopOrderId);

@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -108,6 +109,7 @@ public class UserShopOrderController {
 	// 建立訂單並轉跳綠界付款
 	@PostMapping("placeOrder")
 	@ResponseBody
+	@Transactional 
 	public String placeOrder(@RequestParam("shopOrderName") String shopOrderName,
 			@RequestParam("shopOrderPhone") String shopOrderPhone,
 			@RequestParam(value = "shopOrderAddress", required = false) String shopOrderAddress,
@@ -220,7 +222,7 @@ public class UserShopOrderController {
 			ProductsVO product = productsSvc.getOneProduct(item.getProductId());
 			if (product != null) {
 				int newQty = product.getProductQuantity() - item.getCartItemProdQty();
-				product.setProductQuantity(Math.max(newQty, 0));
+				product.setProductQuantity(newQty);
 				productsSvc.updateProduct(product);
 			}
 		}
@@ -314,8 +316,8 @@ public class UserShopOrderController {
 		if (order == null || !order.getMemberId().equals(loginMember.getMemberId())) {
 			return "<script>location.href='/shop/order/myOrders'</script>";
 		}
-		if (order.getShopPaymentStatus() == null || order.getShopPaymentStatus() != 0) {
-			return "<script>location.href='/shop/order/myOrders'</script>";
+		if (order.getShopOrderStatus() != null && order.getShopOrderStatus() == 3) {
+		    return "<script>alert('訂單已取消，無法付款');location.href='/shop/order/myOrders'</script>";
 		}
 
 		List<ProductOrderItemVO> itemList = productOrderItemSvc.getByShopOrderId(orderId);
@@ -398,7 +400,7 @@ public class UserShopOrderController {
 		params.put("ItemName", (itemNames == null || itemNames.isBlank()) ? "商品" : itemNames);
 		params.put("ReturnURL", BASE_URL + "/shop/order/ecpay/return");
 		// ④ OrderResultURL 使用 resolveResultBaseUrl 決定網域
-		params.put("OrderResultURL",
+		params.put("ClientBackURL",
 				resolveResultBaseUrl(clientBackUrl) + "/shop/order/ecpay/result?orderId=" + orderId);
 		params.put("ChoosePayment", "Credit");
 		params.put("EncryptType", "1");
