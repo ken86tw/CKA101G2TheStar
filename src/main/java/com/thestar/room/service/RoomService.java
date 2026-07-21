@@ -119,7 +119,7 @@ public class RoomService {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "刪除失敗：該房間已有相關住宿紀錄，禁止刪除。");
 		}
 
-		// 3. 💡 [新增防護] 檢查該房型是否有影響到未來的庫存排程 (若刪除實體房間，總數會少一個)
+		// 3. 檢查該房型是否有影響到未來的庫存排程 (若刪除實體房間，總數會少一個)
 		boolean hasFutureInventory = roomInventoryRepository.existsByRoomTypeIdAndDate(room.getRoomTypeId(),
 				LocalDate.now());
 		if (hasFutureInventory) {
@@ -148,10 +148,10 @@ public class RoomService {
 
 	// 使用Repository寫好的動態查詢
 	public List<RoomVO> searchRooms(Integer roomId, Integer roomTypeId, Boolean roomSwitchStatus) {
-		// 呼叫剛剛在 Repository 寫好的動態查詢
+		
 		List<RoomVO> list = repository.findRoomsByCriteria(roomId, roomTypeId, roomSwitchStatus);
 
-		// 補上房型名稱（維持你原本 findAll / findById 的好習慣）
+	
 		for (RoomVO room : list) {
 			RoomTypeVO type = roomTypeService.getOneRoomType(room.getRoomTypeId());
 			if (type != null) {
