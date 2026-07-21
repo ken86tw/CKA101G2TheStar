@@ -172,6 +172,31 @@ a {
 	align-items: center;
 	gap: 30px; /* 控制選單與按鈕之間的間距 */
 }
+
+/* 1. 確保表格中的文字與按鈕絕對不自動換行，保持橫向顯示 */
+.room-table th, 
+.room-table td {
+    white-space: nowrap;        /* 防止文字自動換行 */
+}
+
+/* 2. 修正「操作」欄位裡的按鈕，讓其橫向顯示三個字且框框完美貼合字體 */
+.room-table .btn-action {
+    display: inline-block !important;
+    width: auto !important;
+    white-space: nowrap !important;
+    padding: 6px 14px !important;  /* 調整精緻的內距，使框框剛好貼合字體 */
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+    text-align: center !important;
+}
+
+/* 3. 如果取消按鈕（已回覆）有用到額外類別，一併確保樣式一致 */
+.room-table .btn-cancel {
+    display: inline-block !important;
+    width: auto !important;
+    white-space: nowrap !important;
+    padding: 6px 14px !important;
+}
 </style>
 </head>
 
