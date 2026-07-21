@@ -57,7 +57,7 @@ public class FeedbackController {
 	// 員工管理、回覆畫面
 	@GetMapping("/manage")
 	public String showFeedbackReply() {
-		return "/admin/feedback/reply";
+		return "admin/feedback/reply";
 	}
 
 	// @ResponseBody 才能繼續回傳 JSON
