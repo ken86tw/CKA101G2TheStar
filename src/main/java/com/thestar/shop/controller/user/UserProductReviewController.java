@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,8 +53,9 @@ public class UserProductReviewController {
 		}
 
 		// 確認訂單已完成才能評論
-		if (orderItem.getShopOrder().getShopOrderStatus() != 2) {
-			return "redirect:/shop/order/myOrders";
+		Byte st = orderItem.getShopOrder().getShopOrderStatus();
+		if (st == null || st != 2) {
+		    return "redirect:/shop/order/myOrders";
 		}
 
 		// 已評論過就導回
@@ -67,6 +69,7 @@ public class UserProductReviewController {
 
 	// 送出評論
 	@PostMapping("submit")
+	@Transactional
 	public String submitReview(@RequestParam("productOrderItemId") Integer productOrderItemId,
 			@RequestParam("productRate") Byte productRate,
 			@RequestParam(value = "productReview", required = false) String productReview, HttpSession session) {
@@ -83,13 +86,18 @@ public class UserProductReviewController {
 		}
 		
 		// 確認訂單已完成才能評論
-		if (orderItem.getShopOrder().getShopOrderStatus() != 2) {
+		Byte orderStatus = orderItem.getShopOrder().getShopOrderStatus();
+		if (orderStatus == null || orderStatus != 2) {
 		    return "redirect:/shop/order/myOrders";
 		}
 
 		// 防止重複評論
 		if (productReviewSvc.existsByProductOrderItemId(productOrderItemId)) {
 			return "redirect:/shop/order/myOrders";
+		}
+		
+		if (productRate == null || productRate < 1 || productRate > 5) {
+		    return "redirect:/shop/order/myOrders";
 		}
 
 		// 建立評論

@@ -118,6 +118,17 @@ public class ShopOrderController extends AdminShopBaseController {
 
 		// 先記下原狀態，用來判斷是否真的發生轉換
 		Byte oldStatus = order.getShopOrderStatus();
+		
+		// 已取消訂單：允許修改付款狀態（供客服標記已退款），但不可修改訂單狀態
+		if (oldStatus != null && oldStatus == ORDER_CANCELLED) {
+		    if (!shopOrderStatus.equals(oldStatus)) {
+		        return "redirect:/admin/shop/order/listAllOrders";
+		    }
+		    order.setShopPaymentStatus(shopPaymentStatus);      // ★ 加這一行
+		    shopOrderSvc.updateShopOrder(order);
+		    return "redirect:/admin/shop/order/listAllOrders";
+		}
+		
 		boolean statusChanged = !shopOrderStatus.equals(oldStatus);
 
 		order.setShopOrderStatus(shopOrderStatus);

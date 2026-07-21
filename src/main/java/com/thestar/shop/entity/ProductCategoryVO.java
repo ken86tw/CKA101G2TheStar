@@ -6,6 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "PRODUCT_CATEGORY")
@@ -16,6 +18,8 @@ public class ProductCategoryVO {
     @Column(name = "PRODUCT_CATEGORY_ID")
     private Integer productCategoryId;
 
+    @NotBlank(message = "類別名稱不可為空")
+    @Size(max = 30, message = "類別名稱最多 30 字")
     @Column(name = "PRODUCT_CATEGORY_NAME", nullable = false)
     private String productCategoryName;
 

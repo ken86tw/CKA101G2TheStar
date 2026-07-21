@@ -12,7 +12,7 @@ public interface ProductReviewRepository extends JpaRepository<ProductReviewVO, 
 
     @Transactional
     @Modifying
-    @Query(value = "delete from product_review where product_review_id = ?1", nativeQuery = true)
+    @Query(value = "delete from PRODUCT_REVIEW where product_review_id = ?1", nativeQuery = true)
     void deleteByProductReviewId(int productReviewId);
 
     List<ProductReviewVO> findByProductId(Integer productId);
