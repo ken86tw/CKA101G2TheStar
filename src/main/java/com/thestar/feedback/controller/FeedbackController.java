@@ -3,9 +3,12 @@ package com.thestar.feedback.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,9 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.thestar.employee.security.EmployeeUserDetails;
 import com.thestar.feedback.entity.FeedbackVO;
 import com.thestar.feedback.service.FeedbackService;
-import com.thestar.employee.security.EmployeeUserDetails;
 import com.thestar.member.entity.MemberVO;
 import com.thestar.member.service.MemberService;
 
@@ -35,8 +38,8 @@ public class FeedbackController {
 	@GetMapping("/report")
 	public String showReportForm(Model model, HttpSession session) {
 
-		// 1. 從 session 取得目前登入的會員（這裡的屬性名稱 "loggedInMember" 請換成你專案實際設定的名稱）
-		MemberVO member = (MemberVO) session.getAttribute("loggedInMember");
+		// 1. 從 session 取得目前登入的會員
+		MemberVO member = (MemberVO) session.getAttribute("loginMember");
 
 		// 2. 防禦性檢查：如果有登入，就撈出資料帶到前端
 		if (member != null) {
@@ -81,8 +84,11 @@ public class FeedbackController {
 	@PostMapping("/reply")
 	@ResponseBody
 	public FeedbackVO reply(@RequestParam Integer ticketId, @RequestParam String replyContent,
+			@RequestParam String email, // 接收前端傳來的會員信箱
 			@AuthenticationPrincipal EmployeeUserDetails principal) {
-		return service.replyFeedback(ticketId, replyContent, principal.getEmployeeId());
+
+// 呼叫 Service，只要寄信失敗就會拋錯，Controller 不用寫繁雜的邏輯
+		return service.replyFeedback(ticketId, replyContent, principal.getEmployeeId(), email);
 	}
 
 	// 查詢所有問題回報紀錄
@@ -116,5 +122,11 @@ public class FeedbackController {
 
 		// 呼叫正確的 Getter 方法：getMemberEmail()，明確取出字串欄位並回傳
 		return member.getMemberEmail();
+	}
+
+	@ExceptionHandler(RuntimeException.class)
+	public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
+		// 回傳 HTTP 500，但內容直接是 e.getMessage() 的純文字
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 	}
 }

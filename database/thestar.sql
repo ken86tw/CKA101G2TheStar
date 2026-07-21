@@ -1,3 +1,6 @@
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
 CREATE DATABASE IF NOT EXISTS thestar
 DEFAULT CHARACTER SET UTF8MB4
 DEFAULT COLLATE UTF8MB4_UNICODE_CI;
@@ -22,7 +25,7 @@ DROP TABLE IF EXISTS ROOM_INVENTORY;
 DROP TABLE IF EXISTS ROOM;             
 DROP TABLE IF EXISTS ROOM_TYPE_PHOTO;  
 DROP TABLE IF EXISTS ROOM_TYPE;        
-DROP TABLE IF EXISTS CANNED_MESSAGE;   
+DROP TABLE IF EXISTS FEEDBACK;   
 -- ====================================================================
 DROP TABLE IF EXISTS REVIEW;
 DROP TABLE IF EXISTS ARTICLE;
@@ -667,18 +670,20 @@ INSERT INTO REVIEW (ARTICLE_ID, CONTENT, LIKE_COUNT, MEMBER_ID) VALUES
 -- 房間&房型121212
 -- ========================================================================================================
 
-
+-- 房型
 CREATE TABLE ROOM_TYPE ( 
 ROOM_TYPE_ID INT NOT NULL AUTO_INCREMENT COMMENT '房型編號',
 ROOM_TYPE_NAME VARCHAR(50) NOT NULL COMMENT '房型名稱',
 ROOM_TYPE_AMOUNT INT NOT NULL COMMENT '房型數量',
 ROOM_TYPE_CONTENT VARCHAR(1000) NOT NULL COMMENT '房型說明',
+CAPACITY TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '容納人數',
+AMENITIES VARCHAR(255) DEFAULT NULL COMMENT '設施說明',
 ROOM_TYPE_STATUS BOOLEAN DEFAULT 1 COMMENT '房型上下架狀態', -- 0:下架，1:上架 --
 ROOM_TYPE_PRICE INT NOT NULL COMMENT '房型價格',
 CONSTRAINT ROOM_TYPE_ROOM_TYPE_ID_PK PRIMARY KEY (ROOM_TYPE_ID)
 ) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4 COLLATE = UTF8MB4_UNICODE_CI COMMENT = '房型';
 
-
+-- 房間
 CREATE TABLE ROOM ( 
 ROOM_ID INT NOT NULL COMMENT '房間編號',
 ROOM_TYPE_ID INT NOT NULL COMMENT '房型編號',
@@ -699,44 +704,68 @@ CONSTRAINT ROOM_TYPE_PHOTO_ROOM_TYPE_ID_FK FOREIGN KEY (ROOM_TYPE_ID)
 REFERENCES ROOM_TYPE(ROOM_TYPE_ID)
 ) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4 COLLATE = UTF8MB4_UNICODE_CI COMMENT = '房型圖片';
 
--- 罐頭訊息
-CREATE TABLE CANNED_MESSAGE ( 
-CANNED_MESSAGE_ID  INT NOT NULL AUTO_INCREMENT COMMENT '罐頭編號',
-CANNED_MESSAGE_QUESTION VARCHAR(100) NOT NULL COMMENT '罐頭問題',
-CANNED_MESSAGE_ANSWER VARCHAR(1000) NOT NULL COMMENT '罐頭解答',
-CONSTRAINT CANNED_MESSAGE_CANNED_MESSAGE_ID_PK PRIMARY KEY (CANNED_MESSAGE_ID)
-) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4 COLLATE = UTF8MB4_UNICODE_CI COMMENT = '罐頭回覆';
 
-INSERT INTO CANNED_MESSAGE (CANNED_MESSAGE_ID, CANNED_MESSAGE_QUESTION, CANNED_MESSAGE_ANSWER) VALUES
-(1, '什麼時候能辦理入住?', '隨時都可以，線上辦理在此網頁上即可，現場入住可至飯店地點臨櫃辦理，
-依照當日住宿情況可能無空房，如有需要請先撥打電話向櫃台人員確認。'),
-(2, '有供應有毛巾、牙刷和牙膏嗎?', '有的，每間房都備有毛巾、牙刷、牙膏、沐浴乳等基本盥洗用具，
-如房內缺少、或需要更多，請向房務人員詢問喔。'),
-(3, '付款方式有哪些?能現金付款嗎?','線上訂房僅限信用卡，現金付款只適用於臨櫃訂房。'),
-(4, '房內設施有什麼?有網路嗎?', '備有液晶電視、冷暖氣、小冰箱、衛浴設備、充電器等等，
-住宿期間提供Wifi網路使用。'),
-(5, '飯店有停車場可用?需要付錢嗎?', '住宿客免費使用，住宿期間可自由出入，到當日退房時間下午13:00為止，
-一般消費者請洽附近的公、私有停車場，目前飯店停車場僅供住宿客使用。');
+-- 問題回報
+CREATE TABLE FEEDBACK (
+    TICKET_ID      INT           NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '問題回報主鍵',
+    MEMBER_ID      INT           NOT NULL COMMENT '會員ID',
+    EMPLOYEE_ID    INT           DEFAULT NULL COMMENT '處理員工ID',
+    EMAIL          VARCHAR(100)  NOT NULL COMMENT '備份聯絡Email',
+    SUBJECT        VARCHAR(255)  NOT NULL COMMENT '問題主旨',
+    CONTENT        TEXT          NOT NULL COMMENT '問題內容詳述',
+    REPLY_CONTENT  TEXT          DEFAULT NULL COMMENT '員工回覆內容',
+    TICKET_STATUS  TINYINT       NOT NULL DEFAULT 0 COMMENT '0:未回覆, 1:已回覆',
+    CREATED_AT     DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '收到問題時間',
+    REPLIED_AT     DATETIME      DEFAULT NULL COMMENT '員工回覆時間',
 
-INSERT INTO ROOM_TYPE (ROOM_TYPE_ID, ROOM_TYPE_NAME, ROOM_TYPE_AMOUNT, ROOM_TYPE_CONTENT, ROOM_TYPE_STATUS, ROOM_TYPE_PRICE) VALUES 
-(1, '雙人房', 10, '單人獨享；雙人剛好，適合獨自或有伴侶的旅客，標準且最多人選擇。
-床型： 一張標準雙人床
-坪數： 10 坪
-設施： 無線網路、液晶電視、免治馬桶、乾濕分離沐浴間、快煮壺、小型商務辦公桌。', 
-1, 4000),
+    -- 外鍵約束
+    CONSTRAINT FEEDBACK_MEMBER_ID_FK FOREIGN KEY (MEMBER_ID) 
+        REFERENCES MEMBERS(MEMBER_ID),
+    CONSTRAINT FEEDBACK_EMPLOYEE_ID_FK FOREIGN KEY (EMPLOYEE_ID) 
+        REFERENCES EMPLOYEE(EMPLOYEE_ID)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-(2, '四人房', 10, '家人、團體住宿的不二選擇，充分的空間和齊全的設備讓人能放鬆的體驗。
-床型： 兩張標準雙人床
-坪數： 16 坪
-設施： 無線網路、大螢幕液晶電視、獨立浴缸、免治馬桶、雙人盥洗台、膠囊咖啡機、簡易小冰箱、客廳休憩區。',
- 1, 7500),
 
-(3, '總統套房', 5, '給只想感受最好的你。上限六人，東方之星就在此處。
-床型： 四張大雙人床 及 一組頂級高級沙發床
-坪數： 32 坪
-設施：高速無線網路、65吋 4K 影音娛樂系統、獨立大客廳與六人座餐桌、雙衛浴配置 (含大型景觀按摩浴缸)、
-紅酒櫃與膠囊咖啡機、空氣清淨機、更衣室與大型置物櫃、現代遊戲主機、掌機、獨立多功能辦公桌。',
- 1, 12600);
+
+-- 1. 未回覆情境：
+-- 假設是今天下午 14:00 收到的問題
+INSERT INTO FEEDBACK (MEMBER_ID, EMAIL, SUBJECT, CONTENT, TICKET_STATUS, CREATED_AT)
+VALUES (
+    1, 
+    'one@example.com', 
+    '關於住宿熱水問題', 
+    '請問房內熱水供應時間是否有限制？為什麼晚上12點後水溫不太穩定？', 
+    0,
+    '2026-07-18 14:00:00' -- 自訂收到時間
+);
+
+-- 2. 已回覆情境：
+-- 假設是昨天早上 09:00 收到，並在兩小時後回覆
+INSERT INTO FEEDBACK (MEMBER_ID, EMPLOYEE_ID, EMAIL, SUBJECT, CONTENT, REPLY_CONTENT, TICKET_STATUS, CREATED_AT, REPLIED_AT)
+VALUES (
+    2, 
+    2, 
+    'two@example.com', 
+    '詢問餐廳訂位', 
+    '請問如果當天用餐人數增加，可以直接現場加位嗎？', 
+    '您好，現場加位需視當日訂位狀況而定，建議您至少提前一天來電或透過系統修改訂位，以確保位子喔！', 
+    1, 
+    '2026-07-17 09:00:00', -- 自訂收到時間
+    '2026-07-17 11:00:00'  -- 自訂回覆時間
+);
+
+
+
+INSERT INTO ROOM_TYPE (ROOM_TYPE_ID, ROOM_TYPE_NAME, ROOM_TYPE_AMOUNT, ROOM_TYPE_CONTENT, ROOM_TYPE_STATUS, ROOM_TYPE_PRICE, CAPACITY, AMENITIES) VALUES 
+(1, '雙人房', 10, '單人獨享；雙人剛好，適合獨自或有伴侶的旅客，標準且最多人選擇。', 1, 4000, 2, 
+'無線網路、液晶電視、免治馬桶、乾濕分離沐浴間、快煮壺、小型商務辦公桌。'),
+
+(2, '四人房', 10, '家人、團體住宿的不二選擇，充分的空間和齊全的設備讓人能放鬆的體驗。', 1, 7500, 4,
+ '無線網路、大螢幕液晶電視、獨立浴缸、免治馬桶、雙人盥洗台、膠囊咖啡機、簡易小冰箱、客廳休憩區。'),
+
+(3, '總統套房', 5, '給只想感受最好的你。上限六人，東方之星就在此處。', 1, 12600, 6, 
+'高速無線網路、65吋4K影音娛樂系統、大客廳與六人座餐桌、雙衛浴配置、紅酒櫃與膠囊咖啡機、
+空氣清淨機、更衣室與置物櫃、現代遊戲主機、掌機、多功能辦公桌。');
 
 INSERT INTO ROOM_TYPE_PHOTO (ROOM_TYPE_PHOTO_ID, ROOM_TYPE_ID, ROOM_TYPE_PIC) VALUES
 (1, 1, NULL),
@@ -997,13 +1026,16 @@ VALUES
 -- 餐廳
 -- ========================================================================================================
 
+-- 營業時段表 (增加上架狀態控制)
 CREATE TABLE IF NOT EXISTS BUSINESS_HOURS(
-	SESSION_ID INT NOT NULL AUTO_INCREMENT,
+    SESSION_ID INT NOT NULL AUTO_INCREMENT,
     START_TIME TIME NOT NULL,
     END_TIME TIME NOT NULL,
-	CONSTRAINT BUSINESS_HOURS_SESSION_ID_PK PRIMARY KEY (SESSION_ID)
+    IS_AVAILABLE TINYINT(1) NOT NULL DEFAULT 1, -- 1為上架/啟用，0為下架/停用
+    CONSTRAINT BUSINESS_HOURS_SESSION_ID_PK PRIMARY KEY (SESSION_ID)
 ) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4 COLLATE = UTF8MB4_UNICODE_CI;
 
+-- 桌型設定表
 CREATE TABLE IF NOT EXISTS TABLE_TYPE (
     TABLE_TYPE_ID  INT NOT NULL,
     TABLE_TYPE_NAME VARCHAR(50) NOT NULL,
@@ -1011,6 +1043,7 @@ CREATE TABLE IF NOT EXISTS TABLE_TYPE (
     CONSTRAINT TABLE_TYPE_TABLE_TYPE_ID_PK PRIMARY KEY (TABLE_TYPE_ID)
 ) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4 COLLATE = UTF8MB4_UNICODE_CI;
  
+-- 每日可用桌數控管表
 CREATE TABLE IF NOT EXISTS AVAILABLE_TABLE (
     DATE              DATE NOT NULL,
     SESSION_ID        INT  NOT NULL,
@@ -1020,6 +1053,7 @@ CREATE TABLE IF NOT EXISTS AVAILABLE_TABLE (
     CONSTRAINT AVAILABLE_TABLE_SESSION_ID_FK FOREIGN KEY(SESSION_ID) REFERENCES BUSINESS_HOURS(SESSION_ID)
 ) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4 COLLATE = UTF8MB4_UNICODE_CI;
 
+-- 菜單分類表
 CREATE TABLE IF NOT EXISTS MENU_CATEGORY (
     CATEGORY_ID   INT         NOT NULL AUTO_INCREMENT,
     CATEGORY_NAME VARCHAR(20) NOT NULL,
@@ -1027,24 +1061,26 @@ CREATE TABLE IF NOT EXISTS MENU_CATEGORY (
     CONSTRAINT MENU_CATEGORY_CATEGORY_ID_PK PRIMARY KEY (CATEGORY_ID)
 ) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4 COLLATE = UTF8MB4_UNICODE_CI;
  
+-- 餐廳菜單餐點表
 CREATE TABLE IF NOT EXISTS RESTAURANT_MENU (
     ITEM_ID     INT           NOT NULL AUTO_INCREMENT,
     CATEGORY_ID INT           NOT NULL,
     ITEM_NAME   VARCHAR(50)   NOT NULL,
     ITEM_DESC   VARCHAR(200),
     PRICE       DECIMAL(8, 2) NOT NULL,
-    ITEM_IMAGE   LONGBLOB,
+    ITEM_IMAGE  LONGBLOB,
     SORT_ORDER  INT           NOT NULL DEFAULT 0,
     CONSTRAINT RESTAURANT_MENU_ITEM_ID_PK PRIMARY KEY (ITEM_ID),
     CONSTRAINT RESTAURANT_MENU_CATEGORY_ID_FK FOREIGN KEY (CATEGORY_ID) REFERENCES MENU_CATEGORY (CATEGORY_ID)
 ) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4 COLLATE = UTF8MB4_UNICODE_CI;
  
+-- 餐廳訂位紀錄表
 CREATE TABLE IF NOT EXISTS RESTAURANT_RESERVATION (
     RESERVATION_ID      INT                                    NOT NULL AUTO_INCREMENT,
     MEMBER_ID           INT                                    NOT NULL,
     DATE                DATE                                   NOT NULL,
     SESSION_ID          INT                                    NOT NULL,
-    TABLE_TYPE_ID 		INT									   NOT NULL,
+    TABLE_TYPE_ID       INT                                    NOT NULL,
     RESERVATION_STATUS  ENUM('BOOKED', 'FINISHED', 'CANCELED') NOT NULL,
     REVIEW_STATUS       BOOLEAN                                NOT NULL,
     RESERVATION_REQUEST VARCHAR(255),
@@ -1054,6 +1090,7 @@ CREATE TABLE IF NOT EXISTS RESTAURANT_RESERVATION (
     CONSTRAINT RESTAURANT_RESERVATION_TABLE_TYPE_ID FOREIGN KEY (TABLE_TYPE_ID) REFERENCES TABLE_TYPE (TABLE_TYPE_ID)
 ) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4 COLLATE = UTF8MB4_UNICODE_CI;
  
+-- 餐廳評論表
 CREATE TABLE IF NOT EXISTS RESTAURANT_REVIEW (
     REVIEW_ID      INT           NOT NULL AUTO_INCREMENT,
     MEMBER_ID      INT           NOT NULL,
@@ -1066,24 +1103,53 @@ CREATE TABLE IF NOT EXISTS RESTAURANT_REVIEW (
 ) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4 COLLATE = UTF8MB4_UNICODE_CI;
 
 
+-- ==========================================
+-- 2. 插入測試假資料 (DML)
+-- ==========================================
 
-INSERT INTO BUSINESS_HOURS (SESSION_ID, START_TIME, END_TIME) VALUES
-(1,'6:00:00', '9:00:00'),
-(2,'11:00:00', '14:00:00'),
-(3,'18:00:00', '21:00:00');
+-- 營業時段：每半小時拆分一格，預設全部上架啟用 (1)
+INSERT INTO BUSINESS_HOURS (SESSION_ID, START_TIME, END_TIME, IS_AVAILABLE) VALUES
+-- === 早餐時段 (06:00 - 09:00) ===
+(1, '06:00:00', '06:30:00', 1),
+(2, '06:30:00', '07:00:00', 1),
+(3, '07:00:00', '07:30:00', 1),
+(4, '07:30:00', '08:00:00', 1),
+(5, '08:00:00', '08:30:00', 1),
+(6, '08:30:00', '09:00:00', 1),
 
+-- === 午餐時段 (11:00 - 14:00) ===
+(7, '11:00:00', '11:30:00', 1),
+(8, '11:30:00', '12:00:00', 1),
+(9, '12:00:00', '12:30:00', 1),
+(10, '12:30:00', '13:00:00', 1),
+(11, '13:00:00', '13:30:00', 1),
+(12, '13:30:00', '14:00:00', 1),
+
+-- === 晚餐時段 (17:30 - 21:30) ===
+(13, '17:30:00', '18:00:00', 1),
+(14, '18:00:00', '18:30:00', 1),
+(15, '18:30:00', '19:00:00', 1),
+(16, '19:00:00', '19:30:00', 1),
+(17, '19:30:00', '20:00:00', 1),
+(18, '20:00:00', '20:30:00', 1),
+(19, '20:30:00', '21:00:00', 1),
+(20, '21:00:00', '21:30:00', 1);
+
+-- 桌型設定
 INSERT INTO TABLE_TYPE (TABLE_TYPE_ID, TABLE_TYPE_NAME, TABLE_TYPE_COUNT) VALUES
 (1, 'LARGE_TABLE', 2),
 (2, 'SMALL_TABLE', 8);
 
+-- 每日可用桌數 (對應新拆分的 SESSION_ID)
 INSERT INTO AVAILABLE_TABLE (DATE, SESSION_ID, LARGE_TABLE_COUNT, SMALL_TABLE_COUNT) VALUES
-('2026-05-27', 1, 2, 8),
-('2026-05-27', 2, 1, 7),
-('2026-05-27', 3, 2, 8),
-('2026-05-28', 1, 2, 8),
-('2026-05-28', 2, 1, 1),
-('2026-05-28', 3, 2, 2);
+('2026-05-27', 1, 2, 8), -- 11:00
+('2026-05-27', 2, 1, 7), -- 11:30
+('2026-05-27', 5, 2, 8), -- 18:00
+('2026-05-28', 1, 2, 8), 
+('2026-05-28', 2, 1, 1), 
+('2026-05-28', 6, 2, 2); -- 18:30
 
+-- 菜單分類
 INSERT INTO MENU_CATEGORY (CATEGORY_NAME, SORT_ORDER) VALUES
 ('前菜',   1),
 ('主食',   2),
@@ -1091,23 +1157,26 @@ INSERT INTO MENU_CATEGORY (CATEGORY_NAME, SORT_ORDER) VALUES
 ('甜點',   4),
 ('飲料',   5);
 
+-- 菜單餐點
 INSERT INTO RESTAURANT_MENU (CATEGORY_ID, ITEM_NAME, ITEM_DESC, PRICE, ITEM_IMAGE, SORT_ORDER) VALUES
 (1, '凱薩沙拉',     '新鮮蘿蔓生菜搭配凱薩醬與帕馬森起司',    180.00, NULL,  1),
-(2, '奶油義大利麵', '選用特製奶油醬汁搭配培根與蘑菇',        320.00, NULL,         1),
+(2, '奶油義大利麵', '選用特製奶油醬汁搭配培根與蘑菇',        320.00, NULL,  1),
 (3, '南瓜濃湯',     '香濃南瓜搭配鮮奶油與麵包丁',            150.00, NULL,  1),
-(4, '提拉米蘇',     '經典義式甜點，濃郁咖啡與馬斯卡彭起司',   220.00, NULL,      1),
-(5, '手工檸檬氣泡水','現榨檸檬汁搭配氣泡水與薄荷葉',          120.00, NULL,    1);
+(4, '提拉米蘇',     '經典義式甜點，濃郁咖啡與馬斯卡彭起司',   220.00, NULL,  1),
+(5, '手工檸檬氣泡水','現榨檸檬汁搭配氣泡水與薄荷葉',          120.00, NULL,  1);
  
+-- 餐廳訂位紀錄 (已連動新拆分時段，且修正留評預約之狀態為 FINISHED)
 INSERT INTO RESTAURANT_RESERVATION (MEMBER_ID, DATE, SESSION_ID, TABLE_TYPE_ID, RESERVATION_STATUS, REVIEW_STATUS, RESERVATION_REQUEST) VALUES
-(1, '2024-06-01', 1, 1, 'FINISHED',  TRUE,  '素食需求一位'),
-(2, '2024-06-10', 3, 1, 'FINISHED',  TRUE, '不吃海鮮'),
-(3, '2024-06-15', 2, 2, 'CANCELED',  TRUE, NULL),
-(4, '2024-07-01', 2, 2, 'BOOKED',    TRUE, '需要兒童座椅'),
-(5, '2024-07-15', 3, 2, 'BOOKED',    TRUE, '慶生，請協助準備蠟燭');
+(1, '2024-06-01', 1, 1, 'FINISHED', TRUE, '素食需求一位'),       -- 11:00
+(2, '2024-06-10', 5, 1, 'FINISHED', TRUE, '不吃海鮮'),          -- 18:00
+(3, '2024-06-15', 2, 2, 'FINISHED', TRUE, NULL),               -- 11:30
+(4, '2024-07-01', 3, 2, 'BOOKED',   TRUE, '需要兒童座椅'),       -- 12:00
+(5, '2024-07-15', 6, 2, 'BOOKED',   TRUE, '慶生，請協助準備蠟燭'); -- 18:30
 
+-- 餐廳評論
 INSERT INTO RESTAURANT_REVIEW (MEMBER_ID, RESERVATION_ID, REVIEW_CONTENT, REVIEW_STARS) VALUES
 (1, 1, '食物非常美味，服務態度親切，環境舒適，下次還會再來！',  5),
 (2, 2, '整體不錯，但等待時間稍長，希望能改善出餐速度。',       3),
 (3, 3, '菜色豐富，擺盤精緻，價格合理，非常推薦！',            4),
 (4, 4, '服務生非常熱情，特別協助安排了驚喜，感謝！',           5),
-(5, 5, '口味偏重，建議可以提供輕食選項，但整體環境很好。',     4);
+(5, 5, '口味偏重，建議可以提供輕食選項，但整個環境很好。',     4);

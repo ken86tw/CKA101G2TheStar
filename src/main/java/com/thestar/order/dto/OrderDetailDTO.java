@@ -6,6 +6,7 @@ public class OrderDetailDTO {
     private Integer QTY;
     private Integer roomPrice;
     private Integer subtotal;
+    private Integer discountedSubtotal;
 
     public OrderDetailDTO() {
     }
@@ -40,5 +41,13 @@ public class OrderDetailDTO {
 
     public void setSubtotal(Integer subtotal) {
         this.subtotal = subtotal;
+    }
+
+    public Integer getDiscountedSubtotal() {
+        return discountedSubtotal;
+    }
+
+    public void setDiscountedSubtotal(Integer discountedSubtotal) {
+        this.discountedSubtotal = discountedSubtotal;
     }
 }

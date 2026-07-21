@@ -50,9 +50,7 @@
                         <td>{{ o.checkInDate }}</td>
                         <td>{{ o.checkOutDate }}</td>
                         <td><span class="money">${{ (o.totalAmount - o.discountAmount).toLocaleString()
-                            }}</span>
-                            <span v-if="o.discountAmount>0" class="strike">${{ o.totalAmount.toLocaleString()
-                                }}</span></td>
+                            }}</span></td>
                         <td>
                             <div class="actions">
                                 <button class="btn line sm" @click="toggleDetail(orders,o.orderId,'member')">
@@ -76,6 +74,7 @@
                                     <th>每晚</th>
                                     <th>數量</th>
                                     <th>小計</th>
+                                    <th v-if="o.discountAmount>0">折後</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -84,6 +83,7 @@
                                     <td>${{ d.roomPrice.toLocaleString() }}</td>
                                     <td>×{{ d.QTY }}</td>
                                     <td class="money">${{ d.subtotal.toLocaleString() }}</td>
+                                    <td v-if="o.discountAmount>0" class="money">${{ d.discountedSubtotal.toLocaleString() }}</td>
                                 </tr>
                                 </tbody>
                             </table>

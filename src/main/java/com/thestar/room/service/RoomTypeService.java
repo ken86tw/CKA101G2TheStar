@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.thestar.room.entity.RoomTypeVO;
+import com.thestar.room.repository.RoomInventoryRepository;
 import com.thestar.room.repository.RoomRepository;
 import com.thestar.room.repository.RoomTypePhotoRepository;
 import com.thestar.room.repository.RoomTypeRepository;
@@ -19,10 +20,10 @@ import com.thestar.stayrecord.repository.StayRecordRepository;
 public class RoomTypeService {
 
 	// 自動注入
-	@Autowired 
+	@Autowired
 	private RoomRepository roomRepository;
 
-	@Autowired 
+	@Autowired
 	private RoomTypeRepository repository;
 
 	@Autowired
@@ -30,6 +31,9 @@ public class RoomTypeService {
 
 	@Autowired
 	private StayRecordRepository stayRecordRepository;
+
+	@Autowired
+	private RoomInventoryRepository roomInventoryRepository;
 
 	// 查詢所有房型
 	public List<RoomTypeVO> getAllRoomTypes() {
@@ -109,6 +113,12 @@ public class RoomTypeService {
 	public void deleteRoomType(Integer id) {
 		if (!repository.existsById(id)) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "刪除失敗：找不到該房型 (ID: " + id + ")");
+		}
+
+		// --- 修正點：直接使用 roomInventoryRepository 檢查 ---
+		// 傳入 id 與當前日期，確保檢查的是未來庫存
+		if (roomInventoryRepository.existsByRoomTypeIdAndDate(id, java.time.LocalDate.now())) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "無法刪除：該房型已有未來庫存排程，請先清空庫存！");
 		}
 
 		// [強化檢查] 檢查房間實體

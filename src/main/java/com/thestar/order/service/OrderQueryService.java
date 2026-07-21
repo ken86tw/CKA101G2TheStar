@@ -66,10 +66,17 @@ public class OrderQueryService {
     @Transactional(readOnly = true)
     public List<OrderDetailDTO> findOrderDetail(Integer orderId) {
 
-        List<OrderListVO> orderList = orderRepository.findById(orderId).orElseThrow().getOrderList();
+        OrderVO order = orderRepository.findById(orderId).orElseThrow();
+        List<OrderListVO> orderList = order.getOrderList();
         List<OrderDetailDTO> dtoList = new ArrayList<>();
 
-        for (OrderListVO list : orderList) {
+        int gross = order.getTotalAmount() == null ? 0 : order.getTotalAmount();
+        int discount = order.getDiscountAmount() == null ? 0 : order.getDiscountAmount();
+        int net = gross - discount;
+        int allocated = 0;
+
+        for (int i = 0; i < orderList.size(); i++) {
+            OrderListVO list = orderList.get(i);
             OrderDetailDTO dto = new OrderDetailDTO();
             Integer roomTypeId = list.getRoomTypeId();
             RoomTypeVO room = roomTypeRepository.findById(roomTypeId).orElseThrow();
@@ -78,6 +85,17 @@ public class OrderQueryService {
             dto.setQTY(list.getQuantity());
             dto.setSubtotal(list.getSubtotal());
             dto.setRoomPrice(list.getRoomPrice());
+
+            int discountedSubtotal;
+            if (gross <= 0) {
+                discountedSubtotal = list.getSubtotal();
+            } else if (i < orderList.size() - 1) {
+                discountedSubtotal = Math.round((float) list.getSubtotal() * net / gross);
+                allocated += discountedSubtotal;
+            } else {
+                discountedSubtotal = net - allocated;
+            }
+            dto.setDiscountedSubtotal(discountedSubtotal);
 
             dtoList.add(dto);
         }
