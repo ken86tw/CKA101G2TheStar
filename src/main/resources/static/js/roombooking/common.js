@@ -66,10 +66,11 @@ RB.common = {
         payLeftOf(o) {
             if (!o || !o.createdTime) return null;
             // createdTime是後端給的字串 new Date()解析成時間再取毫秒數
-            const deadline = new Date(o.createdTime).getTime() + 200 * 1000;
+            // 前端用180秒(整三分鐘),比後端200秒短:確保前端一定先歸零,不會出現「前端還在倒數但後端已取消」的競態
+            const deadline = new Date(o.createdTime).getTime() + 180 * 1000;
             return Math.max(0, Math.floor((deadline - this.nowTick) / 1000)); // 到期停在0 不顯示負數
         },
-        // 秒數轉 mm:ss 例如 200 → 3:20
+        // 秒數轉 mm:ss 例如 180 → 3:00
         mmss(sec) {
             const m = Math.floor(sec / 60);
             const s = String(sec % 60).padStart(2, '0'); // 不足兩位補0 避免顯示 3:5
