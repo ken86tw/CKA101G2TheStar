@@ -6,9 +6,29 @@
     <div class="main-content">
         <div th:replace="~{admin/restaurant/common_sidebar :: topbar('餐廳營業時段配置')}"></div>
         <div class="page-body">
-            <div class="card p-4">
+            
+            <!-- ========================================================================= -->
+            <!-- 錯誤與成功訊息動態提示區塊 (由 Controller RedirectAttributes 帶入) -->
+            <!-- ========================================================================= -->
+            <div th:if="${errorMsg}" class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                <span th:text="${errorMsg}">錯誤訊息說明</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            
+            <div th:if="${successMsg}" class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                <i class="fa-solid fa-circle-check me-2"></i>
+                <span th:text="${successMsg}">成功訊息說明</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <!-- ========================================================================= -->
+            
+            <!-- ========================================================================= -->
+            <!-- 區塊一：上架中時段 (isAvailable == true) -->
+            <!-- ========================================================================= -->
+            <div class="card p-4 mb-4 border-top border-success border-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="m-0 fw-bold"><i class="fa-solid fa-clock me-2"></i>營業時段列表</h5>
+                    <h5 class="m-0 fw-bold text-success"><i class="fa-solid fa-circle-check me-2"></i>上架中時段</h5>
                     <a href="/admin/restaurant/businesshours/addPage" class="btn btn-primary"><i class="fa-solid fa-plus me-1"></i>新增時段</a>
                 </div>
                 <table class="table table-striped table-bordered align-middle">
@@ -17,25 +37,65 @@
                             <th>時段流水號 (Session ID)</th>
                             <th>開始時間 (Start)</th>
                             <th>結束時間 (End)</th>
-                            <th width="180">操作</th>
+                            <th width="200">操作</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="bh : ${bhList}">
+                        <!-- 篩選上架的資料 -->
+                        <tr th:each="bh : ${bhList}" th:if="${bh.isAvailable}">
                             <td th:text="${bh.sessionId}">1</td>
                             <td class="text-success fw-bold" th:text="${bh.startTime}">11:30:00</td>
                             <td class="text-danger fw-bold" th:text="${bh.endTime}">14:00:00</td>
                             <td>
-                                <a th:href="@{/admin/restaurant/businesshours/editPage(sessionId=${bh.sessionId})}" class="btn btn-warning btn-sm"><i class="fa-solid fa-pen"></i> 修改</a>
-                                <form th:action="@{/admin/restaurant/businesshours/delete}" method="post" style="display:inline;" onsubmit="return confirm('確定要刪除此營業時段嗎？');">
+                                <!-- 下架按鈕 -->
+                                <form th:action="@{/admin/restaurant/businesshours/offShelf}" method="post" style="display:inline;">
                                     <input type="hidden" name="sessionId" th:value="${bh.sessionId}">
-                                    <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> 刪除</button>
+                                    <button type="submit" class="btn btn-warning btn-sm"><i class="fa-solid fa-arrow-down"></i> 下架</button>
                                 </form>
+                                <!-- 刪除按鈕 -->
+
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+
+            <!-- ========================================================================= -->
+            <!-- 區塊二：已下架時段 (isAvailable == false) -->
+            <!-- ========================================================================= -->
+            <div class="card p-4 border-top border-secondary border-4 bg-light">
+                <div class="mb-3">
+                    <h5 class="m-0 fw-bold text-secondary"><i class="fa-solid fa-eye-slash me-2"></i>已下架時段</h5>
+                </div>
+                <table class="table table-striped table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>時段流水號 (Session ID)</th>
+                            <th>開始時間 (Start)</th>
+                            <th>結束時間 (End)</th>
+                            <th width="200">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 篩選下架的資料 -->
+                        <tr th:each="bh : ${bhList}" th:if="${!bh.isAvailable}">
+                            <td th:text="${bh.sessionId}">2</td>
+                            <td class="text-muted fw-bold" th:text="${bh.startTime}">18:00:00</td>
+                            <td class="text-muted fw-bold" th:text="${bh.endTime}">21:00:00</td>
+                            <td>
+                                <!-- 上架按鈕 -->
+                                <form th:action="@{/admin/restaurant/businesshours/onShelf}" method="post" style="display:inline;">
+                                    <input type="hidden" name="sessionId" th:value="${bh.sessionId}">
+                                    <button type="submit" class="btn btn-success btn-sm"><i class="fa-solid fa-arrow-up"></i> 上架</button>
+                                </form>
+                                <!-- 刪除按鈕（已放回） -->
+        
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
         </div>
     </div>
 </body>

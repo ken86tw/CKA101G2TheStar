@@ -14,7 +14,8 @@ import com.thestar.restaurant.entity.RestaurantReservationVO;
 public interface RestaurantReservationRepository extends JpaRepository<RestaurantReservationVO, Integer> {
 
     // 1. 查詢某會員的所有訂位紀錄（透過物件內的 memberId 屬性查詢）
-    @Query("from RestaurantReservationVO r where r.memberVO.memberId = ?1 order by r.date desc")
+	// 寫法一：完全以「編號越大越上面」為主（最推薦，最符合最新訂位在最上面的直覺）
+    @Query("from RestaurantReservationVO r where r.memberVO.memberId = ?1 order by r.reservationId desc")
     List<RestaurantReservationVO> findByMemberId(Integer memberId);
 
     // 2. 查詢某會員特定狀態的訂位

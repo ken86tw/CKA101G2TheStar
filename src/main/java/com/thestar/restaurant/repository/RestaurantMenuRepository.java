@@ -1,6 +1,7 @@
 package com.thestar.restaurant.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -24,6 +25,8 @@ public interface RestaurantMenuRepository extends JpaRepository<RestaurantMenuVO
     @Query("from RestaurantMenuVO order by menuCategoryVO.sortOrder, sortOrder")
     List<RestaurantMenuVO> findAllOrderByCategoryAndSort();
 
+    Optional<RestaurantMenuVO> findByMenuCategoryVO_CategoryIdAndSortOrder(Integer categoryId, Integer sortOrder);
+    
     // 刪除某分類下的所有餐點（刪分類前先清餐點）
     @Transactional
     @Modifying

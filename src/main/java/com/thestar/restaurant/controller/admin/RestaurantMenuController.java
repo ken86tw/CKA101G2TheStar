@@ -71,25 +71,48 @@ public class RestaurantMenuController {
     }
 
     // 儲存餐點
+ // 儲存餐點
     @PostMapping("/save")
     public String save(@Valid @ModelAttribute("restaurantMenuVO") RestaurantMenuVO menuVO, 
                        BindingResult result, 
                        @RequestParam("itemImageFile") MultipartFile file, 
                        Model model) {
         
+        // 1. 檢查同一分類下的排序是否重疊（改由呼叫 Service 方法）
+        if (menuVO.getMenuCategoryVO() != null && menuVO.getMenuCategoryVO().getCategoryId() != null && menuVO.getSortOrder() != null) {
+            
+            RestaurantMenuVO existingMenu = menuService.getByCategoryIdAndSortOrder(
+                menuVO.getMenuCategoryVO().getCategoryId(), 
+                menuVO.getSortOrder()
+            );
+            
+            // 如果有找到相同排序的餐點
+            if (existingMenu != null) {
+                // 情境一：新增時發現有人佔用排序 (menuVO.getItemId() == null)
+                // 情境二：修改時發現「別人」佔用了這個排序 (itemId 不同)
+                if (menuVO.getItemId() == null || !existingMenu.getItemId().equals(menuVO.getItemId())) {
+                    result.rejectValue("sortOrder", "error.sortOrder", "此分類下已存在相同的排序項目：" + existingMenu.getItemName() + " (排序:" + existingMenu.getSortOrder() + ")");
+                }
+            }
+        }
+        
+        // 2. 統一由原本的 Validation 檢查（包含我們剛才加進去的 sortOrder 錯誤）
         if (result.hasErrors()) {
             model.addAttribute("categoryList", categoryService.getAll());
+            if (menuVO.getItemId() != null) {
+                RestaurantMenuVO originalMenu = menuService.getOneRestaurantMenu(menuVO.getItemId());
+                if (originalMenu != null) {
+                    menuVO.setItemImage(originalMenu.getItemImage());
+                }
+            }
             return menuVO.getItemId() == null ? "admin/restaurant/menu/add" : "admin/restaurant/menu/edit";
         }
         
         try {
             if (file != null && !file.isEmpty()) {
-                // 情境一：使用者有上傳新圖片，將新圖片寫入
                 menuVO.setItemImage(file.getBytes());
             } else {
-                // 情境二：使用者沒有上傳圖片（可能保留原圖，或新上架時就沒傳圖）
                 if (menuVO.getItemId() != null) {
-                    // 若是「修改」且「沒上傳新圖」，撈出資料庫原有的舊圖重新塞回，避免被 null 覆蓋
                     RestaurantMenuVO originalMenu = menuService.getOneRestaurantMenu(menuVO.getItemId());
                     if (originalMenu != null) {
                         menuVO.setItemImage(originalMenu.getItemImage());
@@ -103,7 +126,6 @@ public class RestaurantMenuController {
             return menuVO.getItemId() == null ? "admin/restaurant/menu/add" : "admin/restaurant/menu/edit";
         }
         
-        // 呼叫原本的 addRestaurantMenu（本質是 repository.save，會自動依據有無 itemId 來進行 Insert 或 Update）
         menuService.addRestaurantMenu(menuVO);
         return "redirect:/admin/restaurant/menu/list";
     }

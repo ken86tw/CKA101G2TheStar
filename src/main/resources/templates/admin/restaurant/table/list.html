@@ -33,12 +33,7 @@
                                     <i class="fa-solid fa-pen"></i> 修改
                                 </a>
                                 
-                                <form th:action="@{/admin/restaurant/table/delete}" method="post" style="display:inline;" onsubmit="return confirm('確定要刪除嗎？');">
-                                    <input type="hidden" name="tableType" th:value="${table.tableTypeId}">
-                                    <button type="submit" class="btn btn-danger btn-sm">
-                                        <i class="fa-solid fa-trash"></i> 刪除
-                                    </button>
-                                </form>
+
                             </td>
                         </tr>
                     </tbody>

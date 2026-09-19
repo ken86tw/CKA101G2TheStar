@@ -109,27 +109,35 @@ public class RestaurantBookingController {
 		return "user/restaurant/booking/add";
 	}
 
-	// 👈 修正 1：清除本區塊所有看不見的隱形空白字元，現在 @RequestParam 能夠被正常解析了
 	@GetMapping("/api/session-status")
 	@ResponseBody
 	public List<SessionStatusDTO> getSessionStatus(@RequestParam("guests") int guests,
 			@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 
-		List<BusinessHoursVO> allSessions = businessHoursService.getAll();
-
+		// 1. 撈出該日期與人數下，符合「有資料」且「還有空桌」的時段紀錄
 		List<AvailableTableVO> availableTables = availableTableService.getAvailableSessionsByDateAndGuests(date,
 				guests);
 
-		java.util.Set<Integer> availableSessionIds = availableTables.stream().map(table -> table.getId().getSessionId())
-				.collect(Collectors.toSet());
-
-		return allSessions.stream().map(session -> {
-			boolean isAvailable = availableSessionIds.contains(session.getSessionId());
-			return new SessionStatusDTO(session.getSessionId(), session.getStartTime(), session.getEndTime(),
-					isAvailable);
-		}).collect(Collectors.toList());
-	}
-
+		// 2. 直接用這群符合條件的資料轉成 DTO 回傳（沒資料、沒空桌的自然就不會被抓到，也不會回傳）
+		return availableTables.stream()
+				.map(table -> {
+					// 透過關聯的 businessHoursVO 拿到時段與時間資訊
+					BusinessHoursVO session = table.getBusinessHoursVO();
+					
+					// 因為能被這個服務撈出來的都是有空桌的，所以 isAvailable 直接給 true
+					return new SessionStatusDTO(
+							session.getSessionId(), 
+							session.getStartTime(), 
+							session.getEndTime(),
+							true
+					);
+				}).collect(Collectors.toList());
+	}	
+	
+	
+	
+	
+	
 	@PostMapping("/submit")
 	public String submitBooking(@ModelAttribute("reservationVO") RestaurantReservationVO reservationVO,
 			BindingResult result, @RequestParam("guests") int guests, Model model,

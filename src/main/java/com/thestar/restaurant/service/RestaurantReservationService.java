@@ -57,7 +57,7 @@ public class RestaurantReservationService {
 
 	// 查某會員的所有訂位
 	public List<RestaurantReservationVO> getByMemberId(Integer memberId) {
-		return repository.findByMemberId(memberId);
+		return repository.findByMemberId(memberId); 
 	}
 
 	// 查某天所有訂位（後台當日總覽）

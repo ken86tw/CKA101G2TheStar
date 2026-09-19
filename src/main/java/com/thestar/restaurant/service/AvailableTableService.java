@@ -130,47 +130,47 @@ public class AvailableTableService {
      */
     @Transactional
     public void initializeMonthlyTables() {
-        LocalDate today = LocalDate.now(); // 👈 取得今天的 LocalDate
+        LocalDate today = LocalDate.now(); 
+        // 1. 撈出所有營業時段（包含上架與下架）
         List<BusinessHoursVO> businessHours = businessHoursRepository.findAll();
         
+        // 2. 提早查出桌況配置（避免放在雙重迴圈內重複查詢，提升效能）
+        Integer largeTableCount = restaurantTableRepository.findById(1)
+                .orElseThrow(() -> new RuntimeException("找不到該桌況資料"))
+                .getTableTypeCount();    
         
+        Integer smallTableCount = restaurantTableRepository.findById(2)
+                .orElseThrow(() -> new RuntimeException("找不到該桌況資料"))
+                .getTableTypeCount();    
         
+        // 外層迴圈：未來的 31 天
         for (int i = 0; i <= 31; i++) {
-            LocalDate targetDate = today.plusDays(i); // 👈 直接加天數，一行搞定！
+            LocalDate targetDate = today.plusDays(i); 
             
-            for (int sessionId = 1; sessionId <= businessHours.size(); sessionId++) {
+            // 內層迴圈：改為直接遍歷營業時段物件
+            for (BusinessHoursVO bhVO : businessHours) {
+                
+                // === 核心修改：如果該時段狀態是下架 (false) 或為 null，就不初始化該筆資料，直接跳過 ===
+                if (bhVO.getIsAvailable() == null || !bhVO.getIsAvailable()) {
+                    continue; 
+                }
+                
+                Integer sessionId = bhVO.getSessionId();
                 AvailableTableId id = new AvailableTableId(targetDate, sessionId);
                 boolean exists = repository.existsById(id);
                 
+                // 如果該日期的該時段還沒有初始化過，才新增
                 if (!exists) {
-                	
                     AvailableTableVO newTable = new AvailableTableVO();
                     newTable.setId(id); 
                     
-                    BusinessHoursVO bhVO = businessHoursRepository.findById(sessionId).orElse(null);
+                    // 這裡可以直接使用外層迴圈帶進來的 bhVO，不需再重新 findById(sessionId)
+                    newTable.setBusinessHoursVO(bhVO);
+                    newTable.setLargeTableCount(largeTableCount);  
+                    newTable.setSmallTableCount(smallTableCount);  
                     
-                    Integer largeTableCount = restaurantTableRepository.findById(1)
-                    	    .orElseThrow(() -> new RuntimeException("找不到該桌況資料"))
-                    	    .getTableTypeCount();    
-                    
-                    Integer smallTableCount = restaurantTableRepository.findById(2)
-                    	    .orElseThrow(() -> new RuntimeException("找不到該桌況資料"))
-                    	    .getTableTypeCount();    
-                    
-                    
-                    
-                    if (bhVO != null) {
-                        newTable.setBusinessHoursVO(bhVO);
-                        newTable.setLargeTableCount(largeTableCount);  
-                        newTable.setSmallTableCount(smallTableCount);  
-                        
-                        
-                        repository.save(newTable);
-                    } else {
-                        System.out.println("警告：找不到 SESSION_ID = " + sessionId + " 的營業時間設定，跳過初始化。");
-                    }
+                    repository.save(newTable);
                 }
             }
         }
-    }
-}
+    }}

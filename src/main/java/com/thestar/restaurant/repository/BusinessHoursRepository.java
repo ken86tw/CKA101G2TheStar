@@ -18,4 +18,6 @@ public interface BusinessHoursRepository extends JpaRepository<BusinessHoursVO, 
     // 依開始時間排序取得所有時段
     @Query("from BusinessHoursVO order	 by startTime")
     List<BusinessHoursVO> findAllOrderByStartTime();
+    
+    int countByStartTimeAndEndTime(java.sql.Time startTime, java.sql.Time endTime);
 }

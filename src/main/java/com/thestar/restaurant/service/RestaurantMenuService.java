@@ -52,4 +52,9 @@ public class RestaurantMenuService {
     public void deleteByCategory(Integer categoryId) {
         repository.deleteByCategoryId(categoryId);
     }
+    
+    public RestaurantMenuVO getByCategoryIdAndSortOrder(Integer categoryId, Integer sortOrder) {
+        return repository.findByMenuCategoryVO_CategoryIdAndSortOrder(categoryId, sortOrder)
+                         .orElse(null);
+    }
 }

@@ -19,6 +19,9 @@ public class BusinessHoursVO implements Serializable {
     private Integer sessionId;
     private Time startTime;
     private Time endTime;
+    
+    // === 新增：上架/下架狀態屬性 ===
+    private Boolean isAvailable; 
 
     @Id
     @Column(name = "SESSION_ID")
@@ -46,5 +49,19 @@ public class BusinessHoursVO implements Serializable {
     }
     public void setEndTime(Time endTime) {
         this.endTime = endTime;
+    }
+
+    /*
+     * =========================================================================
+     * 新增：上架狀態控制 (TRUE = 上架中 / FALSE = 已下架)
+     * =========================================================================
+     */
+    @Column(name = "IS_AVAILABLE")
+    @NotNull(message = "上架狀態：請勿空白")
+    public Boolean getIsAvailable() {
+        return isAvailable;
+    }
+    public void setIsAvailable(Boolean isAvailable) {
+        this.isAvailable = isAvailable;
     }
 }

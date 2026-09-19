@@ -47,9 +47,14 @@
             </div>
         </div>
         
+        <!-- 3. 排序欄位：加入動態錯誤樣式與阻擋訊息提示 -->
         <div class="mb-3">
             <label class="form-label">前台顯示排序編號:</label>
-            <input type="number" th:field="*{sortOrder}" class="form-control" value="10" required>
+            <input type="number" th:field="*{sortOrder}" 
+                   th:classappend="${#fields.hasErrors('sortOrder')} ? 'is-invalid' : ''" 
+                   class="form-control" required>
+            <!-- 當 Controller 拋出排序重複錯誤時，會動態顯示在這裡 -->
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('sortOrder')}" th:errors="*{sortOrder}"></div>
         </div>
         
         <button type="submit" class="btn btn-success">確認上架</button>
